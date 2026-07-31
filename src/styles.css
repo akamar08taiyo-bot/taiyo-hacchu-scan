@@ -1,0 +1,4017 @@
+:root {
+  font-family: "Segoe UI", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+  color: #182331;
+  background: #eef2f5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* Standalone販売受注簿版: 売上伝票切替UIは別アプリへ分離。 */
+.integratedShell > .integratedTabs,
+.integratedShell > .salesVoucherFrameWrap,
+.integratedShell .salesVoucherFrameWrap {
+  display: none !important;
+}
+
+.integratedShell {
+  display: block !important;
+}
+
+/* 2026-07-04 final readability pass */
+.orderEntrySheet,
+.orderEntrySheet input,
+.orderEntrySheet select,
+.orderEntrySheet textarea,
+.orderEntrySheet .printValue,
+.entryProductTable th,
+.entryProductTable td,
+.management dt,
+.management dd {
+  color: #07111f !important;
+}
+
+.orderEntrySheet input,
+.orderEntrySheet select,
+.orderEntrySheet textarea {
+  font-weight: 700;
+}
+
+.entryProductTable th:nth-child(5),
+.entryProductTable th:nth-child(7),
+.entryProductTable th:nth-child(8) {
+  white-space: nowrap !important;
+  line-height: 1.05 !important;
+  vertical-align: middle !important;
+}
+
+.entryProductTable th br {
+  display: none !important;
+}
+
+.entryProductTable td:nth-child(5),
+.entryProductTable td:nth-child(7),
+.entryProductTable td:nth-child(8),
+.moneyCell,
+.moneyCell input,
+.moneyCell .printValue {
+  font-weight: 400 !important;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .entryProductTable th:nth-child(5),
+  .entryProductTable th:nth-child(7),
+  .entryProductTable th:nth-child(8) {
+    white-space: nowrap !important;
+    line-height: 1.03 !important;
+    vertical-align: middle !important;
+  }
+
+  .entryProductTable th br {
+    display: none !important;
+  }
+
+  .entryProductTable td:nth-child(5),
+  .entryProductTable td:nth-child(7),
+  .entryProductTable td:nth-child(8),
+  .moneyCell,
+  .moneyCell .printValue {
+    font-weight: 400 !important;
+  }
+}
+
+/* Keep the live order-entry controls intact, but make captured/printed sheets
+   behave like a clean form: the title is centered and screen-only controls
+   do not leave an empty grid column behind. */
+.pdfCaptureMode .orderTitleWithAdd {
+  display: block !important;
+  text-align: center !important;
+  margin: 4px 0 12px !important;
+}
+
+.pdfCaptureMode .orderTitleWithAdd .orderTitleSpacer {
+  display: none !important;
+}
+
+.pdfCaptureMode .orderTitleWithAdd h2 {
+  margin: 0 !important;
+  text-align: center !important;
+}
+
+@media print {
+  .orderTitleWithAdd {
+    display: block !important;
+    text-align: center !important;
+    margin: 4px 0 12px !important;
+  }
+
+  .orderTitleWithAdd .orderTitleSpacer,
+  .orderTitleWithAdd .multiPageNav,
+  .orderTitleWithAdd .addProductNearTitle {
+    display: none !important;
+  }
+
+  .orderTitleWithAdd h2 {
+    margin: 0 !important;
+    text-align: center !important;
+  }
+
+  .orderEntryPanel {
+    overflow: visible !important;
+  }
+
+  .orderEntrySheet {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* 2026-07-01: readability and table balance refinements */
+.orderEntrySheet,
+.orderEntrySheet input,
+.orderEntrySheet select,
+.orderEntrySheet textarea,
+.orderEntrySheet .printValue,
+.entryProductTable th,
+.entryProductTable td,
+.management dt,
+.management dd {
+  color: #071522;
+}
+
+.orderEntrySheet input,
+.orderEntrySheet select,
+.orderEntrySheet textarea {
+  font-weight: 650;
+}
+
+.entryProductTable th {
+  white-space: nowrap;
+  line-height: 1.08;
+  vertical-align: middle;
+}
+
+.officeMasterBox {
+  border-color: #d6a94d;
+  background: #fffdf7;
+}
+
+.officeSelectBox {
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid #d6a94d;
+  border-radius: 10px;
+  background: #fff8e5;
+  font-weight: 800;
+}
+
+.officeSelectBox select,
+.defaultOfficeSelect select,
+.officeFieldGrid input {
+  width: 100%;
+  border: 1px solid #cfd8e3;
+  border-radius: 7px;
+  padding: 8px 10px;
+  background: #fff;
+  color: #071522;
+}
+
+.officeSelectBox select {
+  border-color: #d6a94d;
+}
+
+.officeFieldGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.officeFieldGrid label,
+.defaultOfficeSelect {
+  display: grid;
+  gap: 5px;
+  color: #243447;
+  font-weight: 750;
+}
+
+.smallButton {
+  width: fit-content;
+  margin-top: 9px;
+  padding: 7px 12px;
+}
+
+
+.entryProductTable td,
+.entryProductTable td input,
+.entryProductTable td .printValue {
+  vertical-align: middle;
+  line-height: 1.16;
+}
+
+.moneyCell,
+.moneyCell input,
+.moneyCell .printValue,
+.entryProductTable td:nth-child(5),
+.entryProductTable td:nth-child(7),
+.entryProductTable td:nth-child(8) {
+  font-weight: 400 !important;
+}
+
+.productNameBlock textarea,
+.productNameBlock .printValue {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media print {
+  .entryProductTable th {
+    white-space: nowrap !important;
+    line-height: 1.05 !important;
+    vertical-align: middle !important;
+  }
+
+  .entryProductTable th br {
+    display: none !important;
+  }
+
+  .entryProductTable td:nth-child(5),
+  .entryProductTable td:nth-child(7),
+  .entryProductTable td:nth-child(8),
+  .moneyCell,
+  .moneyCell .printValue {
+    font-weight: 400 !important;
+  }
+
+  .productNameBlock .printValue {
+    font-size: 9pt !important;
+    line-height: 1.12 !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+/* final overrides: keep order/print tables readable after earlier print rules */
+.orderEntrySheet,
+.orderEntrySheet input,
+.orderEntrySheet select,
+.orderEntrySheet textarea,
+.orderEntrySheet .printValue,
+.entryProductTable th,
+.entryProductTable td,
+.management dt,
+.management dd {
+  color: #071522;
+}
+
+.entryProductTable th {
+  white-space: nowrap;
+  line-height: 1.08;
+  vertical-align: middle;
+}
+
+.moneyCell,
+.moneyCell input,
+.moneyCell .printValue,
+.entryProductTable td:nth-child(5),
+.entryProductTable td:nth-child(7),
+.entryProductTable td:nth-child(8) {
+  font-weight: 400 !important;
+}
+
+@media print {
+  .entryProductTable th {
+    white-space: nowrap !important;
+    line-height: 1.05 !important;
+    vertical-align: middle !important;
+  }
+
+  .entryProductTable th br {
+    display: none !important;
+  }
+
+  .entryProductTable td:nth-child(5),
+  .entryProductTable td:nth-child(7),
+  .entryProductTable td:nth-child(8),
+  .moneyCell,
+  .moneyCell .printValue {
+    font-weight: 400 !important;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.integratedShell {
+  min-height: 100vh;
+  background: #eef2f5;
+}
+
+.integratedTabs {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid #d7e1ea;
+  box-shadow: 0 6px 18px rgba(15, 45, 70, 0.08);
+}
+
+.integratedTabs button {
+  min-height: 42px;
+  border-radius: 10px;
+  padding: 0 18px;
+  border: 1px solid #b9c8d6;
+  background: #ffffff;
+  color: #102033;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.integratedTabs button.active {
+  background: linear-gradient(180deg, #1769aa 0%, #0d4f8b 100%);
+  border-color: #0d4f8b;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(13, 79, 139, 0.2);
+}
+
+.integratedTabs .scanResetButton {
+  margin-left: auto;
+  border-color: #f0b7b7;
+  background: #fff8f8;
+  color: #b42318;
+}
+
+.integratedTabs .scanResetButton:hover {
+  background: #fff1f1;
+  border-color: #e78a8a;
+}
+
+.scanMount {
+  width: 100%;
+}
+
+.salesVoucherFrameWrap {
+  height: calc(100vh - 64px);
+  padding: 12px;
+  background: #eef2f5;
+}
+
+.salesVoucherNotice {
+  margin-bottom: 8px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.salesVoucherFrame {
+  width: 100%;
+  height: calc(100% - 30px);
+  border: 1px solid #b9c8d6;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 12px 26px rgba(15, 45, 70, 0.1);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    linear-gradient(180deg, #f7f9fb 0%, #eef2f5 56%, #e9eef2 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: 1px solid #c9d3dc;
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9fb 100%);
+  color: #1d2c3b;
+  border-radius: 8px;
+  min-height: 36px;
+  padding: 0 13px;
+  cursor: pointer;
+  font-weight: 750;
+  box-shadow: 0 1px 2px rgba(30, 45, 60, 0.06);
+}
+
+button:hover {
+  background: #f0f6f8;
+  border-color: #aebdc9;
+}
+
+.primary {
+  background: linear-gradient(180deg, #1769aa 0%, #0d4f8b 100%);
+  border-color: #0d4f8b;
+  color: #ffffff;
+}
+
+.softPrimary {
+  background: linear-gradient(180deg, #2b78b8 0%, #155f9c 100%);
+  border-color: #155f9c;
+}
+
+.app {
+  min-height: 100vh;
+  padding-bottom: 34px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 13px 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid #d9e1e8;
+  box-shadow: 0 8px 24px rgba(35, 50, 65, 0.06);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.logoMark {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0d4f8b, #2b78b8);
+  color: #ffffff;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.brand p,
+.panelHead p {
+  margin: 3px 0 0;
+  color: #667789;
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+}
+
+.topProfitAlerts {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 46px;
+  margin-left: 2px;
+}
+
+.profitAlert {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 5px 9px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.profitAlert.profitError {
+  color: #9d1c16;
+  background: #fff0ef;
+  border: 1px solid #df8c86;
+}
+
+.profitAlert.profitWarning {
+  color: #825500;
+  background: #fff8e6;
+  border: 1px solid #e0b35c;
+}
+
+.actions button,
+.actions .primary,
+.actions .softPrimary {
+  min-height: 46px;
+  min-width: 84px;
+  padding: 0 18px;
+  border: 1.5px solid #a8bfd3;
+  border-radius: 11px;
+  background: linear-gradient(180deg, #ffffff 0%, #f1f6fa 100%);
+  color: #132b42;
+  font-size: 16px;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  box-shadow: 0 3px 7px rgba(30, 63, 91, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.actions button:hover,
+.actions .primary:hover,
+.actions .softPrimary:hover {
+  background: linear-gradient(180deg, #f9fdff 0%, #dcecf8 100%);
+  border-color: #5b91bc;
+  color: #0b4f86;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 10px rgba(30, 63, 91, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.actions button:active,
+.actions .primary:active,
+.actions .softPrimary:active {
+  transform: translateY(0);
+  box-shadow: inset 0 2px 4px rgba(30, 45, 60, 0.16);
+}
+
+.actions button:focus-visible,
+.catalogVersionTabs button:focus-visible {
+  outline: 3px solid rgba(45, 132, 206, 0.34);
+  outline-offset: 2px;
+}
+
+.actions .primary {
+  background: linear-gradient(180deg, #1769aa 0%, #0d4f8b 100%);
+  border-color: #0d4f8b;
+  color: #fff;
+  box-shadow: 0 4px 9px rgba(13, 79, 139, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.actions .primary:hover {
+  background: linear-gradient(180deg, #2580c4 0%, #12639e 100%);
+  border-color: #0a477d;
+  color: #fff;
+}
+
+.actions .softPrimary {
+  background: linear-gradient(180deg, #eaf5ff 0%, #cfe7f9 100%);
+  border-color: #73a9d0;
+  color: #0b4f86;
+}
+
+.actions .softPrimary:hover {
+  background: linear-gradient(180deg, #f2faff 0%, #bfe0f5 100%);
+  border-color: #3d81b5;
+}
+
+.hidden {
+  display: none;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(390px, 1.05fr) minmax(420px, 1.25fr);
+  gap: 10px;
+  padding: 8px;
+  align-items: stretch;
+  min-height: calc(100vh - 96px);
+}
+
+.workspace.twoColumn {
+  grid-template-columns: minmax(320px, 0.72fr) minmax(500px, 1.28fr);
+}
+
+.orderEntryPanel {
+  overflow: auto;
+}
+
+.orderEntrySheet {
+  margin: 4px;
+  padding: 9px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
+  border: 1px solid #aebbc6;
+  border-top: 5px solid #1769aa;
+  border-radius: 10px;
+  color: #111827;
+  min-width: 820px;
+  min-height: calc(100vh - 128px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 30px rgba(24, 35, 49, 0.08);
+}
+
+.orderEntrySheet h2 {
+  text-align: center;
+  margin: 8px 0 16px;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+.orderTitleWithAdd {
+  display: grid;
+  grid-template-columns: 1fr auto auto 1fr;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 12px;
+}
+
+.orderTitleWithAdd h2 {
+  margin: 0;
+}
+
+.addProductNearTitle {
+  justify-self: end;
+  padding: 9px 14px;
+  border: 1px solid #8fb2ce;
+  border-radius: 8px;
+  background: #eef6fb;
+  color: #0d4f8b;
+  font-weight: 850;
+  box-shadow: 0 2px 5px rgba(30, 45, 60, 0.09);
+}
+
+.addProductNearTitle:hover {
+  background: #e1f0fa;
+  border-color: #1769aa;
+}
+
+.multiPageNav {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid #c4d8ea;
+  border-radius: 999px;
+  background: #f4f8fc;
+}
+
+.multiPageNav button {
+  min-width: 50px;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: #27577d;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.multiPageNav button:hover {
+  background: #e3f0fa;
+}
+
+.multiPageNav button.active {
+  background: #1769aa;
+  color: #ffffff;
+  border-color: #0d4f8b;
+}
+
+@media print {
+  .multiPageNav {
+    display: none !important;
+  }
+}
+
+.sheetActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sheetDateInput {
+  display: flex;
+  justify-content: center;
+}
+
+.entryGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-top: 1px solid #718291;
+  border-left: 1px solid #718291;
+  align-items: stretch;
+  background: #ffffff;
+}
+
+.entryGridPrimary {
+  grid-template-columns: 0.74fr 0.82fr 0.72fr 0.9fr 1.05fr 0.95fr 0.95fr 0.98fr;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+}
+
+.entryGridCustomer {
+  grid-template-columns: 1fr 1fr 2.25fr 0.75fr;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.entryGridSecondary {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin-top: 8px;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+.entryGrid .sheetCell input,
+.entryGrid .sheetCell select,
+.entryProductTable input,
+.entryProductTable textarea,
+.entryBottom input,
+.entryBottom select {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #111827;
+  min-height: 25px;
+  padding: 2px 4px;
+  box-shadow: none;
+  font-size: 12.5px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.orderEntrySheet .sheetCell {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+}
+
+.orderEntrySheet .sheetCell b,
+.orderEntrySheet .sheetCell label,
+.orderEntrySheet .sheetCell span,
+.receiptCheck span {
+  border: 0;
+  border-bottom: 0;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.orderEntrySheet .sheetCell b,
+.orderEntrySheet .sheetCell span,
+.orderEntrySheet .sheetCell label,
+.orderEntrySheet .sheetCell input,
+.orderEntrySheet .sheetCell select,
+.orderEntrySheet .sheetCell textarea,
+.orderEntrySheet th,
+.orderEntrySheet td,
+.orderEntrySheet dt,
+.orderEntrySheet dd,
+.orderEntrySheet .printValue,
+.management h3 {
+  text-align: center;
+}
+
+.orderEntrySheet th,
+.orderEntrySheet td,
+.management h3,
+.management dt,
+.management dd,
+.productNameBlock b {
+  vertical-align: middle;
+}
+
+.management h3,
+.management dt,
+.management dd,
+.productNameBlock b {
+  display: grid;
+  place-items: center;
+}
+
+.printValue {
+  display: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.orderTypeChecks {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 28px;
+}
+
+.orderTypeChecks label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.orderTypeChecks input {
+  width: auto !important;
+  min-height: auto !important;
+}
+
+.receiptCheck {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 28px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.receiptCheck input {
+  width: auto !important;
+  min-height: auto !important;
+}
+
+.productNameBlock {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  border: 1px solid #718291;
+  border-bottom: 0;
+  margin-top: 9px;
+  min-height: 42px;
+  background: #ffffff;
+}
+
+.productNameBlock b {
+  display: grid;
+  place-items: center;
+  background: #eaf4ff;
+  border-right: 1px solid #718291;
+  color: #0d3f73;
+  font-size: 13px;
+}
+
+.productNameBlock textarea {
+  border: 0;
+  resize: vertical;
+  min-height: 40px;
+  padding: 11px 8px 4px;
+  font-size: 14px;
+  line-height: 1.18;
+  font-weight: 700;
+  align-self: center;
+}
+
+.productNameBlock .manualProductMetaInput {
+  width: calc(100% - 16px);
+  min-height: 30px;
+  margin: 4px 8px;
+  border: 1px solid #9db8d2;
+  border-radius: 5px;
+  padding: 5px 7px;
+  background: #fff;
+  color: #122b45;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.productNameBlock .manualProductMetaInput:focus,
+.compactProductTable .manualAmountInput:focus {
+  border-color: #1769aa;
+  outline: 3px solid rgba(23, 105, 170, .16);
+  background: #f8fcff;
+}
+
+.compactProductTable .manualAmountInput {
+  border-color: #9db8d2;
+  background: #fff;
+}
+
+.productPriceNoteLabel {
+  border-top: 1px solid #718291;
+}
+
+.productPriceNote {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  min-height: 30px;
+  border-top: 1px solid #718291;
+  padding: 4px 8px;
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #25384d;
+  background: #fbfdff;
+}
+
+.productPriceNote .manualProductPriceInput {
+  width: 112px;
+  min-height: 27px;
+  margin: 0 4px;
+  padding: 4px 7px;
+  border: 1px solid #9db8d2;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #122b45;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.productPriceNote .manualProductPriceInput:focus {
+  border-color: #1769aa;
+  outline: 3px solid rgba(23, 105, 170, .16);
+  background: #f8fcff;
+}
+
+@media (max-width: 980px) {
+  .productPriceNote .manualProductPriceInput {
+    width: 92px;
+  }
+}
+
+.entryProductTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0;
+  table-layout: fixed;
+}
+
+.entryProductTable th,
+.entryProductTable td {
+  border: 1px solid #718291;
+  padding: 2px 4px;
+  font-size: 12.5px;
+  line-height: 1.15;
+  vertical-align: top;
+  min-height: 30px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.entryProductTable th {
+  background: #eaf4ff;
+  color: #0d3f73;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.entryProductTable input,
+.entryProductTable select {
+  font-size: 12.5px;
+  min-height: 22px;
+  padding: 1px 4px;
+  line-height: 1.15;
+}
+
+.entryProductTable th:nth-child(2),
+.entryProductTable td:nth-child(2) {
+  width: 9%;
+}
+
+.entryProductTable th:nth-child(3),
+.entryProductTable td:nth-child(3) {
+  width: 13%;
+}
+
+.entryProductTable th:nth-child(4),
+.entryProductTable td:nth-child(4) {
+  width: 18%;
+}
+
+.entryProductTable th:nth-child(1),
+.entryProductTable td:nth-child(1) {
+  width: 8%;
+}
+
+.entryProductTable th:nth-child(5),
+.entryProductTable td:nth-child(5) {
+  width: 5%;
+}
+
+.entryProductTable th:nth-child(6),
+.entryProductTable td:nth-child(6) {
+  width: 5%;
+}
+
+.entryProductTable th:nth-child(7),
+.entryProductTable td:nth-child(7) {
+  width: 12%;
+}
+
+.entryProductTable th:nth-child(8),
+.entryProductTable td:nth-child(8) {
+  width: 30%;
+}
+
+.compactProductTable th:nth-child(1),
+.compactProductTable td:nth-child(1) {
+  width: 9%;
+}
+
+.compactProductTable th:nth-child(2),
+.compactProductTable td:nth-child(2) {
+  width: 10%;
+}
+
+.compactProductTable th:nth-child(3),
+.compactProductTable td:nth-child(3) {
+  width: 17%;
+}
+
+.compactProductTable th:nth-child(4),
+.compactProductTable td:nth-child(4) {
+  width: 18%;
+}
+
+.compactProductTable th:nth-child(5),
+.compactProductTable td:nth-child(5) {
+  width: 10%;
+}
+
+.compactProductTable th:nth-child(6),
+.compactProductTable td:nth-child(6) {
+  width: 7%;
+}
+
+.compactProductTable th:nth-child(7),
+.compactProductTable td:nth-child(7) {
+  width: 14%;
+}
+
+.compactProductTable th:nth-child(8),
+.compactProductTable td:nth-child(8) {
+  width: 15%;
+}
+
+.compactProductTable td {
+  min-height: 34px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.compactProductTable .printValue {
+  text-align: center;
+}
+
+.entryProductTable textarea {
+  resize: vertical;
+  min-height: 30px;
+  padding: 1px 4px;
+  line-height: 1.15;
+}
+
+.moneyCell {
+  text-align: center;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.entryBottom {
+  display: grid;
+  grid-template-columns: minmax(520px, 1fr) minmax(360px, 0.55fr);
+  gap: 10px;
+  margin-top: 10px;
+  align-items: stretch;
+  flex: 1;
+  min-height: 220px;
+}
+
+.mailBox {
+  border: 1px solid #333;
+  padding: 10px;
+  font-size: 12px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.mailBox label {
+  display: grid;
+  gap: 4px;
+  font-weight: 800;
+}
+
+.mailBox p {
+  margin: 0;
+  word-break: break-word;
+  color: #526575;
+}
+
+.orderAttachedImage {
+  border-color: #718291;
+  border-radius: 6px;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  background: #ffffff;
+  align-self: stretch;
+}
+
+.orderAttachedImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.panel,
+.previewShell {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #d8e0e7;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(26, 41, 56, 0.07);
+}
+
+.workspace.twoColumn > .panel {
+  min-height: calc(100vh - 118px);
+}
+
+.imagePanel {
+  display: flex;
+  flex-direction: column;
+}
+
+.panelHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid #e5ebf0;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+}
+
+.panelHead h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #e8f2ff;
+  color: #0d4f8b;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.imagePasteArea {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 240px);
+  gap: 10px;
+  margin: 12px;
+  align-items: stretch;
+}
+
+.imagePasteArea.usageAbove {
+  grid-template-columns: 1fr;
+}
+
+.imagePanel {
+  container-type: inline-size;
+}
+
+.dropZone {
+  margin: 0;
+  min-height: 285px;
+  aspect-ratio: 16 / 10;
+  max-height: none;
+  flex: 1;
+  border: 1px dashed #aebdcc;
+  border-radius: 8px;
+  background: #f8fafb;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+}
+
+.usageGuide {
+  border: 1px solid #c7d8e5;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.46fr) minmax(260px, 0.54fr);
+  align-items: start;
+  gap: 10px 12px;
+  color: #314456;
+}
+
+.usageGuide h3 {
+  margin: 0;
+  color: #0d4f8b;
+  font-size: 15px;
+  grid-column: 1 / -1;
+}
+
+.usageGuide img {
+  width: 100%;
+  max-height: 178px;
+  object-fit: contain;
+  border: 1px solid #d8e2e8;
+  border-radius: 6px;
+  background: #f8fafb;
+  grid-column: 2;
+  grid-row: 2 / span 3;
+  align-self: start;
+}
+
+.usageGuide .catalogVersionTabs {
+  grid-column: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.usageGuide .catalogVersionTabs button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+@container (max-width: 650px) {
+  .usageGuide {
+    grid-template-columns: 1fr;
+  }
+
+  .usageGuide img,
+  .usageGuide .catalogVersionTabs {
+    grid-column: 1;
+  }
+
+  .usageGuide img {
+    grid-row: auto;
+  }
+}
+
+.usageGuide p,
+.usageGuide li {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.usageGuide ol {
+  margin: 0;
+  padding-left: 1.3em;
+  display: grid;
+  gap: 3px;
+}
+
+.dropZone img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.emptyImage {
+  display: grid;
+  gap: 6px;
+  text-align: center;
+  color: #6c7b88;
+  line-height: 1.38;
+  padding: 16px;
+  max-width: 560px;
+}
+
+.emptyImage strong {
+  color: #223040;
+  font-size: 18px;
+}
+
+.emptyImage span {
+  font-size: 12.5px;
+}
+
+.cropFrame {
+  position: absolute;
+  inset: 24px;
+  border: 2px solid rgba(23, 105, 170, 0.5);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.imageToolbar {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px 10px;
+}
+
+.imageToolbar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.imageList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+
+.imageThumb {
+  display: grid;
+  gap: 5px;
+  border: 1px solid #d4dee7;
+  border-radius: 8px;
+  padding: 5px;
+  background: #ffffff;
+}
+
+.imageThumb.active {
+  border-color: #1769aa;
+  box-shadow: 0 0 0 2px rgba(23, 105, 170, 0.14);
+}
+
+.imageThumb > button:first-child {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px;
+  padding: 0;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+}
+
+.imageThumb img {
+  grid-column: 1 / -1;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 5px;
+  background: #eef2f5;
+}
+
+.imageThumb span,
+.imageThumb em {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.imageThumb span {
+  font-weight: 900;
+}
+
+.imageThumb em {
+  justify-self: end;
+  font-style: normal;
+  color: #607284;
+}
+
+.thumbDelete {
+  min-height: 28px;
+  padding: 0 8px;
+  font-size: 11px;
+  color: #b42318;
+}
+
+.scanSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+
+.progressTrack {
+  height: 7px;
+  margin: 0 12px 10px;
+  border-radius: 999px;
+  background: #e3e9ef;
+  overflow: hidden;
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #1769aa, #4f9de8);
+  transition: width 180ms ease;
+}
+
+.ocrText {
+  margin: 0 12px 12px;
+  border: 1px solid #d7e0e7;
+  border-radius: 8px;
+  background: #fbfcfd;
+}
+
+.ocrText summary {
+  cursor: pointer;
+  padding: 9px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #334253;
+}
+
+.ocrText pre {
+  margin: 0;
+  max-height: 160px;
+  overflow: auto;
+  border-top: 1px solid #e3e9ef;
+  padding: 10px;
+  white-space: pre-wrap;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.scanSummary span,
+.field em {
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.ok {
+  background: #e8f6ef;
+  color: #177245;
+}
+
+.warn,
+.candidate em {
+  background: #fff2c5;
+  color: #8a5f00;
+}
+
+.danger,
+.required em {
+  background: #ffe3e3;
+  color: #b42318;
+}
+
+.formPanel {
+  max-height: calc(100vh - 92px);
+  overflow: auto;
+}
+
+.formGroup {
+  border: 0;
+  margin: 0;
+  padding: 12px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.formGroup legend {
+  padding: 0 0 8px;
+  font-weight: 900;
+  color: #26394c;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.field {
+  display: grid;
+  gap: 5px;
+  position: relative;
+}
+
+.field.wide {
+  grid-column: 1 / -1;
+}
+
+.field span,
+.noteBox span {
+  font-size: 12px;
+  color: #5a6b7d;
+  font-weight: 800;
+}
+
+.field input,
+.field select,
+.noteBox textarea {
+  width: 100%;
+  border: 1px solid #cbd5de;
+  border-radius: 7px;
+  min-height: 36px;
+  padding: 7px 9px;
+  background: #ffffff;
+  color: #172331;
+  box-shadow: inset 0 1px 2px rgba(20, 35, 50, 0.03);
+}
+
+.field input:focus,
+.field select:focus,
+.noteBox textarea:focus {
+  border-color: #267887;
+  box-shadow: 0 0 0 3px rgba(38, 120, 135, 0.12);
+  outline: none;
+}
+
+.candidate input,
+.candidate select {
+  border-color: #d7a900;
+  background: #fffaf0;
+}
+
+.required input,
+.required strong {
+  border-color: #d92d20;
+  background: #fff7f7;
+}
+
+.field em {
+  position: absolute;
+  right: 6px;
+  top: 24px;
+}
+
+.readOnly strong {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #d7e0e7;
+  border-radius: 7px;
+  padding: 7px 9px;
+  background: #f7f9fb;
+}
+
+.previewPlaceholder {
+  min-height: 520px;
+  margin: 12px;
+  border: 1px dashed #b8c5cf;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.86), rgba(247,249,251,0.92));
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #526575;
+}
+
+.previewPlaceholder h2 {
+  margin: 0 0 8px;
+  color: #213345;
+  font-size: 18px;
+}
+
+.previewPlaceholder p {
+  margin: 0 0 16px;
+  font-size: 13px;
+}
+
+.noteBox {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+}
+
+.noteBox textarea {
+  min-height: 78px;
+  resize: vertical;
+}
+
+.settingsNumberGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pricingChoiceGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pricingChoice {
+  border: 1px solid #cbd5de;
+  border-radius: 10px;
+  background: #f8fbfd;
+}
+
+.pricingChoice.active {
+  border-color: #1b6aa8;
+  background: #eef7ff;
+  box-shadow: inset 0 0 0 1px rgba(27, 106, 168, 0.22);
+}
+
+.pricingChoice span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #0f416d;
+  font-weight: 900;
+}
+
+.pricingChoice input[type="radio"] {
+  width: 16px;
+  height: 16px;
+}
+
+.pricingChoice em {
+  color: #526575;
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.settingsNumberGrid .noteBox select,
+.settingsNumberGrid .noteBox input {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid #cbd5de;
+  border-radius: 7px;
+  padding: 7px 9px;
+  background: #ffffff;
+  color: #172331;
+  text-align: center;
+  font-weight: 800;
+}
+
+.masterListBox {
+  margin: 12px;
+  padding: 12px;
+  border: 1px solid #d5e1ec;
+  border-radius: 10px;
+  background: #f8fbfe;
+  display: grid;
+  gap: 10px;
+}
+
+.masterListBox h3 {
+  margin: 0;
+  color: #0d4f8b;
+  font-size: 14px;
+}
+
+.externalAiSettingsBox {
+  border-color: #b9d4ec;
+  background: #f5faff;
+}
+
+.externalAiToggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #c8d9e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #123a5c;
+  font-weight: 900;
+}
+
+.externalAiToggle input {
+  width: 18px;
+  height: 18px;
+}
+
+.externalAiWarning {
+  margin: 0;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: #fff8e7;
+  color: #704b00;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.externalAiGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.externalAiGrid label {
+  display: grid;
+  gap: 5px;
+  color: #23445f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.externalAiGrid input,
+.externalAiGrid select {
+  min-height: 36px;
+  border: 1px solid #cbd5de;
+  border-radius: 7px;
+  padding: 7px 9px;
+  background: #ffffff;
+  color: #172331;
+}
+
+.externalAiKeyField {
+  grid-column: 1 / -1;
+}
+
+.masterItems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-height: 32px;
+  align-items: center;
+}
+
+.masterItems em {
+  color: #718196;
+  font-size: 12px;
+}
+
+.masterItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 7px 6px 10px;
+  border: 1px solid #bdd3e5;
+  border-radius: 999px;
+  background: #fff;
+  color: #16324f;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.masterItem button {
+  min-height: 24px;
+  padding: 0 7px;
+  border-radius: 999px;
+  color: #b42318;
+  font-size: 11px;
+}
+
+.masterAddRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.masterAddRow input {
+  min-height: 36px;
+  border: 1px solid #cbd5de;
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: #fff;
+}
+
+.masterHelp {
+  margin: 0;
+  color: #5d7186;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.branchOfficeText {
+  width: 100%;
+  min-height: 118px;
+  border: 1px solid #cbd5de;
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: #fff;
+  resize: vertical;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.defaultOfficeSelect {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.defaultOfficeSelect span {
+  color: #0d4f8b;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.defaultOfficeSelect input {
+  min-height: 36px;
+  border: 1px solid #cbd5de;
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: #fff;
+}
+
+.previewToggle {
+  display: none;
+  margin: 12px;
+}
+
+.orderSheet {
+  background: #ffffff;
+  margin: 12px;
+  padding: 14px;
+  border: 1px solid #1f2933;
+  color: #111827;
+  aspect-ratio: 1.414 / 1;
+  min-height: 520px;
+  position: relative;
+  font-family: "Yu Gothic", "Yu Gothic UI", Meiryo, sans-serif;
+}
+
+.orderSheet h2 {
+  text-align: center;
+  margin: 8px 0 16px;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+.sheetDate {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.sheetGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-top: 1px solid #333;
+  border-left: 1px solid #333;
+}
+
+.sheetCell {
+  min-height: 39px;
+  border-right: 1px solid #333;
+  border-bottom: 1px solid #333;
+  padding: 3px 4px;
+  display: grid;
+  gap: 2px;
+  align-content: start;
+}
+
+.sheetCell.span {
+  grid-column: span 2;
+}
+
+.sheetCell b,
+.productTable th {
+  font-size: 10px;
+  background: #f4f6f7;
+  margin: -4px -4px 0;
+  padding: 3px;
+  border-bottom: 1px solid #333;
+}
+
+.sheetCell span {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.productTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+  table-layout: fixed;
+}
+
+.productTable th,
+.productTable td {
+  border: 1px solid #333;
+  padding: 5px;
+  font-size: 11px;
+  vertical-align: top;
+  height: 42px;
+  word-break: break-word;
+}
+
+.productTable th:first-child {
+  width: 24%;
+}
+
+.sheetBottom {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 12px;
+  margin-top: 14px;
+  min-height: 180px;
+}
+
+.management {
+  border: 1px solid #333;
+  height: 100%;
+}
+
+.management h3 {
+  margin: 0;
+  padding: 5px;
+  background: #f0f2f3;
+  border-bottom: 1px solid #333;
+  font-size: 12px;
+}
+
+.management dl {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 0;
+}
+
+.management div {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  border-right: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+
+.management dt,
+.management dd {
+  margin: 0;
+  padding: 5px;
+  font-size: 11px;
+}
+
+.management dt {
+  background: #fafafa;
+  border-right: 1px solid #333;
+}
+
+.management .managementTotalRow dt,
+.management .managementTotalRow dd {
+  background: #edf7ff;
+  font-weight: 800;
+}
+
+.management dl > div:nth-child(5) dt,
+.management dl > div:nth-child(5) dd {
+  background: #edf7ff;
+  font-weight: 800;
+}
+
+.management dl > div:nth-child(1) dd,
+.management dl > div:nth-child(2) dd,
+.management dl > div:nth-child(3) dd,
+.management dl > div:nth-child(5) dd {
+  text-align: center;
+}
+
+.management dl > div:nth-child(1) input,
+.management dl > div:nth-child(2) input,
+.management dl > div:nth-child(3) input,
+.management dl > div:nth-child(5) input {
+  text-align: center;
+}
+
+.sheetImage {
+  border: 1px solid #333;
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.sheetImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.sheetImage span {
+  font-size: 13px;
+  color: #777;
+}
+
+.sheetImage.orderAttachedImage {
+  min-height: 100%;
+  max-height: none;
+  align-self: stretch;
+}
+
+.sheetCompany {
+  position: absolute;
+  right: 14px;
+  bottom: 8px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.companyName {
+  position: fixed;
+  right: 14px;
+  bottom: 8px;
+  color: #4d6173;
+  font-size: 12px;
+  font-weight: 900;
+  z-index: 4;
+}
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 25, 36, 0.42);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  overflow: auto;
+  padding: 24px;
+}
+
+.drawerPanel {
+  width: min(760px, calc(100vw - 48px));
+  background: #ffffff;
+  height: auto;
+  max-height: calc(100dvh - 48px);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid #d7e0e7;
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(17, 32, 45, 0.28);
+  padding-bottom: max(18px, env(safe-area-inset-bottom));
+}
+
+.drawerPanel .panelHead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  border-radius: 18px 18px 0 0;
+}
+
+.wideButton {
+  margin: 12px;
+  width: calc(100% - 24px);
+}
+
+@media (max-width: 980px) {
+  .workspace {
+    grid-template-columns: minmax(290px, 0.9fr) minmax(390px, 1.1fr);
+  }
+
+  .workspace.twoColumn {
+    grid-template-columns: 1fr;
+  }
+
+  .imagePasteArea {
+    grid-template-columns: 1fr;
+  }
+
+  .usageGuide {
+    grid-template-columns: 1fr;
+  }
+
+  .usageGuide img {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .orderEntryPanel {
+    grid-column: 1 / -1;
+  }
+
+  .previewToggle {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .previewShell:not(.open) .orderSheet {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    position: static;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .brand {
+    min-width: 0;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .topProfitAlerts {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .profitAlert {
+    white-space: normal;
+  }
+
+  .actions button {
+    flex: 1 1 30%;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+    padding: 8px;
+  }
+
+  .formPanel {
+    max-height: none;
+  }
+
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .dropZone {
+    min-height: 180px;
+    aspect-ratio: 16 / 10;
+  }
+
+  .orderSheet {
+    min-width: 820px;
+    min-height: 580px;
+  }
+
+  .previewShell {
+    overflow-x: auto;
+  }
+
+  .drawer {
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .drawerPanel {
+    width: 100%;
+    max-height: calc(100dvh - 20px);
+    border-radius: 14px;
+  }
+
+  .drawerPanel .panelHead {
+    border-radius: 14px 14px 0 0;
+  }
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  .topbar,
+  .imagePanel,
+  .previewToggle,
+  .noPrint,
+  .companyName,
+  .drawer {
+    display: none !important;
+  }
+
+  .app {
+    padding: 0;
+  }
+
+  .workspace,
+  .orderEntryPanel {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: #ffffff;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .orderEntrySheet {
+    margin: 0;
+    width: 100%;
+    min-width: 0;
+    min-height: auto;
+    max-height: 202mm;
+    display: block;
+    aspect-ratio: auto;
+    border: 1px solid #6b7f8f;
+    border-top: 3px solid #1769aa;
+    border-radius: 2mm;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    overflow: hidden;
+    padding: 3mm;
+    color: #182331;
+  }
+
+  .orderEntrySheet input,
+  .orderEntrySheet select,
+  .orderEntrySheet textarea {
+    appearance: none;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    resize: none;
+    color: #111827;
+  }
+
+  .productNameBlock textarea,
+  .sheetDateInput input,
+  .entryGrid input[type="date"],
+  .entryProductTable input,
+  .entryProductTable select,
+  .entryProductTable textarea {
+    display: none !important;
+  }
+
+  .orderTypeChecks label {
+    display: none !important;
+  }
+
+  .orderTypeChecks {
+    justify-content: center;
+    min-height: auto;
+  }
+
+  .receiptCheck {
+    min-height: auto;
+    font-size: 10.5pt;
+    line-height: 1.25;
+  }
+
+  .receiptCheck input {
+    display: inline-block !important;
+    appearance: auto !important;
+    width: 3.5mm !important;
+    height: 3.5mm !important;
+    margin: 0 1mm 0 0 !important;
+  }
+
+  .printValue {
+    display: block !important;
+    font-size: 9.2pt;
+    line-height: 1.2;
+  }
+
+  .productNameBlock {
+    min-height: 10mm;
+    grid-template-columns: 20mm 1fr;
+    border-color: #6b7f8f;
+  }
+
+  .productNameBlock b {
+    font-size: 9.2pt;
+    background: #eaf4ff;
+    color: #0d3f73;
+  }
+
+  .productNameBlock .printValue {
+    padding: 1mm 1.6mm;
+    font-size: 10.5pt;
+    line-height: 1.12;
+    font-weight: 700;
+    text-align: left !important;
+    justify-items: start !important;
+  }
+
+  .productPriceNote {
+    min-height: 5.5mm;
+    padding: 0.8mm 1.6mm;
+    font-size: 8.8pt;
+    line-height: 1.1;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    border-color: #6b7f8f;
+    background: #fbfdff;
+    color: #111827;
+    justify-content: flex-start;
+  }
+
+  /* 印刷時は入力用の分割表示を隠し、印刷用の一行だけを表示する。
+     これにより「商品代金 定価」の表示が二重になって重なるのを防ぐ。 */
+  .productPriceNote > span,
+  .productPriceNote > input {
+    display: none !important;
+  }
+
+  .productPriceNote > .printValue {
+    display: block !important;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left !important;
+  }
+
+  .entryProductTable textarea {
+    min-height: 10mm;
+  }
+
+  .entryProductTable th,
+  .entryProductTable td {
+    font-size: 7.6pt;
+    line-height: 1.08;
+    padding: 0.6mm;
+    border-color: #6b7f8f;
+    text-align: center !important;
+    vertical-align: middle !important;
+  }
+
+  .entryProductTable td:nth-child(7),
+  .entryProductTable td:nth-child(8) {
+    text-align: center !important;
+    font-weight: 800;
+  }
+
+  .entryBottom {
+    grid-template-columns: 1fr 86mm;
+    gap: 2mm;
+    margin-top: 2mm;
+    align-items: stretch;
+    min-height: 42mm;
+    max-height: 60mm;
+  }
+
+  .orderAttachedImage {
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    break-inside: avoid;
+  }
+
+  .orderAttachedImage img {
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .entryProductTable th,
+  .entryGrid .sheetCell b,
+  .management h3,
+  .management dt {
+    background: #eaf4ff !important;
+    color: #0d3f73;
+  }
+
+  .entryGrid {
+    border-color: #6b7f8f;
+  }
+
+  .entryGrid .sheetCell {
+    min-height: 7.2mm;
+    padding: 0.55mm;
+    gap: 0.4mm;
+    align-content: center;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .entryGridPrimary .sheetCell:nth-child(6),
+  .entryGridPrimary .sheetCell:nth-child(7),
+  .entryGridPrimary .sheetCell:nth-child(8),
+  .entryGridSecondary .sheetCell:nth-child(5) {
+    align-content: start;
+  }
+
+  .entryGridPrimary .sheetCell:nth-child(6) .printValue,
+  .entryGridPrimary .sheetCell:nth-child(7) .printValue,
+  .entryGridPrimary .sheetCell:nth-child(8) .printValue,
+  .entryGridSecondary .sheetCell:nth-child(5) .printValue {
+    min-height: 4.5mm;
+  }
+
+  .sheetCell,
+  .management,
+  .management div,
+  .management dt {
+    border-color: #6b7f8f;
+  }
+
+  .orderEntrySheet h2 {
+    color: #0d4f8b;
+    letter-spacing: 0.08em;
+    margin: 1mm 0 2mm;
+    font-size: 13.5pt;
+  }
+
+  .orderEntrySheet b,
+  .orderEntrySheet span,
+  .orderEntrySheet dt,
+  .orderEntrySheet dd,
+  .orderEntrySheet th,
+  .orderEntrySheet td,
+  .orderEntrySheet .printValue,
+  .management h3 {
+    text-align: center !important;
+  }
+
+  .entryGrid .sheetCell b,
+  .entryGrid .sheetCell label,
+  .entryGrid .sheetCell span,
+  .receiptCheck span {
+    border: 0 !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+  }
+
+  .entryGrid .sheetCell b {
+    display: grid !important;
+    place-items: center;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 0 0.4mm !important;
+    line-height: 1.1;
+  }
+
+  .entryGrid .sheetCell .printValue,
+  .entryGrid .sheetCell > span,
+  .receiptCheck {
+    display: flex !important;
+    place-items: center;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 4.2mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.15;
+  }
+
+  .productNameBlock b,
+  .receiptCheck,
+  .management h3 {
+    display: grid !important;
+    place-items: center;
+  }
+
+  .productNameBlock .printValue {
+    display: grid !important;
+    align-items: center;
+    justify-items: start;
+    place-items: center start;
+    min-height: 100%;
+  }
+
+  .management dt,
+  .management dd {
+    display: grid;
+    place-items: center;
+    font-size: 8pt;
+    line-height: 1.08;
+    padding: 0.55mm;
+  }
+
+  .management {
+    height: auto;
+  }
+
+  .management .managementTotalRow dt,
+  .management .managementTotalRow dd {
+    background: #eef7ff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .management dl > div:nth-child(5) dt,
+  .management dl > div:nth-child(5) dd {
+    background: #eef7ff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .management h3 {
+    font-size: 8.5pt;
+    line-height: 1.1;
+    padding: 0.6mm;
+  }
+
+  @page {
+    size: A4 landscape;
+    margin: 4mm;
+  }
+}
+
+/* 2026-07-04 final override: keep table headers one-line and text dark */
+.orderEntrySheet,
+.orderEntrySheet input,
+.orderEntrySheet select,
+.orderEntrySheet textarea,
+.orderEntrySheet .printValue,
+.entryProductTable th,
+.entryProductTable td,
+.management dt,
+.management dd {
+  color: #07111f !important;
+}
+
+.orderEntrySheet input,
+.orderEntrySheet select,
+.orderEntrySheet textarea {
+  font-weight: 700;
+}
+
+.entryProductTable th:nth-child(5),
+.entryProductTable th:nth-child(7),
+.entryProductTable th:nth-child(8) {
+  white-space: nowrap !important;
+  line-height: 1.05 !important;
+  vertical-align: middle !important;
+}
+
+.entryProductTable th br {
+  display: none !important;
+}
+
+.entryProductTable td:nth-child(5),
+.entryProductTable td:nth-child(7),
+.entryProductTable td:nth-child(8),
+.moneyCell,
+.moneyCell input,
+.moneyCell .printValue {
+  font-weight: 400 !important;
+}
+
+@media print {
+  .entryProductTable th:nth-child(5),
+  .entryProductTable th:nth-child(7),
+  .entryProductTable th:nth-child(8) {
+    white-space: nowrap !important;
+    line-height: 1.03 !important;
+    vertical-align: middle !important;
+  }
+
+  .entryProductTable th br {
+    display: none !important;
+  }
+
+  .entryProductTable td:nth-child(5),
+  .entryProductTable td:nth-child(7),
+  .entryProductTable td:nth-child(8),
+  .moneyCell,
+  .moneyCell .printValue {
+    font-weight: 400 !important;
+  }
+}
+
+/* benefit-mode-blue-layout-2026-07-09 */
+.orderEntrySheet.benefitMode {
+  border-top-color: #147fc1;
+  background: #fbfdff;
+}
+
+.orderEntrySheet.benefitMode .entryGridPrimary,
+.orderEntrySheet.benefitMode .entryGridCustomer,
+.orderEntrySheet.benefitMode .entryGridSecondary,
+.orderEntrySheet.benefitMode .productNameBlock,
+.orderEntrySheet.benefitMode .entryProductTable,
+.orderEntrySheet.benefitMode .management,
+.orderEntrySheet.benefitMode .sheetImage {
+  border-color: #8fbfe2;
+}
+
+.orderEntrySheet.benefitMode .entryGrid .sheetCell b,
+.orderEntrySheet.benefitMode .entryProductTable th,
+.orderEntrySheet.benefitMode .management h3,
+.orderEntrySheet.benefitMode .management dt,
+.orderEntrySheet.benefitMode .productNameBlock > b {
+  background: #e5f4ff !important;
+  color: #0b568f !important;
+}
+
+.orderEntrySheet.benefitMode .entryBottom {
+  grid-template-columns: 1fr;
+  align-items: start;
+  gap: 10px;
+}
+
+.orderEntrySheet.benefitMode .management {
+  background: #fff;
+  border-color: #8fbfe2;
+}
+
+.orderEntrySheet.benefitMode .orderAttachedImage {
+  grid-column: 1;
+  min-height: 150px;
+  height: 150px;
+  max-height: 150px;
+  align-self: auto;
+  border-color: #8fbfe2;
+  background: #f4fbff;
+}
+
+.orderEntrySheet.benefitMode .orderAttachedImage img {
+  object-fit: contain;
+  max-height: 100%;
+}
+
+.benefitPanelBlue {
+  color: #123047;
+}
+
+.benefitPanelBlue input,
+.benefitPanelBlue select,
+.benefitPanelBlue textarea {
+  color: #10243a;
+}
+
+.benefitPanelBlue .benefitChoiceGroup button.active {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .45);
+}
+
+.benefitPanelBlue .benefitCheck input {
+  accent-color: #1280c4;
+}
+
+@media (max-width: 1280px) {
+  .benefitPanelBlue .benefitTopGrid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media print {
+  .orderEntrySheet.benefitMode .entryBottom {
+    grid-template-columns: 1fr 58mm;
+    gap: 2mm;
+    max-height: none;
+  }
+
+  .orderEntrySheet.benefitMode .orderAttachedImage {
+    grid-column: auto;
+    min-height: 42mm;
+    height: 42mm;
+    max-height: 42mm;
+  }
+
+  .benefitPanelBlue {
+    padding: 1.5mm !important;
+    margin-top: 1.2mm !important;
+  }
+
+  .benefitPanelBlue .benefitTopGrid {
+    grid-template-columns: 1fr 1.05fr 1fr !important;
+    gap: 1.5mm !important;
+  }
+}
+
+/* integrated-tabs-dedupe-2026-07-09 */
+.integratedShell .integratedShell > .integratedTabs,
+.app > .integratedTabs,
+main .integratedTabs {
+  display: none !important;
+}
+
+.integratedShell > .integratedTabs {
+  display: flex !important;
+}
+
+/* compact-readable-and-benefit-cleanup-2026-07-09 */
+.orderEntrySheet,
+.orderEntrySheet * {
+  color: #06111f;
+}
+
+.orderEntrySheet input,
+.orderEntrySheet select,
+.orderEntrySheet textarea,
+.orderEntrySheet .printValue {
+  color: #06111f !important;
+  font-weight: 700;
+}
+
+.orderEntrySheet {
+  font-size: 12.5px;
+}
+
+.entryGrid .sheetCell {
+  min-height: 40px;
+}
+
+.entryGrid .sheetCell b,
+.entryProductTable th,
+.management h3,
+.management dt {
+  color: #08375d !important;
+  font-weight: 900;
+}
+
+.entryProductTable th {
+  padding: 5px 6px;
+  font-size: 12px;
+  line-height: 1.05;
+}
+
+.entryProductTable td {
+  height: 34px;
+  padding: 3px 5px;
+  font-size: 12.3px;
+  line-height: 1.15;
+}
+
+.entryProductTable input,
+.entryProductTable select,
+.entryProductTable textarea {
+  min-height: 26px;
+  height: 28px;
+  font-size: 12.3px;
+}
+
+.productNameBlock textarea {
+  min-height: 42px;
+  font-size: 12.8px;
+  font-weight: 800;
+}
+
+.management dt,
+.management dd {
+  min-height: 27px;
+  padding: 3px 5px;
+  font-size: 12px;
+  line-height: 1.08;
+}
+
+.management input,
+.management select {
+  min-height: 26px;
+  height: 28px;
+  font-size: 12px;
+}
+
+.benefitPanelBlue {
+  margin-top: 8px !important;
+  padding: 10px !important;
+  font-size: 12px !important;
+  line-height: 1.18 !important;
+  color: #06111f !important;
+}
+
+.benefitPanelBlue p,
+.benefitPanelBlue b,
+.benefitPanelBlue label,
+.benefitPanelBlue input {
+  color: #06111f !important;
+}
+
+.benefitPanelBlue input {
+  font-weight: 800 !important;
+}
+
+.benefitPanelBlue .benefitTopGrid {
+  gap: 7px !important;
+}
+
+.benefitPanelBlue .benefitChoiceGroup {
+  gap: 4px !important;
+}
+
+.benefitPanelBlue .benefitChoiceGroup button {
+  min-height: 29px !important;
+  padding: 2px 6px !important;
+  font-size: 11.5px !important;
+}
+
+.benefitPanelBlue .benefitChoiceGroup button:not(.active) {
+  color: #06111f !important;
+}
+
+.benefitPanelBlue .benefitChoiceGroup button.active {
+  color: #fff !important;
+}
+
+.benefitPanelBlue .benefitResultGrid > div {
+  padding: 5px 8px !important;
+  font-size: 11.5px !important;
+  line-height: 1.14 !important;
+}
+
+@media print {
+  .orderEntrySheet {
+    font-size: 8pt;
+  }
+
+  .entryGrid .sheetCell {
+    min-height: 8mm;
+  }
+
+  .entryProductTable th,
+  .entryProductTable td {
+    padding: 1.1mm 1.2mm !important;
+    line-height: 1.06 !important;
+  }
+
+  .management dt,
+  .management dd {
+    min-height: 5.8mm;
+    padding: 0.45mm 0.6mm !important;
+  }
+}
+
+
+/* continuation-fixes-2026-07-09 */
+.benefitPanel,
+.benefitPanelBlue {
+  display: none !important;
+}
+
+.orderEntrySheet.benefitMode .benefitPanel,
+.orderEntrySheet.benefitMode .benefitPanelBlue {
+  display: block !important;
+}
+
+.appShell > .integratedTabs,
+.scanApp > .integratedTabs,
+.toolShell > .integratedTabs,
+.scanMount .integratedTabs,
+.scanMount [role="tablist"][aria-label="業務ツール切替"],
+.integratedShell .integratedTabs + .integratedTabs {
+  display: none !important;
+}
+
+.integratedShell > .integratedTabs:first-of-type {
+  display: flex !important;
+}
+
+.sampleGuide,
+.usageSample,
+.howToSample {
+  font-size: 1.06em;
+}
+
+.sampleGuide img,
+.usageSample img,
+.howToSample img {
+  transform: scale(1.04);
+  transform-origin: left center;
+}
+
+.orderEntrySheet,
+.orderEntrySheet * {
+  color: #030b14 !important;
+}
+
+.entryProductTable th:nth-child(5),
+.entryProductTable th:nth-child(7),
+.entryProductTable th:nth-child(8) {
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+}
+
+@media print {
+  .integratedTabs,
+  .integratedShell > .integratedTabs,
+  .appShell > .integratedTabs,
+  .scanApp > .integratedTabs,
+  .toolShell > .integratedTabs {
+    display: none !important;
+  }
+  .benefitPanel,
+  .benefitPanelBlue {
+    display: none !important;
+  }
+}
+
+/* benefit-panel-ui-repair-2026-07-09 */
+.management > .benefitPanel,
+.management > .benefitPanelBlue {
+  display: block !important;
+  grid-column: 1 / -1;
+  width: auto;
+  margin: 12px !important;
+  padding: 14px !important;
+  border: 1px solid #9cccf3 !important;
+  border-radius: 12px !important;
+  background: #f6fbff !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.management > .benefitPanel div,
+.management > .benefitPanelBlue div {
+  display: block;
+  grid-template-columns: none;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+}
+
+.management > .benefitPanel p,
+.management > .benefitPanel b,
+.management > .benefitPanel label,
+.management > .benefitPanel span,
+.management > .benefitPanel button,
+.management > .benefitPanelBlue p,
+.management > .benefitPanelBlue b,
+.management > .benefitPanelBlue label,
+.management > .benefitPanelBlue span,
+.management > .benefitPanelBlue button {
+  writing-mode: horizontal-tb !important;
+  word-break: keep-all;
+  line-break: strict;
+}
+
+.management > .benefitPanel .benefitTopGrid,
+.management > .benefitPanelBlue .benefitTopGrid {
+  display: grid !important;
+  grid-template-columns: minmax(180px, .85fr) minmax(320px, 1.35fr) minmax(300px, 1.1fr) !important;
+  gap: 12px !important;
+  align-items: stretch;
+}
+
+.management > .benefitPanel .benefitChoiceGroup,
+.management > .benefitPanelBlue .benefitChoiceGroup {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.management > .benefitPanel .benefitChoiceGroup button,
+.management > .benefitPanelBlue .benefitChoiceGroup button {
+  min-width: 0;
+  min-height: 38px !important;
+  padding: 6px 8px !important;
+  line-height: 1.25 !important;
+  white-space: normal;
+}
+
+.management > .benefitPanel .benefitCheck,
+.management > .benefitPanelBlue .benefitCheck {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.management > .benefitPanel .benefitResultGrid,
+.management > .benefitPanelBlue .benefitResultGrid {
+  display: grid !important;
+  grid-template-columns: minmax(260px, 1fr) 150px 150px !important;
+}
+
+.orderEntrySheet.benefitMode .entryBottom {
+  grid-template-columns: 1fr !important;
+  gap: 12px !important;
+}
+
+.orderEntrySheet.benefitMode .management {
+  width: 100%;
+  overflow: visible;
+}
+
+.orderEntrySheet.benefitMode .management dl {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.orderEntrySheet.benefitMode .management .benefitPanelBlue {
+  margin: 12px !important;
+  padding: 14px !important;
+  border: 1px solid #9cccf3 !important;
+  border-radius: 12px !important;
+  background: #f6fbff !important;
+  box-shadow: none !important;
+  overflow: visible;
+}
+
+.orderEntrySheet.benefitMode .management .benefitPanelBlue div {
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.orderEntrySheet.benefitMode .management .benefitPanelBlue p,
+.orderEntrySheet.benefitMode .management .benefitPanelBlue b,
+.orderEntrySheet.benefitMode .management .benefitPanelBlue label,
+.orderEntrySheet.benefitMode .management .benefitPanelBlue span {
+  color: #123047 !important;
+  writing-mode: horizontal-tb !important;
+  word-break: keep-all;
+}
+
+.orderEntrySheet.benefitMode .benefitPanelBlue .benefitTopGrid {
+  display: grid !important;
+  grid-template-columns: minmax(190px, .8fr) minmax(360px, 1.4fr) minmax(330px, 1.15fr) !important;
+  gap: 12px !important;
+  align-items: stretch;
+}
+
+.orderEntrySheet.benefitMode .benefitPanelBlue .benefitChoiceGroup {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(82px, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.orderEntrySheet.benefitMode .benefitPanelBlue .benefitChoiceGroup button {
+  min-width: 0;
+  min-height: 38px !important;
+  padding: 6px 8px !important;
+  line-height: 1.25 !important;
+  white-space: normal;
+  writing-mode: horizontal-tb !important;
+}
+
+.orderEntrySheet.benefitMode .benefitPanelBlue .benefitCheck {
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.orderEntrySheet.benefitMode .benefitPanelBlue .benefitResultGrid {
+  display: grid !important;
+  grid-template-columns: minmax(260px, 1fr) 150px 150px !important;
+}
+
+.orderEntrySheet.benefitMode .orderAttachedImage {
+  width: 100%;
+  min-height: 135px;
+  height: 135px;
+  max-height: 135px;
+}
+
+@media (max-width: 1400px) {
+  .management > .benefitPanel .benefitTopGrid,
+  .management > .benefitPanelBlue .benefitTopGrid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .management > .benefitPanel .benefitChoiceGroup,
+  .management > .benefitPanelBlue .benefitChoiceGroup {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)) !important;
+  }
+
+  .orderEntrySheet.benefitMode .management dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .orderEntrySheet.benefitMode .benefitPanelBlue .benefitTopGrid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .orderEntrySheet.benefitMode .benefitPanelBlue .benefitChoiceGroup {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .management > .benefitPanel .benefitResultGrid,
+  .management > .benefitPanelBlue .benefitResultGrid {
+    grid-template-columns: minmax(180px, 1fr) 110px 110px !important;
+  }
+
+  .orderEntrySheet.benefitMode .management dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .orderEntrySheet.benefitMode .benefitPanelBlue .benefitResultGrid {
+    grid-template-columns: minmax(180px, 1fr) 110px 110px !important;
+  }
+}
+
+@media print {
+  .management > .benefitPanel,
+  .management > .benefitPanelBlue {
+    display: block !important;
+    margin: 1.5mm !important;
+    padding: 1.5mm !important;
+    border-radius: 2mm !important;
+    break-inside: avoid;
+  }
+
+  .management > .benefitPanel .benefitTopGrid,
+  .management > .benefitPanelBlue .benefitTopGrid {
+    grid-template-columns: 1fr 1.15fr 1fr !important;
+    gap: 1.4mm !important;
+  }
+
+  .management > .benefitPanel .benefitChoiceGroup button,
+  .management > .benefitPanelBlue .benefitChoiceGroup button {
+    min-height: 6mm !important;
+    padding: .6mm 1mm !important;
+    font-size: 7.8pt !important;
+  }
+
+  .management > .benefitPanel .benefitResultGrid,
+  .management > .benefitPanelBlue .benefitResultGrid {
+    grid-template-columns: minmax(38mm, 1fr) 22mm 22mm !important;
+  }
+
+  .orderEntrySheet.benefitMode .benefitPanel,
+  .orderEntrySheet.benefitMode .benefitPanelBlue {
+    display: block !important;
+  }
+
+  .orderEntrySheet.benefitMode .entryBottom {
+    grid-template-columns: 1fr 58mm !important;
+    gap: 2mm !important;
+  }
+
+  .orderEntrySheet.benefitMode .management dl {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .orderEntrySheet.benefitMode .management .benefitPanelBlue {
+    margin: 1.5mm !important;
+    padding: 1.5mm !important;
+    border-radius: 2mm !important;
+    break-inside: avoid;
+  }
+
+  .orderEntrySheet.benefitMode .benefitPanelBlue .benefitTopGrid {
+    grid-template-columns: 1fr 1.15fr 1fr !important;
+    gap: 1.4mm !important;
+  }
+
+  .orderEntrySheet.benefitMode .benefitPanelBlue .benefitChoiceGroup {
+    gap: 1mm !important;
+  }
+
+  .orderEntrySheet.benefitMode .benefitPanelBlue .benefitChoiceGroup button {
+    min-height: 6mm !important;
+    padding: .6mm 1mm !important;
+    font-size: 7.8pt !important;
+  }
+
+  .orderEntrySheet.benefitMode .benefitPanelBlue .benefitResultGrid {
+    grid-template-columns: minmax(38mm, 1fr) 22mm 22mm !important;
+  }
+}
+
+/* benefit-print-split-2026-07-10 */
+.orderEntrySheet.benefitMode .orderAttachedImage {
+  border: 2px solid #d92f2f !important;
+  background: #fff7f7 !important;
+}
+
+.orderEntrySheet.benefitMode .management > .benefitPanel,
+.orderEntrySheet.benefitMode .management > .benefitPanelBlue {
+  border: 2px solid #2bb8c0 !important;
+  background: #f2feff !important;
+}
+
+@media print {
+  .orderEntrySheet.benefitMode .orderAttachedImage {
+    border: 2px solid #d92f2f !important;
+    background: #fff7f7 !important;
+  }
+
+  .orderEntrySheet.benefitMode .management > .benefitPanel,
+  .orderEntrySheet.benefitMode .management > .benefitPanelBlue {
+    border: 2px solid #2bb8c0 !important;
+    background: #f2feff !important;
+  }
+}
+
+/* benefit-layout-full-width-2026-07-11 */
+.orderEntrySheet.benefitMode .entryBottom {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 36%) !important;
+  grid-template-areas:
+    "managementTitle image"
+    "managementBody image"
+    "benefit benefit" !important;
+  align-items: start !important;
+  column-gap: 10px !important;
+  row-gap: 0 !important;
+}
+
+.orderEntrySheet.benefitMode .management {
+  display: contents !important;
+}
+
+.orderEntrySheet.benefitMode .management > h3 {
+  grid-area: managementTitle !important;
+  width: 100% !important;
+  min-height: 28px !important;
+  margin: 0 !important;
+  border: 1px solid #6f8191 !important;
+  border-bottom: 0 !important;
+  border-radius: 8px 8px 0 0 !important;
+  background: #eaf6ff !important;
+  color: #073b63 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 900 !important;
+}
+
+.orderEntrySheet.benefitMode .management > dl {
+  grid-area: managementBody !important;
+  width: 100% !important;
+  margin: 0 !important;
+  border: 1px solid #6f8191 !important;
+  border-radius: 0 0 8px 8px !important;
+  overflow: hidden !important;
+  background: #fff !important;
+}
+
+.orderEntrySheet.benefitMode .management > .benefitPanel,
+.orderEntrySheet.benefitMode .management > .benefitPanelBlue {
+  grid-area: benefit !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 10px 0 0 !important;
+  box-sizing: border-box !important;
+}
+
+.orderEntrySheet.benefitMode .orderAttachedImage {
+  grid-area: image !important;
+  align-self: start !important;
+  justify-self: stretch !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: 360px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+.orderEntrySheet.benefitMode .orderAttachedImage img {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 360px !important;
+  object-fit: contain !important;
+  object-position: top center !important;
+}
+
+.orderEntrySheet.benefitMode .benefitPanelBlue .benefitTopGrid {
+  grid-template-columns: minmax(170px, .8fr) minmax(360px, 1.35fr) minmax(300px, 1fr) !important;
+}
+
+@media (max-width: 1100px) {
+  .orderEntrySheet.benefitMode .entryBottom {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "managementTitle"
+      "managementBody"
+      "image"
+      "benefit" !important;
+    row-gap: 8px !important;
+  }
+
+  .orderEntrySheet.benefitMode .orderAttachedImage,
+  .orderEntrySheet.benefitMode .orderAttachedImage img {
+    max-height: 260px !important;
+  }
+
+  .orderEntrySheet.benefitMode .benefitPanelBlue .benefitTopGrid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* benefit-layout-state-selector-2026-07-11
+   給付選択時に、JS側のクラス付与に依存せず帳票下部を安定配置する。 */
+.orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .entryBottom {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 36%) !important;
+  grid-template-areas:
+    "managementTitle image"
+    "managementBody image"
+    "benefit benefit" !important;
+  align-items: start !important;
+  column-gap: 10px !important;
+  row-gap: 0 !important;
+}
+
+.orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .management {
+  display: contents !important;
+}
+
+.orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .management > h3 {
+  grid-area: managementTitle !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 28px !important;
+  margin: 0 !important;
+  border: 1px solid #6f8191 !important;
+  border-bottom: 0 !important;
+  border-radius: 8px 8px 0 0 !important;
+  background: #eaf6ff !important;
+  color: #073b63 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 900 !important;
+}
+
+.orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .management > dl {
+  grid-area: managementBody !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  border: 1px solid #6f8191 !important;
+  border-radius: 0 0 8px 8px !important;
+  overflow: hidden !important;
+  background: #fff !important;
+}
+
+.orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .management > .benefitPanel,
+.orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .management > .benefitPanelBlue {
+  display: block !important;
+  grid-area: benefit !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 10px 0 0 !important;
+  box-sizing: border-box !important;
+}
+
+.orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .orderAttachedImage {
+  grid-area: image !important;
+  align-self: start !important;
+  justify-self: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: 360px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+.orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .orderAttachedImage img {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 360px !important;
+  object-fit: contain !important;
+  object-position: top center !important;
+}
+
+.orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .benefitPanelBlue .benefitTopGrid {
+  grid-template-columns: minmax(170px, .8fr) minmax(360px, 1.35fr) minmax(300px, 1fr) !important;
+}
+
+@media (max-width: 1100px) {
+  .orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .entryBottom {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "managementTitle"
+      "managementBody"
+      "image"
+      "benefit" !important;
+    row-gap: 8px !important;
+  }
+
+  .orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .orderAttachedImage,
+  .orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .orderAttachedImage img {
+    max-height: 260px !important;
+  }
+
+  .orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .benefitPanelBlue .benefitTopGrid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* multi-product-order-summary-2026-07-13 */
+.multiPrintPages {
+  display: none;
+}
+
+.multiSummaryPanel {
+  grid-column: 2;
+  /* Keep the summary directly below the right-hand entry sheet even when
+     the image/instructions panel on the left is taller. */
+  grid-row: 1;
+  align-self: start;
+  margin-top: calc(100vh - 92px);
+}
+
+.workspace.twoColumn > .orderEntryPanel:not(.multiSummaryPanel) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.workspace.twoColumn:has(.multiSummaryPanel) > .imagePanel {
+  align-self: start;
+}
+
+.multiSummarySheet {
+  margin-top: 16px;
+}
+
+.multiSummaryHead {
+  display: grid;
+  grid-template-columns: 1.4fr .8fr .8fr;
+  border: 1px solid var(--line);
+  margin: 10px 0;
+}
+
+.multiSummaryHead > div {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  min-height: 40px;
+  border-right: 1px solid var(--line);
+  align-items: center;
+}
+
+.multiSummaryHead > div:last-child {
+  border-right: 0;
+}
+
+.multiSummaryHead b {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: var(--blue-50);
+  color: var(--blue-900);
+  border-right: 1px solid var(--line);
+}
+
+.multiSummaryHead span {
+  padding: 6px 10px;
+  text-align: center;
+}
+
+.multiSummaryTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: 10px;
+}
+
+.multiSummaryTable th,
+.multiSummaryTable td {
+  border: 1px solid var(--line);
+  padding: 7px 6px;
+  text-align: center;
+  vertical-align: middle;
+  color: var(--ink);
+}
+
+.multiSummaryTable th {
+  background: var(--blue-50);
+  color: var(--blue-900);
+  font-weight: 800;
+}
+
+.multiSummaryTable .textLeft {
+  text-align: left;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.multiSummaryTable tfoot th {
+  background: #eaf4ff;
+  font-weight: 900;
+}
+
+.multiManagement {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+}
+
+.multiManagement h3 {
+  margin: 0;
+  padding: 7px;
+  text-align: center;
+  background: #f2f6f9;
+  border-bottom: 1px solid var(--line);
+  color: var(--blue-900);
+}
+
+.multiManagement dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.multiManagement dl > div {
+  display: grid;
+  grid-template-columns: 44% 56%;
+  min-height: 38px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.multiManagement dt,
+.multiManagement dd {
+  margin: 0;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+}
+
+.multiManagement dt {
+  background: #f7fafc;
+  color: var(--blue-900);
+  font-weight: 700;
+  border-right: 1px solid var(--line);
+}
+
+.multiManagement dd {
+  font-weight: 800;
+}
+
+.multiCostError {
+  margin: 8px 0;
+  padding: 8px 10px;
+  border: 1px solid #f2b8b5;
+  border-radius: 6px;
+  background: #fff2f2;
+  color: #b42318;
+  font-weight: 700;
+}
+
+@media (max-width: 980px) {
+  .workspace.twoColumn > .orderEntryPanel:not(.multiSummaryPanel) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .workspace.twoColumn:has(.multiSummaryPanel) > .imagePanel {
+    align-self: stretch;
+  }
+
+  .multiSummaryPanel {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    margin-top: 0;
+  }
+}
+
+@media print {
+  .multiPrintPages {
+    display: block !important;
+  }
+
+  /* When products were added, the interactive sheet is replaced by
+     print-only snapshots so every saved page is included. */
+  .workspace:has(.multiPrintPages) > .orderEntryPanel:not(.multiSummaryPanel) {
+    display: none !important;
+  }
+
+  .multiPrintPages > .orderEntryPanel {
+    display: block !important;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .multiPrintPages > .orderEntryPanel:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .multiSummaryPanel {
+    grid-column: auto;
+    grid-row: auto;
+    margin-top: 0;
+    box-shadow: none !important;
+  }
+
+  .workspace.twoColumn > .orderEntryPanel:not(.multiSummaryPanel) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .multiSummarySheet {
+    margin-top: 0;
+    break-before: page;
+    page-break-before: always;
+  }
+}
+
+/* print-hide-integrated-tabs-2026-07-13 */
+@media print {
+  body .integratedShell > .integratedTabs,
+  body .integratedShell .integratedTabs,
+  body .scanMount .integratedTabs,
+  body .app > .integratedTabs,
+  body .businessTabs,
+  body .appTabs,
+  body .scanResetButton,
+  body [role="tablist"][aria-label="業務ツール切替"] {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body .integratedShell {
+    padding-top: 0 !important;
+  }
+}
+
+.catalogVersionTabs{
+  display:flex;
+  gap:8px;
+  margin:6px 0 10px;
+}
+.catalogVersionTabs button{
+  min-height:46px;
+  min-width:144px;
+  border:1.5px solid #9ebcda;
+  background:linear-gradient(180deg,#ffffff 0%,#f2f8fd 100%);
+  color:#17496f;
+  border-radius:11px;
+  padding:0 20px;
+  font-size:16px;
+  font-weight:850;
+  letter-spacing:.02em;
+  white-space:nowrap;
+  cursor:pointer;
+  box-shadow:0 3px 7px rgba(30,63,91,.13),inset 0 1px 0 rgba(255,255,255,.92);
+  transition:background 120ms ease,border-color 120ms ease,box-shadow 120ms ease,transform 120ms ease;
+}
+.catalogVersionTabs button:hover{
+  background:linear-gradient(180deg,#fbfeff 0%,#dcecf8 100%);
+  border-color:#5b91bc;
+  color:#0b4f86;
+  transform:translateY(-1px);
+  box-shadow:0 5px 10px rgba(30,63,91,.17),inset 0 1px 0 rgba(255,255,255,.96);
+}
+.catalogVersionTabs button:active{
+  transform:translateY(0);
+  box-shadow:inset 0 2px 4px rgba(30,45,60,.14);
+}
+.catalogVersionTabs button.active{
+  background:linear-gradient(180deg,#1875b6 0%,#0b558e 100%);
+  border-color:#0b558e;
+  color:#fff;
+  box-shadow:0 4px 9px rgba(13,79,139,.24),inset 0 1px 0 rgba(255,255,255,.22);
+}
+.catalogVersionTabs button.active:hover{
+  background:linear-gradient(180deg,#2585c6 0%,#1269a2 100%);
+  border-color:#084a7c;
+  color:#fff;
+}
+
+/* 2026-07-17: printed product name readability */
+@media print {
+  .orderEntrySheet .productNameBlock {
+    min-height: 12mm !important;
+    grid-template-columns: 22mm minmax(0, 1fr) !important;
+    grid-template-rows: minmax(12mm, auto) auto;
+  }
+
+  .orderEntrySheet .productNameBlock > b {
+    padding: 1mm !important;
+    font-size: 10pt !important;
+    line-height: 1.2 !important;
+  }
+
+  .orderEntrySheet .productNameBlock .printValue {
+    display: flex !important;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 12mm !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 1.5mm 2.2mm !important;
+    font-size: 12pt !important;
+    line-height: 1.25 !important;
+    font-weight: 800 !important;
+    letter-spacing: .01em;
+    text-align: left !important;
+    white-space: pre-wrap;
+    word-break: normal !important;
+    line-break: strict;
+    overflow-wrap: break-word;
+  }
+
+  .orderEntrySheet .compactProductTable th,
+  .orderEntrySheet .compactProductTable td {
+    vertical-align: middle !important;
+  }
+
+  .orderEntrySheet .compactProductTable td:nth-child(5) .printValue,
+  .orderEntrySheet .compactProductTable td:nth-child(6) .printValue,
+  .orderEntrySheet .compactProductTable td:nth-child(7) .printValue,
+  .orderEntrySheet .compactProductTable td:nth-child(8) .printValue {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Standalone版では売上伝票への切替を常に隠す。後続の統合版用CSSより強い指定。 */
+body .integratedShell > .integratedTabs,
+body .integratedShell > .salesVoucherFrameWrap,
+body .integratedShell .salesVoucherFrameWrap,
+body .integratedShell > .integratedTabs:first-of-type {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+body .integratedShell .brand h1 {
+  font-size: 0 !important;
+}
+
+body .integratedShell .brand h1::after {
+  content: "販売受注簿作成ツール";
+  font-size: 22px;
+}
+
+body .integratedShell .brand p {
+  font-size: 0 !important;
+}
+
+body .integratedShell .brand p::after {
+  content: "商品画像を読み取り、販売受注簿を作成";
+  font-size: 12px;
+}
+
+/* 2026-07-30: reference-style visual system for the standalone order app.
+   The workflow and data controls stay unchanged; these are presentation-only overrides. */
+:root {
+  --reference-cyan: #15a8df;
+  --reference-cyan-dark: #0b8dc2;
+  --reference-navy: #1d3448;
+  --reference-muted: #607c91;
+  --reference-bg: #eef9fd;
+  --reference-surface: #ffffff;
+  --reference-line: #cfe1eb;
+}
+
+body,
+#root,
+.app {
+  background: var(--reference-bg) !important;
+  color: var(--reference-navy) !important;
+  font-family: "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif !important;
+}
+
+.topbar {
+  gap: 20px;
+  padding: 12px clamp(16px, 2.4vw, 32px);
+  background: rgba(255, 255, 255, .97) !important;
+  border-bottom: 1px solid var(--reference-line) !important;
+  box-shadow: 0 7px 22px rgba(28, 89, 119, .08) !important;
+}
+
+.brand {
+  gap: 11px;
+}
+
+.logoMark {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px !important;
+  background: linear-gradient(145deg, #f4b63e 0%, #ffd96f 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 5px 12px rgba(242, 174, 54, .28);
+  font-size: 0 !important;
+}
+
+.logoMark::after {
+  content: "販";
+  font-size: 19px;
+  font-weight: 900;
+}
+
+.brand h1 {
+  font-size: 0 !important;
+  color: var(--reference-navy) !important;
+}
+
+.brand h1::after {
+  content: "販売受注簿作成";
+  font-size: 20px;
+  letter-spacing: .02em;
+}
+
+.brand p {
+  font-size: 0 !important;
+  color: var(--reference-muted) !important;
+}
+
+.brand p::after {
+  content: "画像を読み取り、販売受注簿へ反映";
+  font-size: 11px;
+}
+
+.actions {
+  gap: 8px;
+}
+
+.actions button,
+.actions .primary,
+.actions .softPrimary {
+  min-height: 44px;
+  border: 1px solid #b8d6e5 !important;
+  border-radius: 11px !important;
+  background: #fff !important;
+  color: var(--reference-navy) !important;
+  box-shadow: 0 3px 8px rgba(32, 86, 112, .12), inset 0 1px 0 rgba(255, 255, 255, .95) !important;
+}
+
+.actions button:hover,
+.actions .softPrimary:hover {
+  background: #effaff !important;
+  border-color: #67bddc !important;
+  color: #0a668d !important;
+}
+
+.actions .primary {
+  background: var(--reference-cyan) !important;
+  border-color: var(--reference-cyan) !important;
+  color: #fff !important;
+  box-shadow: 0 5px 12px rgba(21, 168, 223, .25) !important;
+}
+
+.actions .primary:hover {
+  background: var(--reference-cyan-dark) !important;
+  border-color: var(--reference-cyan-dark) !important;
+  color: #fff !important;
+}
+
+.actions .softPrimary {
+  background: #e9f8fd !important;
+  border-color: #8ccfe5 !important;
+  color: #0b6d93 !important;
+}
+
+.workspace {
+  gap: 14px;
+  padding: 14px;
+  background: var(--reference-bg);
+}
+
+.panel,
+.previewShell {
+  border: 1px solid var(--reference-line) !important;
+  border-radius: 15px !important;
+  background: rgba(255, 255, 255, .98) !important;
+  box-shadow: 0 12px 28px rgba(29, 87, 115, .08) !important;
+}
+
+.panelHead {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e2eef3 !important;
+  background: #fbfeff !important;
+}
+
+.panelHead h2,
+.orderEntrySheet h2 {
+  color: var(--reference-navy) !important;
+  letter-spacing: .02em;
+}
+
+.panelHead p,
+.brand p {
+  color: var(--reference-muted) !important;
+}
+
+.status {
+  background: #e7f8fd !important;
+  color: #0b7ea8 !important;
+  border: 1px solid #a9dce9;
+}
+
+.usageGuide {
+  border-color: #d2e6ef !important;
+  border-radius: 13px !important;
+  background: #fff !important;
+  color: #31566c !important;
+}
+
+.usageGuide h3 {
+  color: #1a6a8b !important;
+}
+
+.catalogVersionTabs button {
+  border-color: #b7d7e5 !important;
+  border-radius: 11px !important;
+  background: #fff !important;
+  color: #24566f !important;
+  box-shadow: 0 3px 7px rgba(41, 98, 124, .1) !important;
+}
+
+.catalogVersionTabs button:hover {
+  background: #effaff !important;
+  border-color: #69c0dd !important;
+  color: #0b729a !important;
+}
+
+.catalogVersionTabs button.active {
+  background: var(--reference-cyan) !important;
+  border-color: var(--reference-cyan) !important;
+  color: #fff !important;
+  box-shadow: 0 5px 12px rgba(21, 168, 223, .24) !important;
+}
+
+.dropZone {
+  border-color: #9fd6e8 !important;
+  border-radius: 13px !important;
+  background: #f8fdff !important;
+}
+
+.orderEntrySheet {
+  border: 1px solid var(--reference-line) !important;
+  border-top: 5px solid var(--reference-cyan) !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  box-shadow: 0 14px 30px rgba(29, 87, 115, .1) !important;
+}
+
+.orderEntrySheet input,
+.orderEntrySheet select,
+.orderEntrySheet textarea,
+.officeSelectBox select,
+.officeFieldGrid input {
+  border-color: #c8dfe9 !important;
+  border-radius: 9px !important;
+  background: #fbfeff !important;
+}
+
+.orderEntrySheet input:focus,
+.orderEntrySheet select:focus,
+.orderEntrySheet textarea:focus {
+  border-color: var(--reference-cyan) !important;
+  box-shadow: 0 0 0 3px rgba(21, 168, 223, .14) !important;
+  outline: none;
+}
+
+.entryProductTable th {
+  background: #eaf8fc !important;
+  color: #1b506a !important;
+  border-color: #bcdbe7 !important;
+}
+
+.entryProductTable td {
+  border-color: #c8e0e9 !important;
+}
+
+.management h3 {
+  background: #eef9fd !important;
+  color: #1b506a !important;
+  border-color: #c8e0e9 !important;
+}
+
+@media (max-width: 980px) {
+  .topbar { align-items: flex-start; flex-wrap: wrap; }
+  .actions { width: 100%; }
+  .workspace { padding: 10px; }
+}
+
+/* The HTML bootstrap script supplies the accessible Japanese labels directly. */
+.app .logoMark::after,
+.app .brand h1::after,
+.app .brand p::after {
+  content: none !important;
+}
+
+.app .logoMark {
+  font-size: 19px !important;
+}
+
+/* Make the paste instructions easier to read without changing their layout. */
+.emptyImage {
+  color: #42596a !important;
+}
+
+.emptyImage span {
+  color: #42596a !important;
+  font-weight: 600;
+}
+
+/* Final print/PDF alignment overrides. */
+.pdfCaptureMode .orderTitleWithAdd {
+  display: block !important;
+  text-align: center !important;
+  margin: 4px 0 12px !important;
+}
+
+.pdfCaptureMode .orderTitleWithAdd .orderTitleSpacer {
+  display: none !important;
+}
+
+.pdfCaptureMode .orderTitleWithAdd h2 {
+  margin: 0 !important;
+  text-align: center !important;
+}
+
+@media print {
+  .orderTitleWithAdd {
+    display: block !important;
+    text-align: center !important;
+    margin: 4px 0 12px !important;
+  }
+
+  .orderTitleWithAdd .orderTitleSpacer,
+  .orderTitleWithAdd .multiPageNav,
+  .orderTitleWithAdd .addProductNearTitle {
+    display: none !important;
+  }
+
+  .orderTitleWithAdd h2 {
+    margin: 0 !important;
+    text-align: center !important;
+  }
+
+  .orderEntryPanel {
+    overflow: visible !important;
+  }
+
+  .orderEntrySheet {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+}

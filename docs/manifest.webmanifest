@@ -1,0 +1,12 @@
+{
+  "name": "販売受注簿作成ツール",
+  "short_name": "販売受注簿",
+  "description": "カタログ画像を読み取り、販売受注簿を作成する単体Webアプリ",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f7f8",
+  "theme_color": "#0b5f6d",
+  "orientation": "any",
+  "categories": ["business", "productivity"]
+}

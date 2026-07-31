@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b5f6d" />
+    <meta name="description" content="カタログ画像を読み取り、販売受注簿へ転記するWebアプリ" />
+    <link rel="manifest" href="/taiyo-hacchu-scan/manifest.webmanifest" />
+    <title>発注スキャン</title>
+    <meta name="application-name" content="販売受注簿作成ツール" />
+    <title>販売受注簿作成ツール</title>
+    <script>document.title = "販売受注簿作成ツール";</script>
+    <script type="module" crossorigin src="/taiyo-hacchu-scan/assets/index-CsfzXxUO.js"></script>
+    <link rel="stylesheet" crossorigin href="/taiyo-hacchu-scan/assets/index-Cu-oDneD.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      window.addEventListener("load", () => {
+        const brandTitle = document.querySelector(".brand h1");
+        const brandMark = document.querySelector(".logoMark");
+        const brandSubtitle = document.querySelector(".brand p");
+        if (brandTitle) brandTitle.textContent = "販売受注簿作成";
+        if (brandMark) brandMark.textContent = "販";
+        if (brandSubtitle) brandSubtitle.textContent = "画像を読み取り、販売受注簿へ反映";
+      });
+
+      // The in-app PDF button rasterizes the order sheet with html2canvas.
+      // Mark screen-only controls before React's click handler starts so they
+      // are omitted from the captured PDF without changing the normal screen.
+      document.addEventListener("click", (event) => {
+        const button = event.target && event.target.closest ? event.target.closest("button") : null;
+        if (!button || (button.textContent || "").trim() !== "PDF") return;
+        document.documentElement.classList.add("pdfCaptureMode");
+        document.querySelectorAll(".orderEntrySheet .no-print").forEach((element) => {
+          element.setAttribute("data-html2canvas-ignore", "true");
+        });
+        window.setTimeout(() => {
+          document.documentElement.classList.remove("pdfCaptureMode");
+          document.querySelectorAll(".orderEntrySheet .no-print[data-html2canvas-ignore=\"true\"]").forEach((element) => {
+            element.removeAttribute("data-html2canvas-ignore");
+          });
+        }, 10000);
+      }, true);
+    </script>
+  </body>
+</html>
