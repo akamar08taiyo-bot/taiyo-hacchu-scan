@@ -269,7 +269,7 @@ function simpleEstimateHtmlReference(e,t,n,q){
   var honorific=String(order.honorific||'').trim()||(clientFirst&&/(施設|法人|病院|事業所|センター|株式会社|有限会社|学校|組合|協会|ホーム)/.test((clientFirst+' '+clientSecond))?'御中':'様');
   var quoteNo=String(order.quoteNumber||order.estimateNumber||order.salesOrderNumber||'').trim()||'\u2014';
   var category=String(order.categoryName||order.productCategory||order.category||'').trim()||'商品';
-  var remarks=String(order.remarks||'本見積書の記載金額には、消費税は含まれておりません。');
+  var remarks=String(order.remarks||'本見積書の記載金額（合計）は、消費税込みの金額となっております。');
   var fallbackOffices=typeof Ve!=='undefined'&&Array.isArray(Ve.branchOffices)?Ve.branchOffices:[];
   var offices=Array.isArray(settings.branchOffices)&&settings.branchOffices.length?settings.branchOffices:fallbackOffices;
   var defaultOffice=settings.defaultBranchOffice||offices[0]?.name||'';
