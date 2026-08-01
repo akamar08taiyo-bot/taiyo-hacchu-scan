@@ -450,27 +450,22 @@ function estimatePageMetrics(item) {
   const tax = saleTax + shippingTax;
   return { quantity: quantity, saleTotal: saleTotal, shipping: shipping, saleTax: saleTax, shippingTax: shippingTax, subtotal: subtotal, tax: tax, totalTaxIn: subtotal + tax };
 }
-function estimateItemCard(item, index) {
+function estimateItemRow(item, index) {
   const source = item || {};
   const metrics = estimatePageMetrics(source);
   const name = String(source.productName || '商品').replace(/[_＿]+/g, ' ').replace(/\s+/g, ' ').trim();
   const model = String(source.modelNumber || '').trim();
   const product = model && name && name.indexOf(model) < 0 ? name + ' / ' + model : name;
   const option = [String(source.color || '').trim(), sanitizeScanSize(source.size || '')].filter(Boolean).join(' / ').replace(/[_＿]+/g, ' ').replace(/\s+/g, ' ').trim();
-  const listPrice = simpleEstimateNumber(source.listPrice || source.listPriceTaxIn);
   const unitPrice = metrics.quantity ? Math.floor(metrics.saleTotal / metrics.quantity) : metrics.saleTotal;
-  return '<article class="estimateItemCard">' +
-    '<div class="estimatePageLabel">' + (index + 1) + 'ページ目</div>' +
-    '<div class="editable estimateItemTitle" contenteditable="true" data-field="productName">' + estimateHtmlEscape(product) + '</div>' +
-    (option ? '<div class="editable estimateItemOption" contenteditable="true" data-field="colorSize">色・サイズ：' + estimateHtmlEscape(option) + '</div>' : '') +
-    '<div class="editable estimateItemListPrice" contenteditable="true" data-field="listPrice">定価 ' + estimateYen(listPrice) + '</div>' +
-    '<div class="estimateItemAmounts">' +
-      '<div><span>数量</span><strong class="editable" contenteditable="true" data-field="quantity">' + estimateHtmlEscape(metrics.quantity) + '</strong></div>' +
-      '<div><span>単価（税抜）</span><strong class="editable" contenteditable="true" data-field="unitPrice">' + estimateYen(unitPrice) + '</strong></div>' +
-      '<div><span>販売金額（税抜）</span><strong class="editable" contenteditable="true" data-field="saleTotal">' + estimateYen(metrics.saleTotal) + '</strong></div>' +
-      '<div><span>消費税</span><strong class="editable" contenteditable="true" data-field="tax">' + estimateYen(metrics.tax) + '</strong></div>' +
-      '<div class="estimateItemTotal"><span>ページ合計（税込）</span><strong class="editable" contenteditable="true" data-field="pageTotal">' + estimateYen(metrics.totalTaxIn) + '</strong></div>' +
-    '</div></article>';
+  return '<tr>' +
+    '<td class="estimateItemsTableName"><div class="editable" contenteditable="true" data-field="productName-' + index + '">' + estimateHtmlEscape(product) + '</div>' +
+    (option ? '<div class="estimateItemsTableOption">' + estimateHtmlEscape(option) + '</div>' : '') + '</td>' +
+    '<td class="editable" contenteditable="true" data-field="quantity-' + index + '">' + estimateHtmlEscape(metrics.quantity) + '</td>' +
+    '<td class="editable" contenteditable="true" data-field="unitPrice-' + index + '">' + estimateYen(unitPrice) + '</td>' +
+    '<td class="editable" contenteditable="true" data-field="saleTotal-' + index + '">' + estimateYen(metrics.saleTotal) + '</td>' +
+    '<td class="editable" contenteditable="true" data-field="tax-' + index + '">' + estimateYen(metrics.tax) + '</td>' +
+    '</tr>';
 }
 
 const simpleEstimateHtmlReadableBeforeMultiColumns = simpleEstimateHtmlReadable;
@@ -489,19 +484,17 @@ simpleEstimateHtmlReadable = function estimateWithMultiProductPages(order, total
   const remarksEnd = remarksStart >= 0 ? html.indexOf('</section>', remarksStart) + '</section>'.length : -1;
   if (categoryStart >= 0 && remarksStart > categoryStart && remarksEnd > remarksStart) {
     const category = estimateHtmlEscape(order && (order.categoryName || order.productCategory || order.category) || '商品');
-    const pageRows = metrics.map(function (value, index) {
-      return '<div class="estimateAmountSummaryRow"><span>' + (index + 1) + 'ページ目 金額（税込）</span><strong>' + estimateYen(value.totalTaxIn) + '</strong></div>';
-    }).join('');
+    const itemRows = estimateItems.map(estimateItemRow).join('');
     const replacement = '<div class="editable estimateItemsTitle" contenteditable="true" data-field="category">' + category + '</div>' +
-      '<div class="estimateItemGrid">' + estimateItems.map(estimateItemCard).join('') + '</div>' +
-      '<section class="estimateAmountSummary"><div class="estimateAmountSummaryHeading">ページ別金額</div>' + pageRows +
+      '<table class="estimateItemsTable"><thead><tr><th>商品</th><th>数量</th><th>単価（税抜）</th><th>税抜</th><th>消費税</th></tr></thead><tbody>' + itemRows + '</tbody></table>' +
+      '<section class="estimateAmountSummary">' +
       '<div class="estimateAmountSummaryRow"><span>小計（税抜）</span><strong>' + estimateYen(totalTaxOut) + '</strong></div>' +
       '<div class="estimateAmountSummaryRow"><span>消費税</span><strong>' + estimateYen(taxTotal) + '</strong></div>' +
       '<div class="estimateAmountSummaryRow estimateOverallRow"><span>合計（税込）</span><strong>' + estimateYen(totalTaxIn) + '</strong></div></section>' +
       '<section class="remarks"><div class="remarksTitle">備考</div><div class="editable remarksBody" contenteditable="true" data-field="remarks"></div></section>';
     html = html.slice(0, categoryStart) + replacement + html.slice(remarksEnd);
   }
-  const multiEstimateCss = '<style>.estimateItemsTitle{width:100%;min-height:8mm;padding:2mm 2.8mm;border:0.35mm solid #c1d9ef;border-bottom:0;background:#eff7ff;color:#153f82;font-family:"BIZ UDPゴシック","Yu Gothic",Meiryo,sans-serif;font-size:12pt;font-weight:900}.estimateItemGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5mm}.estimateItemCard{min-width:0;border:0.3mm solid #c1d9ef;background:#fff;padding:3.2mm 3.5mm;color:#29394c;break-inside:avoid}.estimatePageLabel{display:inline-block;margin-bottom:2mm;padding:1mm 2mm;background:#dcecff;color:#153f82;font-family:"BIZ UDPゴシック","Yu Gothic",Meiryo,sans-serif;font-size:9.5pt;font-weight:900}.estimateItemTitle{min-height:10mm;color:#263749;font-size:11pt;line-height:1.4;font-weight:800;overflow-wrap:anywhere}.estimateItemOption{margin-top:1.8mm;color:#244f91;font-size:9.3pt;font-weight:700;overflow-wrap:anywhere}.estimateItemListPrice{margin-top:2.2mm;padding-top:2mm;border-top:0.25mm dashed #9dbde0;color:#526174;font-size:9.5pt;font-weight:700}.estimateItemAmounts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2mm;margin-top:3mm}.estimateItemAmounts>div{display:flex;flex-direction:column;gap:1mm;padding:2mm;background:#f7fbff;border:0.25mm solid #d1e2f1;min-width:0}.estimateItemAmounts span{color:#1d6dcc;font-family:"BIZ UDPゴシック","Yu Gothic",Meiryo,sans-serif;font-size:8pt;font-weight:900}.estimateItemAmounts strong{text-align:right;color:#1f2937;font-size:10.5pt;white-space:nowrap}.estimateItemAmounts .estimateItemTotal{grid-column:1 / -1;background:#eff7ff;border-color:#b9d7f0}.estimateItemAmounts .estimateItemTotal strong{color:#153f82;font-size:13pt}.estimateAmountSummary{width:100%;margin-top:6mm;border:0.3mm solid #c1d9ef;background:#fff}.estimateAmountSummaryHeading{padding:2mm 3mm;background:#eff7ff;color:#1d6dcc;font-family:"BIZ UDPゴシック","Yu Gothic",Meiryo,sans-serif;font-size:10pt;font-weight:900}.estimateAmountSummaryRow{display:flex;justify-content:space-between;align-items:center;min-height:7mm;padding:1.7mm 3mm;border-top:0.25mm solid #d7e5f2;color:#526174;font-family:"BIZ UDPゴシック","Yu Gothic",Meiryo,sans-serif;font-size:9.5pt}.estimateAmountSummaryRow strong{color:#1f2937;font-size:10.5pt}.estimateAmountSummaryRow.estimateOverallRow{background:#f7fbff;color:#153f82;font-weight:900}.estimateAmountSummaryRow.estimateOverallRow strong{color:#153f82;font-size:13pt}@media(max-width:900px){.estimateItemGrid{grid-template-columns:1fr}}@media print{.estimateItemGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:4mm}.estimateItemCard{padding:2.6mm 3mm}.estimateItemTitle{font-size:10.3pt}.estimateItemAmounts{gap:1.5mm}.estimateItemAmounts strong{font-size:9.5pt}.estimateItemAmounts .estimateItemTotal strong{font-size:11.5pt}.estimateAmountSummary{margin-top:4mm}}</style>';
+  const multiEstimateCss = '<style>.estimateItemsTitle{width:100%;min-height:8mm;padding:2mm 2.8mm;border:0.35mm solid #c1d9ef;border-bottom:0;background:#eff7ff;color:#153f82;font-family:"BIZ UDPゴシック","Yu Gothic",Meiryo,sans-serif;font-size:12pt;font-weight:900}.estimateItemsTable{width:100%;border-collapse:collapse;table-layout:fixed;font-size:10pt;color:#29394c}.estimateItemsTable th,.estimateItemsTable td{border:0.3mm solid #c1d9ef;padding:2.4mm 2.2mm;text-align:center;vertical-align:middle}.estimateItemsTable thead th{background:#eff7ff;color:#1d6dcc;font-family:"BIZ UDPゴシック","Yu Gothic",Meiryo,sans-serif;font-size:9.5pt;font-weight:900}.estimateItemsTable .estimateItemsTableName{width:44%;text-align:left;font-weight:700;overflow-wrap:anywhere}.estimateItemsTableOption{margin-top:1.2mm;color:#244f91;font-size:8.8pt;font-weight:700}.estimateAmountSummary{width:100%;margin-top:6mm;border:0.3mm solid #c1d9ef;background:#fff}.estimateAmountSummaryRow{display:flex;justify-content:space-between;align-items:center;min-height:7mm;padding:1.7mm 3mm;border-top:0.25mm solid #d7e5f2;color:#526174;font-family:"BIZ UDPゴシック","Yu Gothic",Meiryo,sans-serif;font-size:9.5pt}.estimateAmountSummary .estimateAmountSummaryRow:first-child{border-top:0}.estimateAmountSummaryRow strong{color:#1f2937;font-size:10.5pt}.estimateAmountSummaryRow.estimateOverallRow{background:#f7fbff;color:#153f82;font-weight:900}.estimateAmountSummaryRow.estimateOverallRow strong{color:#153f82;font-size:13pt}@media print{.estimateItemsTable{font-size:9.3pt}.estimateAmountSummary{margin-top:4mm}}</style>';
   html = html.replace('</style>', multiEstimateCss + '</style>');
   return html;
 }
