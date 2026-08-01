@@ -732,7 +732,7 @@ button:hover {
 }
 
 .entryGridPrimary {
-  grid-template-columns: 0.74fr 0.82fr 0.72fr 0.9fr 1.05fr 0.95fr 0.95fr 0.98fr;
+  grid-template-columns: repeat(4, 1fr);
   border-radius: 8px 8px 0 0;
   overflow: hidden;
 }
@@ -2378,6 +2378,10 @@ button:hover {
 
   .entryGrid {
     border-color: #6b7f8f;
+  }
+
+  .entryGridPrimary {
+    grid-template-columns: 0.74fr 0.82fr 0.72fr 0.9fr 1.05fr 0.95fr 0.95fr 0.98fr;
   }
 
   .entryGrid .sheetCell {
