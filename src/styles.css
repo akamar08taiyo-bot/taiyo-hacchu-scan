@@ -3408,12 +3408,28 @@ main .integratedTabs {
 
 .multiSummarySheet {
   margin-top: 16px;
+  padding: 14px 16px 18px;
+  border: 0.3mm solid #b9d7f0;
+  background: #fff;
+  font-family: "BIZ UDPMincho", "BIZ UD明朝", "Yu Mincho", "游明朝", "MS Mincho", serif;
+  color: #29394c;
+}
+
+.multiSummarySheet h2 {
+  margin: 0 0 10px;
+  border-bottom: 0.55mm solid #3b82d6;
+  padding: 0 0 6px;
+  color: #153f82;
+  font-family: "BIZ UDPMincho", "BIZ UD明朝", "Yu Mincho", "游明朝", "MS Mincho", serif;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: .12em;
 }
 
 .multiSummaryHead {
   display: grid;
   grid-template-columns: 1.4fr .8fr .8fr;
-  border: 1px solid var(--line);
+  border: 0.3mm solid #c1d9ef;
   margin: 10px 0;
 }
 
@@ -3421,7 +3437,7 @@ main .integratedTabs {
   display: grid;
   grid-template-columns: 90px 1fr;
   min-height: 40px;
-  border-right: 1px solid var(--line);
+  border-right: 0.3mm solid #c1d9ef;
   align-items: center;
 }
 
@@ -3433,14 +3449,15 @@ main .integratedTabs {
   height: 100%;
   display: grid;
   place-items: center;
-  background: var(--blue-50);
-  color: var(--blue-900);
-  border-right: 1px solid var(--line);
+  background: #dcecff;
+  color: #153f82;
+  border-right: 0.3mm solid #c1d9ef;
 }
 
 .multiSummaryHead span {
   padding: 6px 10px;
   text-align: center;
+  color: #29394c;
 }
 
 .multiSummaryTable {
@@ -3450,30 +3467,72 @@ main .integratedTabs {
   margin-top: 10px;
 }
 
+/* 商品名列を大きく確保し、長い商品名でも2行以内に収まるようにする（他の列は必要最小限に圧縮） */
+.multiSummaryTable col.colProductName { width: 38%; }
+.multiSummaryTable col.colCatalog,
+.multiSummaryTable col.colWeb,
+.multiSummaryTable col.colModel,
+.multiSummaryTable col.colColorSize { width: 6.5%; }
+.multiSummaryTable col.colQty { width: 4%; }
+.multiSummaryTable col.colShipping,
+.multiSummaryTable col.colSale,
+.multiSummaryTable col.colGrand,
+.multiSummaryTable col.colCost { width: 8%; }
+
 .multiSummaryTable th,
 .multiSummaryTable td {
-  border: 1px solid var(--line);
+  border: 0.3mm solid #c1d9ef;
   padding: 7px 6px;
   text-align: center;
   vertical-align: middle;
-  color: var(--ink);
+  color: #29394c;
+  font-size: 9.5pt;
 }
 
 .multiSummaryTable th {
-  background: var(--blue-50);
-  color: var(--blue-900);
+  background: #dcecff;
+  color: #153f82;
+  font-family: "BIZ UDPゴシック", "Yu Gothic", Meiryo, sans-serif;
   font-weight: 800;
 }
 
 .multiSummaryTable .textLeft {
   text-align: left;
-  line-height: 1.35;
+  line-height: 1.32;
   word-break: break-word;
+  overflow-wrap: anywhere;
+  font-size: 9.3pt;
+  font-weight: 700;
 }
 
 .multiSummaryTable tfoot th {
   background: #eaf4ff;
   font-weight: 900;
+}
+
+.multiSummaryManagement {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+  font-family: "BIZ UDPMincho", "BIZ UD明朝", "Yu Mincho", "游明朝", "MS Mincho", serif;
+}
+
+.multiSummaryManagement th,
+.multiSummaryManagement td {
+  border: 0.3mm solid #c1d9ef;
+  padding: 7px 10px;
+  text-align: right;
+  color: #29394c;
+  font-size: 10pt;
+}
+
+.multiSummaryManagement th {
+  width: 26%;
+  background: #eff7ff;
+  color: #153f82;
+  font-family: "BIZ UDPゴシック", "Yu Gothic", Meiryo, sans-serif;
+  font-weight: 800;
+  text-align: left;
 }
 
 .multiManagement {
