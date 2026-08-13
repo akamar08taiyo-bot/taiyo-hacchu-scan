@@ -4094,3 +4094,39 @@ body,
     overflow: visible !important;
   }
 }
+
+/* print-stack-summary-2026-08-13
+   印刷時、作業領域が2カラムのグリッドのままだと、印刷用の商品ページと集計表が
+   同じ行に横並びで配置され、商品画像が集計表に重なってしまう。
+   印刷では縦一列に積むようにする。 */
+@media print {
+  .workspace,
+  .workspace.twoColumn {
+    display: block !important;
+    grid-template-columns: none !important;
+    gap: 0 !important;
+  }
+
+  .workspace > .multiPrintPages,
+  .workspace > .multiSummaryPanel {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+
+  /* 集計表は必ず商品ページの後ろの新しいページから始める */
+  .multiSummaryPanel {
+    break-before: page;
+    page-break-before: always;
+    break-inside: avoid;
+  }
+
+  /* 商品ページ内の貼り付け画像が枠外にはみ出さないようにする */
+  .multiPrintPages .orderAttachedImage,
+  .multiPrintPages .orderAttachedImage img {
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+}
