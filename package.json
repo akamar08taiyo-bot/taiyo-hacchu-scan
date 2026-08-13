@@ -2,7 +2,10 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0 --port 5173"
+    "preview": "vite preview --host 0.0.0.0 --port 5173",
+    "test": "npm run test:date && npm run test:scan",
+    "test:date": "node --test \"test/**/*.test.mjs\"",
+    "test:scan": "node test/run-scan-tests.js"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
