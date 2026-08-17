@@ -613,7 +613,9 @@ button:hover {
   border-top: 5px solid #1769aa;
   border-radius: 10px;
   color: #111827;
-  min-width: 820px;
+  /* 親ペインが約780pxしかない画面幅で 820px を要求すると右端が見切れる。
+     親に収まる範囲で最大化し、狭いときだけ横スクロールさせる。 */
+  min-width: min(820px, 100%);
   min-height: calc(100vh - 128px);
   display: flex;
   flex-direction: column;
@@ -1103,12 +1105,19 @@ button:hover {
 
 .entryBottom {
   display: grid;
-  grid-template-columns: minmax(520px, 1fr) minmax(360px, 0.55fr);
+  /* 520px+360px+gap で 890px 必要になり、シート内幅(約800px)を超えて
+     添付画像が画面右に見切れていた。最小幅を実際に収まる値まで下げ、
+     さらに狭いときは縦積みにして見切れないようにする。 */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.55fr);
   gap: 10px;
   margin-top: 10px;
   align-items: stretch;
   flex: 1;
   min-height: 220px;
+}
+
+@media (max-width: 1100px) {
+  .entryBottom { grid-template-columns: minmax(0, 1fr); }
 }
 
 .mailBox {
