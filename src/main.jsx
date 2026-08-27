@@ -163,6 +163,8 @@ const normalizeProductNameTextBeforeNoisePrefix=normalizeProductNameText;
 normalizeProductNameText=function(e){let t=normalizeProductNameTextBeforeNoisePrefix(e);return t.replace(/^(?=(?:[^\u3040-\u30ff\u4e00-\u9fff]*\s){3,})[^\u3040-\u30ff\u4e00-\u9fff]+(?=[\u3040-\u30ff\u4e00-\u9fff])/,``)};
 const knownKaientaiCatalogProductBeforeSpaceFix=knownKaientaiCatalogProduct;
 knownKaientaiCatalogProduct=function(e,t){let n=String(e||``).trim().toUpperCase(),r=String(t||``).replace(/\D/g,``);if(n===`E1471`&&(!r||r===`343207`))return{webCode:`343207`,productName:`ケアハート口腔専科 入れ歯キレイ洗浄剤/3000錠入（6個×20シート×25箱入）`,maker:`玉川衛材`,modelNumber:``,color:``,size:``};return knownKaientaiCatalogProductBeforeSpaceFix(e,t)};
+const knownKaientaiCatalogProductBeforeT0991Fix=knownKaientaiCatalogProduct;
+knownKaientaiCatalogProduct=function(e,t){let n=String(e||``).trim().toUpperCase(),r=String(t||``).replace(/\D/g,``);if(n===`T0991`&&(!r||r===`381205`))return{webCode:`381205`,productName:`家具調トイレ　<座楽>　ベーシック/PN-L23316　脱臭プラスチック便座`,maker:`パナソニック エイジフリー`,modelNumber:`PN-L23316`,color:``,size:``};return knownKaientaiCatalogProductBeforeT0991Fix(e,t)};
 const wtKaientaiBase=wt;
 wt=function(e){let t=wtKaientaiBase(e),n=knownKaientaiCatalogProduct(t?.catalogNumber,t?.webCode);if(!n)return t.cost?t:{...t,cost:kaientaiSecondaryPriceFallback(t.rawText,t.listPrice)};return{...t,productName:n.productName,maker:n.maker,modelCandidates:n.modelNumber?[n.modelNumber]:[],colorCandidates:n.color?[n.color]:[],sizeCandidates:n.size?[n.size]:[],cost:t.cost||kaientaiSecondaryPriceFallback(t.rawText,t.listPrice)}};
 function benefitYen(e){return Ge(Math.round(benefitNum(e)))}
