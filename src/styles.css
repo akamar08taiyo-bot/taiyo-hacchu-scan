@@ -3392,6 +3392,86 @@ main .integratedTabs {
   }
 }
 
+/* benefit-panel-visual-separation-2026-08-27
+   給付チェック時、既存の管理情報（青系）はそのまま残し、その下に給付内訳を
+   独立した箱として表示する。上のgrid-area:benefitルールと合わせて、管理情報の
+   下に丸ごと別枠（アンバー系の配色）で出るようにし、重なりを解消して見やすくする。 */
+.orderEntrySheet.benefitMode .entryBottom,
+.orderEntrySheet:has(.entryGridPrimary .sheetCell:nth-child(2) .orderTypeChecks label:nth-child(2) input:checked) .entryBottom {
+  align-content: start !important;
+}
+
+.management > .benefitPanel {
+  display: block !important;
+  margin-top: 10px !important;
+  border: 2px solid #f59e0b !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  background: #fffaf0 !important;
+}
+
+.management > .benefitPanel > h3 {
+  margin: 0 !important;
+  padding: 6px 10px !important;
+  border: 0 !important;
+  background: #f59e0b !important;
+  color: #fff !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  text-align: center !important;
+  letter-spacing: .05em !important;
+}
+
+.management > .benefitPanel .benefitBreakdown {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  margin: 0 !important;
+}
+
+.management > .benefitPanel .benefitBreakdown > div {
+  display: grid !important;
+  grid-template-columns: 1fr 1.2fr !important;
+  border-right: 1px solid #fcd34d !important;
+  border-bottom: 1px solid #fcd34d !important;
+}
+
+.management > .benefitPanel .benefitBreakdown > div:nth-child(2n) {
+  border-right: 0 !important;
+}
+
+.management > .benefitPanel .benefitBreakdown dt,
+.management > .benefitPanel .benefitBreakdown dd {
+  margin: 0 !important;
+  padding: 5px !important;
+  font-size: 11px !important;
+  background: #fff7e6 !important;
+  color: #92400e !important;
+}
+
+.management > .benefitPanel .benefitBreakdown dt {
+  border-right: 1px solid #fcd34d !important;
+  font-weight: 700 !important;
+}
+
+.management > .benefitPanel .benefitBreakdown .managementTotalRow dt,
+.management > .benefitPanel .benefitBreakdown .managementTotalRow dd {
+  background: #fde68a !important;
+  color: #7c2d12 !important;
+  font-weight: 900 !important;
+}
+
+@media (max-width: 640px) {
+  .management > .benefitPanel .benefitBreakdown {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media print {
+  .management > .benefitPanel {
+    break-inside: avoid !important;
+  }
+}
+
 /* multi-product-order-summary-2026-07-13 */
 .multiPrintPages {
   display: none;
