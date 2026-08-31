@@ -4139,3 +4139,240 @@ body,
     overflow: hidden !important;
   }
 }
+
+/* 2026-08-31: official adult-diaper product photo catalog */
+.productPhotoPicker {
+  display: grid;
+  grid-template-columns: minmax(150px, auto) minmax(0, 1fr);
+  gap: 6px 10px;
+  align-items: center;
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid #b8d8de;
+  border-radius: 9px;
+  background: #f4fbfc;
+}
+
+.productPhotoPicker label {
+  color: #075d68;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.productPhotoPicker select {
+  min-width: 0;
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 9px;
+  border: 1px solid #9fc7ce;
+  border-radius: 6px;
+  background: #fff;
+  color: #122d35;
+  font: inherit;
+}
+
+.productPhotoPicker small {
+  grid-column: 2;
+  color: #58747a;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+  .productPhotoPicker {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .productPhotoPicker small {
+    grid-column: 1;
+  }
+}
+
+@media print {
+  .productPhotoPicker {
+    display: none !important;
+  }
+}
+
+/* 2026-08-30: benefit order layout finalization
+   The rendered benefit summary is .benefitBreakdown. Older overrides targeted
+   legacy benefit panel class names and left this element without a grid area,
+   which made it overlap the management table. Keep the regular sales layout
+   untouched and apply this structure only while benefit mode is selected. */
+.orderEntrySheet.benefitMode .entryBottom {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 36%) !important;
+  grid-template-areas: "benefitManagement benefitImage" !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+.orderEntrySheet.benefitMode .management {
+  display: block !important;
+  grid-area: benefitManagement !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  overflow: hidden !important;
+}
+
+.orderEntrySheet.benefitMode .management > h3,
+.orderEntrySheet.benefitMode .management > dl {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.orderEntrySheet.benefitMode .management > .benefitBreakdown {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  width: 100% !important;
+  margin: 8px 0 0 !important;
+  border-top: 1px solid #6f8191 !important;
+  background: #f4fbff !important;
+  overflow: hidden !important;
+}
+
+.orderEntrySheet.benefitMode .benefitBreakdown > div {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  min-width: 0 !important;
+  min-height: 40px !important;
+  border-right: 1px solid #6f8191 !important;
+  border-bottom: 1px solid #6f8191 !important;
+}
+
+.orderEntrySheet.benefitMode .benefitBreakdown dt,
+.orderEntrySheet.benefitMode .benefitBreakdown dd {
+  display: grid !important;
+  place-items: center !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 6px 5px !important;
+  text-align: center !important;
+  line-height: 1.15 !important;
+  overflow-wrap: anywhere !important;
+}
+
+.orderEntrySheet.benefitMode .benefitBreakdown dt {
+  border-right: 1px solid #6f8191 !important;
+  background: #eaf6ff !important;
+  color: #073b63 !important;
+  font-weight: 850 !important;
+}
+
+.orderEntrySheet.benefitMode .benefitBreakdown dd {
+  background: #fff !important;
+  color: #07111f !important;
+  font-weight: 850 !important;
+}
+
+.orderEntrySheet.benefitMode .orderAttachedImage {
+  display: grid !important;
+  grid-area: benefitImage !important;
+  place-items: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 180px !important;
+  height: 100% !important;
+  max-height: none !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+.orderEntrySheet.benefitMode .orderAttachedImage img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+@media (max-width: 1100px) {
+  .orderEntrySheet.benefitMode .entryBottom {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas:
+      "benefitManagement"
+      "benefitImage" !important;
+  }
+
+  .orderEntrySheet.benefitMode .orderAttachedImage {
+    min-height: 190px !important;
+    max-height: 280px !important;
+  }
+}
+
+@media print {
+  /* A4 landscape has 202 mm of usable height with the 4 mm page margins. */
+  .orderEntrySheet.benefitMode {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 202mm !important;
+    min-height: 202mm !important;
+    max-height: 202mm !important;
+    overflow: hidden !important;
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Benefit mode adds one primary field, so use nine columns and keep the
+     header information on the same line instead of wrapping a lone cell. */
+  .orderEntrySheet.benefitMode .entryGridPrimary {
+    grid-template-columns:
+      .64fr .72fr .66fr .64fr .78fr 1.18fr .78fr .80fr .80fr !important;
+  }
+
+  .orderEntrySheet.benefitMode .entryBottom {
+    grid-template-columns: minmax(0, 1fr) 58mm !important;
+    grid-template-areas: "benefitManagement benefitImage" !important;
+    gap: 2mm !important;
+    margin-top: 2mm !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+
+  .orderEntrySheet.benefitMode .management > dl:not(.benefitBreakdown) {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .orderEntrySheet.benefitMode .management > .benefitBreakdown {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    margin-top: 1.2mm !important;
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+
+  .orderEntrySheet.benefitMode .benefitBreakdown > div {
+    min-height: 8.5mm !important;
+  }
+
+  .orderEntrySheet.benefitMode .benefitBreakdown dt,
+  .orderEntrySheet.benefitMode .benefitBreakdown dd {
+    padding: .55mm !important;
+    font-size: 7.6pt !important;
+    line-height: 1.08 !important;
+  }
+
+  .orderEntrySheet.benefitMode .orderAttachedImage {
+    display: grid !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+
+  .orderEntrySheet.benefitMode .orderAttachedImage img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+  }
+}
