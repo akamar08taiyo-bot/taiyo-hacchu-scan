@@ -48,13 +48,13 @@ test("見積書は太字を使いすぎない", () => {
   const to = source.indexOf("@media print{body{background:#fff}", from);
   assert.ok(from > 0 && to > from);
   const sheetCss = source.slice(from, to);
-  // 帳票の要素に 800/900 の太字を残さない（画面だけのツールバーは対象外）
-  const heavy = [...sheetCss.matchAll(/\.[A-Za-z][^{]*\{[^}]*font-weight:\s*(?:800|900)[^}]*\}/g)]
+  // 帳票の要素に太字（700以上）を残さない（画面だけのツールバーは対象外）
+  const heavy = [...sheetCss.matchAll(/\.[A-Za-z][^{]*\{[^}]*font-weight:\s*(?:[7-9]00|bold)[^}]*\}/g)]
     .map((m) => m[0].slice(0, m[0].indexOf("{")))
     .filter((selector) => !selector.includes(".toolbar"));
   assert.deepEqual(heavy, []);
-  // 太字は表題だけ。社名も金額も標準の太さにする
-  assert.match(sheetCss, /\.title\{[^}]*font-weight:700/);
+  // 表題も含め、すべて標準の太さで刷る
+  assert.match(sheetCss, /\.title\{[^}]*font-weight:500/);
   assert.match(sheetCss, /\.companyName\{[^}]*font-weight:500\}/);
   assert.match(sheetCss, /\.totalValue\{[^}]*font-weight:500/);
   assert.match(sheetCss, /\.itemTable th\{[^}]*font-weight:500\}/);
