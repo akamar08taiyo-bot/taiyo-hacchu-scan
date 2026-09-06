@@ -42,3 +42,21 @@ test("見積書のPDFはウィンドウ幅によらずA4レイアウトで1ペ�
   // PDFのファイル名に改行が混ざらないようにする
   assert.match(source, /order\.customerName\) \|\| ''\)\.replace\(\/\\s\+\/g, ' '\)\.trim\(\)/);
 });
+
+test("見積書は太字を使いすぎない", () => {
+  const from = source.indexOf("'*{box-sizing:border-box}body{margin:0;background:#eef5fb");
+  const to = source.indexOf("@media print{body{background:#fff}", from);
+  assert.ok(from > 0 && to > from);
+  const sheetCss = source.slice(from, to);
+  // 帳票の要素に 800/900 の太字を残さない（画面だけのツールバーは対象外）
+  const heavy = [...sheetCss.matchAll(/\.[A-Za-z][^{]*\{[^}]*font-weight:\s*(?:800|900)[^}]*\}/g)]
+    .map((m) => m[0].slice(0, m[0].indexOf("{")))
+    .filter((selector) => !selector.includes(".toolbar"));
+  assert.deepEqual(heavy, []);
+  // 強調は表題・自社名・金額に絞る
+  assert.match(sheetCss, /\.title\{[^}]*font-weight:700/);
+  assert.match(sheetCss, /\.companyName\{[^}]*font-weight:700/);
+  assert.match(sheetCss, /\.totalValue\{[^}]*font-weight:700/);
+  assert.match(sheetCss, /\.itemTable th\{[^}]*font-weight:500\}/);
+  assert.match(sheetCss, /\.productTitle\{[^}]*font-weight:500/);
+});
