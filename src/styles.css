@@ -752,6 +752,24 @@ button:hover {
   overflow: hidden;
 }
 
+/* 顧客名（施設名）は Shift+Enter / Alt+Enter で2段に分けられるので textarea。
+   見た目・印刷結果は他の1行入力と同じにする。 */
+.entryGrid .sheetCell textarea.customerNameInput {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #111827;
+  min-height: 25px;
+  padding: 2px 4px;
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.25;
+  text-align: center;
+  resize: none;
+  overflow: hidden;
+}
+
 .entryGrid .sheetCell input,
 .entryGrid .sheetCell select,
 .entryProductTable input,
