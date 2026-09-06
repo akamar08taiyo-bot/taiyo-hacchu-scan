@@ -75,3 +75,26 @@ test("明細表は品目と集計を分け、集計は消費税の列まで寄�
   assert.equal(shifted.length, 3);
   assert.doesNotMatch(source, /class="tableSubtotal">[^<]*<span[\s\S]{0,400}?<\/td><td><\/td><\/tr>/);
 });
+
+test("見積書は明細行と備考行を追加・削除でき、金額は明細から再計算される", () => {
+  // ツールバーの操作ボタン
+  assert.match(source, /<button type="button" id="addRowButton">明細行を追加<\/button>/);
+  assert.match(source, /<button type="button" id="addRemarkButton">備考行を追加<\/button>/);
+  // 商品行・送料行は明細行として印を付け、追加行と同じ扱いにする
+  assert.match(source, /<tbody><tr class="itemRow">/);
+  assert.match(source, /<tr class="shippingRow itemRow">/);
+  // 追加・削除・備考追加
+  assert.match(source, /function estAddItemRow\(\)/);
+  assert.match(source, /function estAddRemarkLine\(\)/);
+  assert.match(source, /className="rowDelete"/);
+  assert.match(source, /if\(estItemRows\(\)\.length<=1\)return;row\.parentNode\.removeChild\(row\);estRecalcTotals\(\)/);
+  // 小計・消費税・合計・上部の御見積金額は明細の合計から出す
+  assert.match(source, /function estRecalcTotals\(\)/);
+  for (const field of ["subtotalTable", "taxTable", "grandTotalTable"]) {
+    assert.match(source, new RegExp(`put\\("\\[data-field=${field}\\]"`));
+  }
+  assert.match(source, /data-field=grandTotalTaxIn/);
+  // 行の削除ボタンは印刷にもPDFにも出さない
+  assert.match(source, /html\.pdfExport \.rowDelete\{display:none\}/);
+  assert.match(source, /@media print\{[^}]*\}\.rowDelete\{display:none!important\}|\.rowDelete\{display:none!important\}/);
+});
