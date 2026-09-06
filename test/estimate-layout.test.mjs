@@ -62,10 +62,14 @@ test("見積書は太字を使いすぎない", () => {
   assert.doesNotMatch(sheetCss, /totalSummaryRow \.tableSubtotal strong\{font-weight:700\}/);
 });
 
-test("明細表は商品行と集計行の間を1行あけ、集計は消費税の列まで寄せる", () => {
-  // 商品行のあとに空行を挟んでから 諸経費(送料)・小計・消費税・合計 が続く
-  assert.match(source, /<tr class="spacerRow">(<td[^>]*><\/td>){5}<\/tr>'\+shippingRow/);
-  assert.match(source, /\.itemTable \.spacerRow td\{height:6mm/);
+test("明細表は品目と集計を分け、集計は消費税の列まで寄せる", () => {
+  // 品目（商品・送料）は続けて並べ、そのあとに空行を挟んで集計へ移る
+  assert.match(source, /'\+shippingRow\+'<tr class="spacerRow">(<td[^>]*><\/td>){5}<\/tr><tr class="subtotalRow">/);
+  // 空行は罫線を消した余白にし、集計は枠と地色を持つ右側のブロックとして独立させる
+  assert.match(source, /\.itemTable \.spacerRow td\{height:4\.5mm;background:#fff;border:0\}/);
+  assert.match(source, /\.itemTable \.tableSubtotalPad\{background:#fff;border:0\}/);
+  assert.match(source, /\.itemTable \.subtotalRow \.tableSubtotal\{background:#f4faff;border:0\.3mm solid #c1d9ef\}/);
+  assert.match(source, /\.itemTable \.totalSummaryRow \.tableSubtotal\{background:#e6f2ff;border-top:0\.5mm solid #7fb0e2\}/);
   // 集計行は先頭に空セルを置いて1列ずらし、右端が消費税の列に来る
   const shifted = [...source.matchAll(/<tr class="subtotalRow[^"]*"><td class="tableSubtotalPad"><\/td><td colspan="4" class="tableSubtotal">/g)];
   assert.equal(shifted.length, 3);
