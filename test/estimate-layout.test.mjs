@@ -53,10 +53,21 @@ test("見積書は太字を使いすぎない", () => {
     .map((m) => m[0].slice(0, m[0].indexOf("{")))
     .filter((selector) => !selector.includes(".toolbar"));
   assert.deepEqual(heavy, []);
-  // 強調は表題・自社名・金額に絞る
+  // 太字は表題だけ。社名も金額も標準の太さにする
   assert.match(sheetCss, /\.title\{[^}]*font-weight:700/);
-  assert.match(sheetCss, /\.companyName\{[^}]*font-weight:700/);
-  assert.match(sheetCss, /\.totalValue\{[^}]*font-weight:700/);
+  assert.match(sheetCss, /\.companyName\{[^}]*font-weight:500\}/);
+  assert.match(sheetCss, /\.totalValue\{[^}]*font-weight:500/);
   assert.match(sheetCss, /\.itemTable th\{[^}]*font-weight:500\}/);
   assert.match(sheetCss, /\.productTitle\{[^}]*font-weight:500/);
+  assert.doesNotMatch(sheetCss, /totalSummaryRow \.tableSubtotal strong\{font-weight:700\}/);
+});
+
+test("明細表は商品行と集計行の間を1行あけ、集計は消費税の列まで寄せる", () => {
+  // 商品行のあとに空行を挟んでから 諸経費(送料)・小計・消費税・合計 が続く
+  assert.match(source, /<tr class="spacerRow">(<td[^>]*><\/td>){5}<\/tr>'\+shippingRow/);
+  assert.match(source, /\.itemTable \.spacerRow td\{height:6mm/);
+  // 集計行は先頭に空セルを置いて1列ずらし、右端が消費税の列に来る
+  const shifted = [...source.matchAll(/<tr class="subtotalRow[^"]*"><td class="tableSubtotalPad"><\/td><td colspan="4" class="tableSubtotal">/g)];
+  assert.equal(shifted.length, 3);
+  assert.doesNotMatch(source, /class="tableSubtotal">[^<]*<span[\s\S]{0,400}?<\/td><td><\/td><\/tr>/);
 });
