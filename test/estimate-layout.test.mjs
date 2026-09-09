@@ -98,3 +98,16 @@ test("見積書は明細行と備考行を追加・削除でき、金額は明�
   assert.match(source, /html\.pdfExport \.rowDelete\{display:none\}/);
   assert.match(source, /@media print\{[^}]*\}\.rowDelete\{display:none!important\}|\.rowDelete\{display:none!important\}/);
 });
+
+test("見積書の帳票内にフォーム部品を置かない（PDFで文字が切れるため）", () => {
+  const from = source.indexOf("function simpleEstimateHtmlReference(e,t,n,q){");
+  const to = source.indexOf("const simpleEstimateHtmlReferenceBeforeSummary", from);
+  assert.ok(from > 0 && to > from);
+  const builder = source.slice(from, to);
+  // html2canvas は input の値テキストを下にずらして描くため、発行日が切れていた。
+  // 帳票（.sheet）内の編集項目は contenteditable の span に統一する。
+  // ツールバーの営業所セレクトは印刷・PDFに出ないので対象外。
+  const formTags = [...builder.matchAll(/<(input|textarea)\b[^>]*>/g)].map((m) => m[0]);
+  assert.deepEqual(formTags, []);
+  assert.match(builder, /<span id="quoteDate" class="editable companyMetaValue" contenteditable="true" data-field="quoteDate">/);
+});

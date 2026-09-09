@@ -92,3 +92,23 @@
 - 修正前後で同じ操作をして生成物（PDF/画像）を比較し、「直したい箇所以外は
   ピクセル単位で変わっていないこと」（例: 給付なしモードのスクリーンショットの
   md5一致）を確認したのも有効だった。
+
+---
+
+## 2026-09-09 見積書PDFで発行日が切れる
+
+### 8. 帳票内に `<input>` を置くとPDF（html2canvas）で文字が切れる
+- **事実**: 見積書をPDF保存すると「発行日」の日付だけ下半分が切れて潰れていた。
+  画面表示・ブラウザ印刷では正常で、PDF保存のときだけ発生していた。
+- **原因**: 見積書の編集項目はすべて `contenteditable` の `<span class="editable">`
+  で統一されているのに、**発行日だけ `<input id="quoteDate">` になっていた**。
+  html2canvas は input の値テキストを独自ロジックで描画し、ブラウザ本来の
+  垂直中央揃えと合わないため、テキストが下にずれて枠外が切り落とされていた。
+- **対処**: 発行日を他の項目と同じ `<span class="editable companyMetaValue"
+  contenteditable="true" data-field="quoteDate">` に置き換え、不要になった
+  `.companyMeta input` セレクタも削除した。
+  `test/estimate-layout.test.mjs` に「帳票ビルダー内に input/textarea を
+  生成しないこと」の検査を追加（ツールバーの select は印刷に出ないので対象外）。
+- **今後**: **html2canvas でPDF化する範囲にフォーム部品（input/textarea/select）を
+  置かない**。編集させたい項目は `contenteditable` の span/div にする。
+  PDFの不具合調査では「その要素だけ他と実装が違わないか」をまず疑う。
