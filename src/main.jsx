@@ -410,7 +410,11 @@ function simpleEstimateHtmlReference(e,t,n,q){
   var rawProduct=String(order.productName||'').trim().replace(/[_＿]+/g,' ').replace(/\s+/g,' ').trim(), model=String(order.modelNumber||'').trim();
   var product=esc(rawProduct+(model&&rawProduct&&!rawProduct.includes(model)?' / '+model:''));
   var color=String(order.color||'').trim(), size=sanitizeScanSize(order.size||'');
-  var optionText=[color,size].filter(Boolean).join(' / ').replace(/[_＿]+/g,' ').replace(/\s+/g,' ').trim();
+  /* 商品名にすでに色・サイズが入っていることが多い（例:「…FSフィット/536-057 ブルー」）。
+     その場合は下の行に重ねて出さない。型番の扱いと同じ考え方。 */
+  var tidy=function(v){return String(v||'').replace(/[_＿]+/g,' ').replace(/\s+/g,' ').trim()};
+  var optionText=[color,size].map(tidy).filter(Boolean)
+    .filter(function(part){return !tidy(rawProduct).includes(part)}).join(' / ');
   var noteParts=[];
   if(optionText) noteParts.push(optionText);
   if(listPrice) noteParts.push('定価'+listPrice.toLocaleString('ja-JP')+'\u5186');

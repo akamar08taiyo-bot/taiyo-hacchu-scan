@@ -111,3 +111,10 @@ test("見積書の帳票内にフォーム部品を置かない（PDFで文字�
   assert.deepEqual(formTags, []);
   assert.match(builder, /<span id="quoteDate" class="editable companyMetaValue" contenteditable="true" data-field="quoteDate">/);
 });
+
+test("商品名にすでに入っている色・サイズは明細の下段に重ねて出さない", () => {
+  // 例:「…FSフィット/536-057 ブルー」＋色「ブルー」で「ブルー」が二重に並んでいた
+  assert.match(source, /\.filter\(function\(part\)\{return !tidy\(rawProduct\)\.includes\(part\)\}\)/);
+  // 型番も同じ考え方で重複を避けている（既存の扱いを壊していないこと）
+  assert.match(source, /model&&rawProduct&&!rawProduct\.includes\(model\)/);
+});
