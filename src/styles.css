@@ -754,6 +754,72 @@ button:hover {
 
 /* 顧客名（施設名）は Shift+Enter / Alt+Enter で2段に分けられるので textarea。
    見た目・印刷結果は他の1行入力と同じにする。 */
+/* 入力途中の受注簿が残っているときに、続きから入力するか新しく始めるかを選ぶダイアログ。 */
+.draftPanel {
+  width: min(520px, calc(100vw - 48px));
+  padding: 22px 24px 20px;
+}
+
+.draftPanel h2 {
+  margin: 0 0 8px;
+  color: #123a5c;
+  font-size: 18px;
+}
+
+.draftPanel p {
+  margin: 0 0 14px;
+  color: #5b6b7c;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.draftSummary {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 6px 12px;
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #dbe6ef;
+  border-radius: 10px;
+  background: #f6fafd;
+  font-size: 13px;
+}
+
+.draftSummary dt {
+  color: #6b7c8d;
+}
+
+.draftSummary dd {
+  margin: 0;
+  color: #16283a;
+  overflow-wrap: anywhere;
+}
+
+.draftActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.draftActions button {
+  min-width: 150px;
+  padding: 10px 16px;
+  border: 1px solid #9bb8d5;
+  border-radius: 8px;
+  background: #fff;
+  color: #173d70;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.draftActions button.primary {
+  border-color: #1769aa;
+  background: #1769aa;
+  color: #fff;
+}
+
 /* 営業担当・発注者・発注先・型番は手打ちで自由に入力できる。登録済みの名前は
    自前の候補リストとして入力欄の真下に出す（datalistは位置がブラウザ依存のため不使用）。 */
 .namePicker {
