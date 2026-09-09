@@ -31,8 +31,12 @@ test("次に開いたとき「続きから」か「新しく」を選べる", ()
   assert.match(source, /function acceptOrderDraft\(\)/);
   assert.match(source, /setMultiSaved\(Array\.isArray\(saved\.multiSaved\)\?saved\.multiSaved:\[\]\)/);
   assert.match(source, /if\(saved\.image\)a\(saved\.image\)/);
-  // 新しく：下書きを消す
-  assert.match(source, /function discardOrderDraft\(\)\{\s*setDraftOffer\(null\);\s*clearOrderDraft\(\)/);
+  // 新しく：押し間違いで失わないよう一度確認してから消す
+  assert.match(source, /function discardOrderDraft\(\)/);
+  assert.match(source, /if\(!window\.confirm\(`前回の入力[\s\S]{0,60}を削除して新しく始めます。よろしいですか？`\)\)return/);
+  assert.match(source, /setDraftOffer\(null\);\s*clearOrderDraft\(\);/);
+  // 復元する側には確認を挟まない（安全な操作に手間を足さない）
+  assert.doesNotMatch(source, /function acceptOrderDraft\(\)\{[\s\S]{0,400}window\.confirm/);
   // 選択のダイアログ
   assert.match(source, /children:`前回の入力が残っています`/);
   assert.match(source, /children:`続きから入力する`/);

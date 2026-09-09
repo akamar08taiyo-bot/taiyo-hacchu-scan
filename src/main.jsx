@@ -264,6 +264,9 @@ function Ot(){let[e,t]=(0,A.useState)(Be),[n,r]=(0,A.useState)(Ve),[i,a]=(0,A.us
     h(`前回の入力を復元しました`);
   }
   function discardOrderDraft(){
+    /* 押し間違いで前回の入力を失わないよう、消す前に一度だけ確認する。 */
+    let label=String(draftOffer?.order?.customerName||draftOffer?.order?.productName||``).trim();
+    if(!window.confirm(`前回の入力${label?`（${label}）`:``}を削除して新しく始めます。よろしいですか？`))return;
     setDraftOffer(null);
     clearOrderDraft();
     h(`新しく入力を始めます`);
