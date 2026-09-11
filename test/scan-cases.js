@@ -28,6 +28,31 @@ function kaientaiPage(o) {
 
 const cases = [
   {
+    // 2通りの読み取り方（psm 6 / psm 11）の結果が1行に並び、商品名が二重になっていた実例。
+    name: 'ラップポン介護用カタメルサー（同じ見出しを2回読み取ってしまう）',
+    lines: kaientaiPage({
+      title: 'ラップポン介護用カタメルサーT3/COCOT3P1） 6L ラップポン人介護用カタメルサーT3/COCOT3P1） 6L',
+      catalogNumber: 'T0989', maker: '日本セイフティー',
+      jan: '4589922490336', webCode: '373031', tais: '',
+      retail: '1,200円', wholesale: '960円',
+    }),
+    expect: { listPrice: 1200, cost: 960, catalogNumber: 'T0989', webCode: '373031',
+              productNameIncludes: 'ラップポン介護用カタメルサーT3',
+              productNameNotIncludes: 'ラップポン人' },
+  },
+  {
+    // 商品名の先頭の数字が「箇条書きの番号」と誤判定されて落ちていた実例。
+    name: '4点ステッキS（商品名の先頭の数字を消さない）',
+    lines: kaientaiPage({
+      title: '4点ステッキS FS4-B ブラック',
+      catalogNumber: 'S9174', maker: 'イーストアイ',
+      jan: '4955574810189', webCode: '220199', tais: '',
+      retail: '9,800円', wholesale: '5,880円',
+    }),
+    expect: { listPrice: 9800, cost: 5880, catalogNumber: 'S9174',
+              productNameIncludes: '4点ステッキS' },
+  },
+  {
     name: '浴槽台 ユクリアAir レギュラー1220（価格改定予告あり）',
     lines: kaientaiPage({
       title: '浴槽台ユクリアAirレギュラー1220/PN-L11220A ブルー',

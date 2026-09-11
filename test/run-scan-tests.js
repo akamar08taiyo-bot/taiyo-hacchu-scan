@@ -23,6 +23,12 @@ for (const c of cases) {
   const num = (v) => (v === '' || v == null ? null : Number(v));
 
   for (const [key, want] of Object.entries(c.expect)) {
+    if (key === 'productNameIncludes') {
+      if (!String(got.productName || '').includes(want)) {
+        errors.push(`商品名に入っているはずの文字が無い: "${want}" → "${got.productName}"`);
+      }
+      continue;
+    }
     if (key === 'productNameNotIncludes') {
       if (String(got.productName || '').includes(want)) {
         errors.push(`商品名にゴミ文字が残っている: "${want}" → "${got.productName}"`);
