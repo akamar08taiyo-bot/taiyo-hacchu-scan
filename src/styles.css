@@ -83,24 +83,6 @@
   }
 }
 
-/* Keep the live order-entry controls intact, but make captured/printed sheets
-   behave like a clean form: the title is centered and screen-only controls
-   do not leave an empty grid column behind. */
-.pdfCaptureMode .orderTitleWithAdd {
-  display: block !important;
-  text-align: center !important;
-  margin: 4px 0 12px !important;
-}
-
-.pdfCaptureMode .orderTitleWithAdd .orderTitleSpacer {
-  display: none !important;
-}
-
-.pdfCaptureMode .orderTitleWithAdd h2 {
-  margin: 0 !important;
-  text-align: center !important;
-}
-
 @media print {
   .orderTitleWithAdd {
     display: block !important;
@@ -3559,22 +3541,6 @@ body,
 .emptyImage span {
   color: #42596a !important;
   font-weight: 600;
-}
-
-/* Final print/PDF alignment overrides. */
-.pdfCaptureMode .orderTitleWithAdd {
-  display: block !important;
-  text-align: center !important;
-  margin: 4px 0 12px !important;
-}
-
-.pdfCaptureMode .orderTitleWithAdd .orderTitleSpacer {
-  display: none !important;
-}
-
-.pdfCaptureMode .orderTitleWithAdd h2 {
-  margin: 0 !important;
-  text-align: center !important;
 }
 
 @media print {

@@ -195,3 +195,15 @@ test("PDF作成中は受注簿のPDF保存ボタンを押せなくする", () =>
   // 押せないことが見て分かる
   assert.match(source, /onClick:pdfDownload,disabled:pdfBusy,children:pdfBusy\?`PDF作成中…`:`PDF保存`/);
 });
+
+test("動かないPDF取り込み用のリスナーとCSSを残さない", () => {
+  // index.html のリスナーは textContent === "PDF" が条件だが実際のボタンは
+  // 「PDF保存」で、一度も動いていなかった（pdfCaptureMode も付かない）。
+  // 画面専用ボタンをPDFに写さない役目は pdfDownload() の印刷CSS流用が担っている。
+  assert.equal(indexHtml.includes("pdfCaptureMode"), false);
+  assert.equal(indexHtml.includes("data-html2canvas-ignore"), false);
+  assert.equal(styles.includes("pdfCaptureMode"), false);
+  // 代わりに効いている印刷側の指定は残っていること
+  assert.match(styles, /@media print \{\s*\.orderTitleWithAdd \{[^}]*text-align: center !important/);
+  assert.match(source, /function collectPrintCssText\(\)/);
+});

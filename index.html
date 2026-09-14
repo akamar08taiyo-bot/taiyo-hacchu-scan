@@ -14,24 +14,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script>
-      // The in-app PDF button rasterizes the order sheet with html2canvas.
-      // Mark screen-only controls before React's click handler starts so they
-      // are omitted from the captured PDF without changing the normal screen.
-      document.addEventListener("click", (event) => {
-        const button = event.target && event.target.closest ? event.target.closest("button") : null;
-        if (!button || (button.textContent || "").trim() !== "PDF") return;
-        document.documentElement.classList.add("pdfCaptureMode");
-        document.querySelectorAll(".orderEntrySheet .no-print").forEach((element) => {
-          element.setAttribute("data-html2canvas-ignore", "true");
-        });
-        window.setTimeout(() => {
-          document.documentElement.classList.remove("pdfCaptureMode");
-          document.querySelectorAll(".orderEntrySheet .no-print[data-html2canvas-ignore=\"true\"]").forEach((element) => {
-            element.removeAttribute("data-html2canvas-ignore");
-          });
-        }, 10000);
-      }, true);
-    </script>
   </body>
 </html>
