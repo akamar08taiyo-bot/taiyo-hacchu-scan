@@ -132,13 +132,13 @@ test("複数商品の見積書PDFはウィンドウ幅で文字サイズが変�
 });
 
 test("給付は支給限度額を画面から直せ、超過分と利用者支払額を帳票に出す", () => {
-  // 限度額は利用者ごとに違うので固定値にしない。既定は特定福祉用具販売の10万円。
-  assert.match(source, /BENEFIT_LIMIT_DEFAULT=100000/);
-  assert.match(source, /careInsuranceBalance:BENEFIT_LIMIT_DEFAULT/);
-  assert.match(source, /careInsuranceBalance\|\|BENEFIT_LIMIT_DEFAULT/);
+  // 限度額は利用者ごとに違うので固定値にしない。未入力のときは給付種別の基準額。
+  assert.match(source, /BENEFIT_LIMIT_BY_TYPE=\{"特定福祉用具":100000,"住宅改修":200000\}/);
+  assert.match(source, /careInsuranceBalance\|\|benefitLimitFor\(e\)/);
   assert.equal(source.includes("careInsuranceBalance||200000"), false);
   // 給付のときだけ出る入力欄
   assert.match(source, /label:`支給限度額`/);
+  assert.match(source, /label:`給付種別`/);
   assert.match(source, /o\(`careInsuranceBalance`,t\.target\.value\)/);
   // 超えた分と、利用者が実際に払う合計。画面と印刷の両方に出す。
   assert.match(source, /children:`限度額超過分\(全額自費\)`/);
@@ -147,8 +147,18 @@ test("給付は支給限度額を画面から直せ、超過分と利用者支�
   assert.match(source, /<dt>利用者支払額 合計\(税込\)<\/dt>/);
   // 限度額内なら行は増やさない（給付の項目は「追加」する方針を崩さない）
   assert.match(source, /bc\.totalTaxIn>bc\.target\?/);
+  // 給付種別を選び直したら限度額もその種別の基準額に入れ替える
+  assert.match(source, /o\(`benefitServiceType`,t\.target\.value\);o\(`careInsuranceBalance`,String\(BENEFIT_LIMIT_BY_TYPE\[t\.target\.value\]\?\?BENEFIT_LIMIT_DEFAULT\)\)/);
+  // 空欄のまま離れたら、その種別の基準額に戻す（表示と計算に使う値を一致させる）
+  assert.match(source, /onBlur:t=>\{t\.target\.value\.trim\(\)===``&&o\(`careInsuranceBalance`,String\(benefitLimitFor\(e\)\)\)\}/);
+  // セレクトは画面だけ。印刷は .printValue（二重に出ていた）
+  assert.match(source, /\(0,j\.jsx\)\(`select`,\{className:`no-print`,value:e\.benefitServiceType/);
+
+  // 種別ごとの既定額
+  assert.equal(JSON.parse(source.match(/BENEFIT_LIMIT_BY_TYPE=(\{[^}]*\})/)[1])["住宅改修"], 200000);
+  assert.equal(JSON.parse(source.match(/BENEFIT_LIMIT_BY_TYPE=(\{[^}]*\})/)[1])["特定福祉用具"], 100000);
   // 印刷でも先頭グリッドが折り返さないよう列数を合わせる
-  assert.match(styles, /給付は先頭グリッドに「給付割合」「支給限度額」が増えるので10列/);
+  assert.match(styles, /給付は先頭グリッドに「給付種別」「給付割合」「支給限度額」が増えるので/);
 
   // 利用者負担＋保険者負担＋超過分 ＝ 商品代金 になることを再現して確認
   for (const [total, limit, ratio] of [[264000, 100000, 1], [264000, 200000, 1], [88000, 100000, 1], [264000, 100000, 3]]) {

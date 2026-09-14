@@ -3731,10 +3731,11 @@ body,
     page-break-inside: avoid !important;
   }
 
-  /* 給付は先頭グリッドに「給付割合」「支給限度額」が増えるので10列にして折り返さない。 */
+  /* 給付は先頭グリッドに「給付種別」「給付割合」「支給限度額」が増えるので
+     11列にして折り返さない。 */
   .orderEntrySheet.benefitMode .entryGridPrimary {
     grid-template-columns:
-      .60fr .66fr .60fr .74fr .60fr .72fr 1.10fr .72fr .76fr .76fr !important;
+      .56fr .60fr .82fr .56fr .70fr .56fr .68fr 1.02fr .68fr .70fr .70fr !important;
   }
 
   .orderEntrySheet.benefitMode .benefitBreakdown > div {
