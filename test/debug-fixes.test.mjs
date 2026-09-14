@@ -159,3 +159,9 @@ test("給付は支給限度額を画面から直せ、超過分と利用者支�
     assert.equal(user + excess, user + Math.max(0, total - target));
   }
 });
+
+test("新しい商品ページは送料0・数量1から始まる", () => {
+  // 前の商品の送料が残ると、同じ便でも送料が二重計上されていた
+  assert.match(source, /function multiBlankOrder\(\)\{return\{[^}]*shippingFee:0,quantity:1/);
+  assert.match(source, /le\(\),t\(e=>\(\{\.\.\.e,shippingFee:0,quantity:1\}\)\),h\(`商品を追加しました/);
+});
