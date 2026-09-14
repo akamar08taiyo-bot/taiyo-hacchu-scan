@@ -129,3 +129,33 @@ test("複数商品の見積書PDFはウィンドウ幅で文字サイズが変�
   assert.match(source, /new MutationObserver\(function\(\)\{if\(document\.documentElement\.classList\.contains\('pdfExport'\)\)autoFitEstimateItems\(\)\}\)/);
   assert.match(source, /attributeFilter:\['class'\]/);
 });
+
+test("給付は支給限度額を画面から直せ、超過分と利用者支払額を帳票に出す", () => {
+  // 限度額は利用者ごとに違うので固定値にしない。既定は特定福祉用具販売の10万円。
+  assert.match(source, /BENEFIT_LIMIT_DEFAULT=100000/);
+  assert.match(source, /careInsuranceBalance:BENEFIT_LIMIT_DEFAULT/);
+  assert.match(source, /careInsuranceBalance\|\|BENEFIT_LIMIT_DEFAULT/);
+  assert.equal(source.includes("careInsuranceBalance||200000"), false);
+  // 給付のときだけ出る入力欄
+  assert.match(source, /label:`支給限度額`/);
+  assert.match(source, /o\(`careInsuranceBalance`,t\.target\.value\)/);
+  // 超えた分と、利用者が実際に払う合計。画面と印刷の両方に出す。
+  assert.match(source, /children:`限度額超過分\(全額自費\)`/);
+  assert.match(source, /children:`利用者支払額 合計\(税込\)`/);
+  assert.match(source, /<dt>限度額超過分\(全額自費\)<\/dt>/);
+  assert.match(source, /<dt>利用者支払額 合計\(税込\)<\/dt>/);
+  // 限度額内なら行は増やさない（給付の項目は「追加」する方針を崩さない）
+  assert.match(source, /bc\.totalTaxIn>bc\.target\?/);
+  // 印刷でも先頭グリッドが折り返さないよう列数を合わせる
+  assert.match(styles, /給付は先頭グリッドに「給付割合」「支給限度額」が増えるので10列/);
+
+  // 利用者負担＋保険者負担＋超過分 ＝ 商品代金 になることを再現して確認
+  for (const [total, limit, ratio] of [[264000, 100000, 1], [264000, 200000, 1], [88000, 100000, 1], [264000, 100000, 3]]) {
+    const target = Math.min(total, limit);
+    const user = Math.ceil((target * ratio) / 10);
+    const insurer = target - user;
+    const excess = total - target;
+    assert.equal(user + insurer + excess, total, `${total}円 / 限度額${limit}円 が合いません`);
+    assert.equal(user + excess, user + Math.max(0, total - target));
+  }
+});

@@ -36,7 +36,11 @@ test("benefit summary states the ratio and both burden shares", () => {
 
 test("benefit print stays on one A4 landscape page with its image", () => {
   assert.match(styles, /height: 202mm !important/);
-  assert.match(styles, /grid-template-columns:[\s\S]{0,180}\.64fr \.72fr \.66fr/);
+  // 給付の先頭グリッドは項目数ぶんの列を持ち、折り返さない
+  // （販売の9項目 ＋ 給付割合 ＋ 支給限度額 = 10列）
+  const benefitGrid = styles.match(/\.orderEntrySheet\.benefitMode \.entryGridPrimary \{[^}]*\}/);
+  assert.ok(benefitGrid, "給付モードの先頭グリッド指定が見つかりません");
+  assert.equal((benefitGrid[0].match(/\d*\.?\d+fr/g) || []).length, 10);
   assert.match(styles, /break-inside: avoid-page !important/);
   assert.match(styles, /page-break-inside: avoid !important/);
   assert.match(styles, /object-fit: contain !important/);

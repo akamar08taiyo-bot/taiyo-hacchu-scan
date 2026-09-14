@@ -3765,10 +3765,10 @@ body,
     page-break-inside: avoid !important;
   }
 
-  /* 給付は先頭グリッドに「給付割合」が1つ増えるので9列にして折り返さない。 */
+  /* 給付は先頭グリッドに「給付割合」「支給限度額」が増えるので10列にして折り返さない。 */
   .orderEntrySheet.benefitMode .entryGridPrimary {
     grid-template-columns:
-      .64fr .72fr .66fr .64fr .78fr 1.18fr .78fr .80fr .80fr !important;
+      .60fr .66fr .60fr .74fr .60fr .72fr 1.10fr .72fr .76fr .76fr !important;
   }
 
   .orderEntrySheet.benefitMode .benefitBreakdown > div {
