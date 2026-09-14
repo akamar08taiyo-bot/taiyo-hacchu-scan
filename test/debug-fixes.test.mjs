@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 const source = readFileSync(new URL("../src/main.jsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
 const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
 test("ヘッダーのツール名と説明が画面に出る", () => {
   // 見出しの文字はマークアップが持ち、CSSは font-size:0 で消さない。
@@ -172,4 +173,14 @@ test("数量を空欄のまま確定したら1に戻す（受注簿と見積書�
   assert.match(source, /onBlur:e=>\{e\.target\.value\.trim\(\)===``&&o\(`quantity`,`1`\)\}/);
   // 0・負数・文字を入れたときの矯正（既存）も残っていること
   assert.match(source, /if\(e===`quantity`&&n!==``\)\{let v=M\(n\);n=String\(Math\.max\(1,Math\.round\(v\)\)\)\}/);
+});
+
+test("依存パッケージを latest 指定にしない（ビルドのたびに中身が変わらないようにする）", () => {
+  // react / vite などが "latest" だと、npm install のたびにメジャーごと
+  // 入れ替わり得て、PDFの見た目やビルドが予告なく変わる
+  const loose = Object.entries(pkg.dependencies || {}).filter(([, range]) => /^(latest|\*|)$/.test(String(range)));
+  assert.deepEqual(loose, []);
+  for (const name of ["react", "react-dom", "vite", "@vitejs/plugin-react"]) {
+    assert.match(pkg.dependencies[name], /^\d+\.\d+\.\d+$/, `${name} はバージョンを固定する`);
+  }
 });
