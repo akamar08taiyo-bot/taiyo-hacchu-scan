@@ -15,15 +15,6 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-      window.addEventListener("load", () => {
-        const brandTitle = document.querySelector(".brand h1");
-        const brandMark = document.querySelector(".logoMark");
-        const brandSubtitle = document.querySelector(".brand p");
-        if (brandTitle) brandTitle.textContent = "販売受注簿作成";
-        if (brandMark) brandMark.textContent = "販";
-        if (brandSubtitle) brandSubtitle.textContent = "画像を読み取り、販売受注簿へ反映";
-      });
-
       // The in-app PDF button rasterizes the order sheet with html2canvas.
       // Mark screen-only controls before React's click handler starts so they
       // are omitted from the captured PDF without changing the normal screen.

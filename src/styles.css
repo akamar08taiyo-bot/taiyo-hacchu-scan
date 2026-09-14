@@ -613,9 +613,10 @@ button:hover {
   border-top: 5px solid #1769aa;
   border-radius: 10px;
   color: #111827;
-  /* 親ペインが約780pxしかない画面幅で 820px を要求すると右端が見切れる。
-     親に収まる範囲で最大化し、狭いときだけ横スクロールさせる。 */
-  min-width: min(820px, 100%);
+  /* A4横の並びを崩さないための最小幅。狭い画面では .orderEntryPanel を
+     横スクロールさせる（min(820px,100%) にしていたときは幅が足りず、
+     受注区分〜売上日や商品表の右端が切り取られて入力できなかった）。 */
+  min-width: 820px;
   min-height: calc(100vh - 128px);
   display: flex;
   flex-direction: column;
@@ -1236,10 +1237,6 @@ button:hover {
   align-items: stretch;
   flex: 1;
   min-height: 220px;
-}
-
-@media (max-width: 1100px) {
-  .entryBottom { grid-template-columns: minmax(0, 1fr); }
 }
 
 .mailBox {
@@ -2144,6 +2141,24 @@ button:hover {
   align-self: stretch;
 }
 
+/* 縦長の写真を貼ると画像が受注簿の枠を押し広げ、PDF・印刷で下が切れていた。
+   画像は枠の中だけに収める。 */
+.sheetImage.orderAttachedImage {
+  position: relative;
+}
+
+/* html2canvas は object-fit を無視して枠いっぱいに描く（PDFで写真が歪む）。
+   要素の箱そのものを元画像の比率のまま最大化し、中央に置く。 */
+.sheetImage.orderAttachedImage > img {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
 .sheetCompany {
   position: absolute;
   right: 14px;
@@ -2160,6 +2175,12 @@ button:hover {
   font-size: 12px;
   font-weight: 900;
   z-index: 4;
+  /* 画面右下に固定で出す表示。下のボタンや入力欄を塞がないようにし、
+     受注簿の上に重なっても文字同士が読めなくならないよう地色を敷く。 */
+  pointer-events: none;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.88);
 }
 
 .drawer {
@@ -2485,6 +2506,29 @@ button:hover {
     align-items: stretch;
     min-height: 42mm;
     max-height: 60mm;
+  }
+
+  /* 縦長の写真でも枠の外へはみ出さない（PDF・印刷で下が切れていた） */
+  .sheetImage.orderAttachedImage {
+    position: relative;
+  }
+
+  /* html2canvas は object-fit を無視して枠いっぱいに描く（PDFで写真が歪む）。
+     要素の箱そのものを元画像の比率のまま最大化し、中央に置く。 */
+  .sheetImage.orderAttachedImage > img {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  /* 未入力欄のプレースホルダー（備考（任意）・自動 など）は刷らない */
+  .orderEntrySheet input::placeholder,
+  .orderEntrySheet textarea::placeholder {
+    color: transparent !important;
   }
 
   .orderAttachedImage {
@@ -3287,24 +3331,6 @@ body .integratedShell > .integratedTabs:first-of-type {
   visibility: hidden !important;
 }
 
-body .integratedShell .brand h1 {
-  font-size: 0 !important;
-}
-
-body .integratedShell .brand h1::after {
-  content: "販売受注簿作成ツール";
-  font-size: 22px;
-}
-
-body .integratedShell .brand p {
-  font-size: 0 !important;
-}
-
-body .integratedShell .brand p::after {
-  content: "商品画像を読み取り、販売受注簿を作成";
-  font-size: 12px;
-}
-
 /* 2026-07-30: reference-style visual system for the standalone order app.
    The workflow and data controls stay unchanged; these are presentation-only overrides. */
 :root {
@@ -3344,34 +3370,21 @@ body,
   background: linear-gradient(145deg, #f4b63e 0%, #ffd96f 100%) !important;
   color: #fff !important;
   box-shadow: 0 5px 12px rgba(242, 174, 54, .28);
-  font-size: 0 !important;
-}
-
-.logoMark::after {
-  content: "販";
   font-size: 19px;
-  font-weight: 900;
 }
 
+/* 見出しの文字はマークアップ側（src/main.jsx）が持つ。ここでは体裁だけを整える。
+   以前は font-size:0 + ::after で差し替えていたが、後続の指定で ::after だけが
+   打ち消され、タイトルと説明文がどこにも表示されない状態になっていた。 */
 .brand h1 {
-  font-size: 0 !important;
-  color: var(--reference-navy) !important;
-}
-
-.brand h1::after {
-  content: "販売受注簿作成";
   font-size: 20px;
+  color: var(--reference-navy) !important;
   letter-spacing: .02em;
 }
 
 .brand p {
-  font-size: 0 !important;
-  color: var(--reference-muted) !important;
-}
-
-.brand p::after {
-  content: "画像を読み取り、販売受注簿へ反映";
   font-size: 11px;
+  color: var(--reference-muted) !important;
 }
 
 .actions {
@@ -3536,17 +3549,6 @@ body,
   .topbar { align-items: flex-start; flex-wrap: wrap; }
   .actions { width: 100%; }
   .workspace { padding: 10px; }
-}
-
-/* The HTML bootstrap script supplies the accessible Japanese labels directly. */
-.app .logoMark::after,
-.app .brand h1::after,
-.app .brand p::after {
-  content: none !important;
-}
-
-.app .logoMark {
-  font-size: 19px !important;
 }
 
 /* Make the paste instructions easier to read without changing their layout. */
