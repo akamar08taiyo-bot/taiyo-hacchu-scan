@@ -165,3 +165,11 @@ test("新しい商品ページは送料0・数量1から始まる", () => {
   assert.match(source, /function multiBlankOrder\(\)\{return\{[^}]*shippingFee:0,quantity:1/);
   assert.match(source, /le\(\),t\(e=>\(\{\.\.\.e,shippingFee:0,quantity:1\}\)\),h\(`商品を追加しました/);
 });
+
+test("数量を空欄のまま確定したら1に戻す（受注簿と見積書の数字を合わせる）", () => {
+  // 空欄だと受注簿は0円、見積書は数量1で計算され食い違っていた。
+  // 打ち直しの邪魔にならないよう、入力中ではなく欄を離れたときだけ戻す。
+  assert.match(source, /onBlur:e=>\{e\.target\.value\.trim\(\)===``&&o\(`quantity`,`1`\)\}/);
+  // 0・負数・文字を入れたときの矯正（既存）も残っていること
+  assert.match(source, /if\(e===`quantity`&&n!==``\)\{let v=M\(n\);n=String\(Math\.max\(1,Math\.round\(v\)\)\)\}/);
+});
