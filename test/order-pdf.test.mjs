@@ -5,7 +5,8 @@ import { readFileSync } from "node:fs";
 const source = readFileSync(new URL("../src/main.jsx", import.meta.url), "utf8");
 
 test("販売受注簿はツールバーからそのままPDFにできる", () => {
-  assert.match(source, /\(0,j\.jsx\)\(`button`,\{onClick:pdfDownload,children:`PDF保存`\}\)/);
+  // ツールバーの「PDF保存」から呼ぶ（作成中は押せなくするので文言も切り替わる）
+  assert.match(source, /onClick:pdfDownload,disabled:pdfBusy,children:pdfBusy\?`PDF作成中…`:`PDF保存`/);
   assert.match(source, /async function pdfDownload\(\)/);
   // A4横・余白6mm。1枚に収める（はみ出しても分割せず縮小）
   assert.match(source, /orientation:`landscape`,unit:`mm`,format:`a4`/);
@@ -17,7 +18,7 @@ test("PDFは印刷と同じ見た目にする（印刷用CSSを流用し、後�
   assert.match(source, /function collectPrintCssText\(\)/);
   assert.match(source, /if\(rule\.media&&\/print\/\.test\(rule\.media\.mediaText\|\|``\)\)/);
   assert.match(source, /document\.head\.appendChild\(printCss\)/);
-  assert.match(source, /finally\{\s*printCss\.remove\(\);\s*\}/);
+  assert.match(source, /finally\{\s*printCss\.remove\(\);/);
   // 画面幅で仕上がりが変わらないよう、取り込み中はA4横の実寸に固定する
   assert.match(source, /\.orderEntrySheet\{width:289mm!important;[^`]*min-height:202mm!important/);
 });

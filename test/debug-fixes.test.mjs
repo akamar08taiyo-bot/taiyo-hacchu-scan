@@ -184,3 +184,14 @@ test("依存パッケージを latest 指定にしない（ビルドのたびに
     assert.match(pkg.dependencies[name], /^\d+\.\d+\.\d+$/, `${name} はバージョンを固定する`);
   }
 });
+
+test("PDF作成中は受注簿のPDF保存ボタンを押せなくする", () => {
+  // state だけだと同じフレームの連打をすり抜けるので ref で同期的に止める
+  assert.match(source, /pdfBusyRef=\(0,A\.useRef\)\(!1\)/);
+  assert.match(source, /if\(pdfBusyRef\.current\)\{h\(`PDFを作成中です。しばらくお待ちください`\);return\}/);
+  assert.match(source, /pdfBusyRef\.current=!0;\s*setPdfBusy\(!0\)/);
+  // 失敗しても必ず戻す
+  assert.match(source, /finally\{\s*printCss\.remove\(\);\s*pdfBusyRef\.current=!1;\s*setPdfBusy\(!1\)/);
+  // 押せないことが見て分かる
+  assert.match(source, /onClick:pdfDownload,disabled:pdfBusy,children:pdfBusy\?`PDF作成中…`:`PDF保存`/);
+});
