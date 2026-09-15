@@ -161,6 +161,19 @@ const cases = [
     expect: { listPrice: 22800, cost: 10260 },
   },
   {
+    // OCRが「コンパクト」の「パ」を1文字重複して読み取り「コンパパクト」になっていた実例。
+    name: 'シャワーチェアAir コンパクトSPワンタッチ（「パ」の重複読み取りを直す）',
+    lines: kaientaiPage({
+      title: 'シャワーチェアAirコンパパクトSPワンタッチ/PN-L41431D オレンジ',
+      catalogNumber: 'S1063', maker: 'パナソニック エイジフリー',
+      jan: '4549980709542', webCode: '485459', tais: '00980-000434',
+      retail: '34,300円', wholesale: '15,435円',
+    }),
+    expect: { listPrice: 34300, cost: 15435, catalogNumber: 'S1063', webCode: '485459',
+              productNameIncludes: 'コンパクトSPワンタッチ',
+              productNameNotIncludes: 'コンパパクト' },
+  },
+  {
     name: '軽減税率(課8)の商品',
     lines: kaientaiPage({
       title: '入浴用小物セット/900-100 ホワイト',
