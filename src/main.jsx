@@ -529,7 +529,12 @@ function simpleEstimateHtmlReference(e,t,n,q){
   var listPrice=simpleEstimateNumber(order.listPrice||order.listPriceTaxIn);
   var taxRate=order.taxType==='8%'?0.08:order.taxType==='\u975e\u8ab2\u7a0e'?0:0.1;
   var productTax=Math.floor(saleTotal*taxRate), shippingTax=Math.floor(shipping*taxRate);
-  var subtotal=saleTotal+shipping, totalTax=productTax+shippingTax, grandTotalIn=subtotal+totalTax, unitPrice=qtyNumber?Math.floor(saleTotal/qtyNumber):saleTotal;
+  var unitPrice=qtyNumber?Math.floor(saleTotal/qtyNumber):saleTotal;
+  /* 受注簿の「送料込合計(税抜/税込)」は自動計算値を手入力で訂正できる（orderManualAmount）。
+     見積書もその訂正を反映する（自動計算のsaleTotal+shippingのままにしない）。 */
+  var subtotal=simpleEstimateNumber(orderManualAmount(order.manualGrandTotalTaxOut, saleTotal+shipping));
+  var totalTax=Math.floor(subtotal*taxRate);
+  var grandTotalIn=simpleEstimateNumber(orderManualAmount(order.manualGrandTotalTaxIn, subtotal+totalTax));
   var now=new Date(), today=now.getFullYear()+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+String(now.getDate()).padStart(2,'0');
   var dateValue=order.createdAt?simpleEstimateJapaneseDate(order.createdAt):simpleEstimateJapaneseDate(today);
   var esc=simpleEstimateEscape, yen=function(v){return '\u00a5'+simpleEstimateNumber(v).toLocaleString('ja-JP')};
@@ -581,7 +586,11 @@ function simpleEstimateHtmlReference(e,t,n,q){
  }
 const simpleEstimateHtmlReferenceBeforeSummary=simpleEstimateHtmlReference;
 simpleEstimateHtmlReference=function(e,t,n,q){
-  var order=e||{}, totals=t||{}, shipping=simpleEstimateNumber(totals.shippingFee!=null?totals.shippingFee:order.shippingFee||0), saleTotal=simpleEstimateNumber(totals.saleTotal||order.saleUnitPrice||Math.floor(simpleEstimateNumber(order.listPrice)*0.8)), taxRate=order.taxType==='8%'?0.08:order.taxType==='\u975e\u8ab2\u7a0e'?0:0.1, productTax=Math.floor(saleTotal*taxRate), shippingTax=Math.floor(shipping*taxRate), subtotal=saleTotal+shipping, totalTax=productTax+shippingTax, grandTotalIn=subtotal+totalTax;
+  var order=e||{}, totals=t||{}, shipping=simpleEstimateNumber(totals.shippingFee!=null?totals.shippingFee:order.shippingFee||0), saleTotal=simpleEstimateNumber(totals.saleTotal||order.saleUnitPrice||Math.floor(simpleEstimateNumber(order.listPrice)*0.8)), taxRate=order.taxType==='8%'?0.08:order.taxType==='\u975e\u8ab2\u7a0e'?0:0.1, productTax=Math.floor(saleTotal*taxRate), shippingTax=Math.floor(shipping*taxRate);
+  /* 受注簿側の手入力訂正（送料込合計 税抜/税込）を見積書の集計にも反映する。 */
+  var subtotal=simpleEstimateNumber(orderManualAmount(order.manualGrandTotalTaxOut, saleTotal+shipping));
+  var totalTax=Math.floor(subtotal*taxRate);
+  var grandTotalIn=simpleEstimateNumber(orderManualAmount(order.manualGrandTotalTaxIn, subtotal+totalTax));
   var html=simpleEstimateHtmlReferenceBeforeSummary(e,t,n,q), yenEditable=function(v){return '\u00a5'+simpleEstimateNumber(v).toLocaleString('ja-JP')};
   html=html.replace('御見積金額　合計（税抜）','御見積金額　合計（税込）');
   html=html.replace(/(<span class="editable totalValue"[^>]*data-field=")subtotal("[^>]*>)[^<]*/, '$1grandTotalTaxIn$2'+yenEditable(grandTotalIn)+'&nbsp;&mdash;');

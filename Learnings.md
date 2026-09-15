@@ -244,3 +244,45 @@
 `test/scan-cases.js` に実例2件を追加し、**修正前のコードでは落ちること**を
 確認してから修正を入れた（10/12 → 12/12）。期待値に `productNameIncludes` を
 使えるよう `test/run-scan-tests.js` を拡張した。
+
+---
+
+## 2026-09-15 受注簿の金額訂正が見積書に反映されない
+
+### 16. 「送料込合計」の手入力訂正が見積書に伝わらない（起点となった不具合）
+- **事実**: 受注簿の管理情報にある「送料込合計(税抜)」「送料込合計(税込)」は
+  `orderManualAmount(e.manualGrandTotalTaxIn, t.grandTotalTaxIn)` のように
+  自動計算値を手入力で訂正できる作りなのに、その状態で「見積もり作成」を押すと
+  見積書の金額が訂正前（自動計算のまま）になっていた。
+- **原因調査で分かったこと（読み方の手がかり）**:
+  - 「見積もり作成」ボタンは `openSimpleEstimate` → `simpleEstimateHtmlReadable`
+    → 最終的に `simpleEstimateHtml`/`simpleEstimateHtmlReadable` 変数に
+    上書き代入されていく `simpleEstimateHtmlReference` ベースの実装に行き着く
+    （`const xxxBefore... = 現在の実装; xxx = function(){...xxxBefore...(...)...}`
+    という「前の実装をラップして再代入」パターンが何段も重なっている。
+    これは壊れているのではなく意図的な積み増し方式なので、
+    `grep -n -o "simpleEstimateHtmlReadable\s*=\s*[A-Za-z]*"` で
+    代入の順序を追い、**一番最後の代入**が実際に使われる実装だと判断する）。
+  - `simpleEstimateHtmlReference`（元の定義）と、それを集計行の追加のために
+    再代入でラップしている版の**両方**が、`totals.saleTotal`（$e()が返す
+    自動計算のみの値）と `order.shippingFee` から `subtotal`/`grandTotalIn` を
+    計算しており、`order.manualGrandTotalTaxOut`/`manualGrandTotalTaxIn`
+    （受注簿側の手入力訂正フィールド）を一切参照していなかった。
+- **対処**: 両方の計算箇所で `subtotal`/`grandTotalIn` の算出に
+  `orderManualAmount(order.manualGrandTotalTaxOut, saleTotal+shipping)` /
+  `orderManualAmount(order.manualGrandTotalTaxIn, subtotal+totalTax)` を使うよう
+  修正（`src/main.jsx` の `simpleEstimateHtmlReference` 定義本体と、
+  `simpleEstimateHtmlReferenceBeforeSummary` を使う再代入版の両方）。
+  税込のみ／税抜のみ／両方訂正、のどのパターンでも整合するよう、
+  税込側が空なら「訂正後の税抜金額×税率」から再計算する形にした。
+- **検証**: Playwright で実際に受注簿へ入力→「送料込合計(税込)」を手入力で
+  25000 に訂正→「見積もり作成」を押してポップアップを開き、
+  `.totalValue` と `[data-field="grandTotalTable"]` が ¥25,000 になることを確認。
+  `node --test` にも `orderManualAmount(order.manualGrandTotalTaxOut, ...)` の
+  存在を両方の計算箇所でチェックする再発防止テストを追加した
+  （`test/estimate-layout.test.mjs`）。
+- **今後**: 「受注簿の項目を手入力で訂正できるようにした」機能を追加したときは、
+  その項目を参照する**別画面（見積書・PDF・売上伝票への転記など）**が
+  自動計算値だけを見ていないか、`grep -n -o "order\.manual[A-Za-z]*"` で
+  訂正フィールドの参照箇所を全部洗い出してから確認する。
+  1箇所（受注簿本体の表示）だけ直して満足しない。

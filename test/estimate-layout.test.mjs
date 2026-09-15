@@ -118,3 +118,22 @@ test("商品名にすでに入っている色・サイズは明細の下段に�
   // 型番も同じ考え方で重複を避けている（既存の扱いを壊していないこと）
   assert.match(source, /model&&rawProduct&&!rawProduct\.includes\(model\)/);
 });
+
+test("受注簿で金額（送料込合計）を手入力訂正すると、見積書の集計もその金額になる", () => {
+  // 受注簿の「送料込合計(税抜/税込)」は orderManualAmount() で自動計算値を手入力訂正できるが、
+  // 見積書側（simpleEstimateHtmlReference とその集計を差し替えるラッパー）が
+  // saleUnitPrice+送料からの自動計算しか見ておらず、訂正が反映されなかった不具合の再発防止。
+  const referenceStart = source.indexOf("function simpleEstimateHtmlReference(e,t,n,q){");
+  const referenceEnd = source.indexOf("const simpleEstimateHtmlReferenceBeforeSummary", referenceStart);
+  assert.ok(referenceStart > 0 && referenceEnd > referenceStart);
+  const referenceBody = source.slice(referenceStart, referenceEnd);
+  assert.match(referenceBody, /orderManualAmount\(order\.manualGrandTotalTaxOut,\s*saleTotal\+shipping\)/);
+  assert.match(referenceBody, /orderManualAmount\(order\.manualGrandTotalTaxIn,\s*subtotal\+totalTax\)/);
+
+  const summaryWrapperStart = referenceEnd;
+  const summaryWrapperEnd = source.indexOf("simpleEstimateHtml=simpleEstimateHtmlReference;", summaryWrapperStart);
+  assert.ok(summaryWrapperEnd > summaryWrapperStart);
+  const summaryWrapperBody = source.slice(summaryWrapperStart, summaryWrapperEnd);
+  assert.match(summaryWrapperBody, /orderManualAmount\(order\.manualGrandTotalTaxOut,\s*saleTotal\+shipping\)/);
+  assert.match(summaryWrapperBody, /orderManualAmount\(order\.manualGrandTotalTaxIn,\s*subtotal\+totalTax\)/);
+});
