@@ -103,7 +103,8 @@ test("複数商品でも、手入力で訂正した合計が集計に反映さ�
   const corrected = multiProductTotals(multiBuildItems({}, [productA, { ...productB, manualGrandTotalTaxIn: "9000" }]));
   assert.equal(corrected.grandTotalTaxIn, 17600 + 9000);
 
-  // 税抜側の訂正は利益の計算根拠（送料込合計(税抜)）にも効く
+  // 税抜側の訂正は集計に持ち込まない（利益額の計算根拠を単一商品と揃えるため）。
+  // 税抜の訂正をどう扱うかは仕様確認が必要な項目として残している。
   const taxOut = multiProductTotals(multiBuildItems({}, [productA, { ...productB, manualGrandTotalTaxOut: "8500" }]));
-  assert.equal(taxOut.grandTotalTaxOut, 16000 + 8500);
+  assert.equal(taxOut.grandTotalTaxOut, 16000 + 8000);
 });
