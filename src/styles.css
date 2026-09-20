@@ -3616,6 +3616,9 @@ body,
     display: block !important;
     grid-template-columns: none !important;
     gap: 0 !important;
+    /* 画面用の .workspace{padding:14px} が後ろにあるため印刷でも効いてしまい、
+       A4横の印刷可能高さ202mmを3.7mm超えて給付モードが2ページに割れていた。 */
+    padding: 0 !important;
   }
 
   .workspace > .multiPrintPages,
@@ -3752,12 +3755,14 @@ body,
 }
 
 @media print {
-  /* A4横は余白4mmで202mmが使える高さ。給付は行が増えるので1ページに収める。 */
+  /* A4横は余白4mmで202mmが使える高さ。給付は行が増えるので1ページに収める。
+     ただし使える高さと同じ202mmを指定すると、枠線ぶんの端数だけはみ出して
+     2ページに割れるため、3mmだけ余裕を持たせる（中身は176mm程度なので隠れない）。 */
   .orderEntrySheet.benefitMode {
     box-sizing: border-box !important;
-    height: 202mm !important;
-    min-height: 202mm !important;
-    max-height: 202mm !important;
+    height: 199mm !important;
+    min-height: 199mm !important;
+    max-height: 199mm !important;
     overflow: hidden !important;
     break-inside: avoid-page !important;
     page-break-inside: avoid !important;

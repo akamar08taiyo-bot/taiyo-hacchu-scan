@@ -20,7 +20,17 @@ test("中身が無いときは残さず、容量超過でも文字データは�
   assert.match(source, /if\(!draftHasContent\(draft\.order,draft\.multiSaved\)\)\{clearOrderDraft\(\);return\}/);
   // 画像つきで入らなければ画像を落として保存し直す（入力の保護を優先）
   assert.match(source, /\{\.\.\.draft,image:``\}/);
-  assert.match(source, /_imgSnap,\.\.\.rest\}=page\|\|\{\};return rest/);
+  assert.match(source, /let dropSnap=page=>\{if\(!page\)return page;let\{_imgSnap,\.\.\.rest\}=page;return rest\}/);
+  // 商品ページと、追加前の入力途中ページの両方から画像を落とす
+  assert.match(source, /multiSaved:\(draft\.multiSaved\|\|\[\]\)\.map\(dropSnap\),multiDraft:dropSnap\(draft\.multiDraft\)/);
+});
+
+test("商品として追加する前の入力途中ページも保存して復元する", () => {
+  // ページを移動すると入力途中の商品は multiDraft に退避されるため、
+  // これを保存しないと再読み込みで消えてしまう。
+  assert.match(source, /order:e,multiSaved,multiPageIndex,multiDraft,/);
+  assert.match(source, /\},\[e,multiSaved,multiPageIndex,multiDraft,i,draftOffer\]\)/);
+  assert.match(source, /setMultiDraft\(saved\.multiDraft\|\|null\)/);
 });
 
 test("次に開いたとき「続きから」か「新しく」を選べる", () => {

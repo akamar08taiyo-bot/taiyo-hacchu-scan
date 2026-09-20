@@ -35,7 +35,14 @@ test("benefit summary states the ratio and both burden shares", () => {
 });
 
 test("benefit print stays on one A4 landscape page with its image", () => {
-  assert.match(styles, /height: 202mm !important/);
+  // A4横・余白4mmで使える高さは202mm。ぴったり202mmを指定すると枠線ぶんの端数で
+  // はみ出して2ページに割れたため、少しだけ小さい高さに固定して1ページへ収める。
+  const forcedHeight = styles.match(/\.orderEntrySheet\.benefitMode \{\s*box-sizing: border-box !important;\s*height: (\d+)mm !important/);
+  assert.ok(forcedHeight, "給付モードの印刷高さの指定が見つからない");
+  const heightMm = Number(forcedHeight[1]);
+  assert.ok(heightMm <= 200 && heightMm >= 190, `印刷高さ ${heightMm}mm は 190〜200mm の範囲にする`);
+  assert.match(styles, /min-height: \d+mm !important/);
+  assert.match(styles, /max-height: \d+mm !important/);
   assert.match(styles, /grid-template-columns:[\s\S]{0,180}\.64fr \.72fr \.66fr/);
   assert.match(styles, /break-inside: avoid-page !important/);
   assert.match(styles, /page-break-inside: avoid !important/);

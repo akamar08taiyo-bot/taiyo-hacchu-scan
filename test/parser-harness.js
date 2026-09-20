@@ -31,7 +31,9 @@ function loadParser() {
     ${parser}
     return { wt, bt, at, it, pt, kaientaiLabeledDetailFix, kaientaiTitleFallback,
              scanTitleName, normalizeProductNameText, sanitizeScanName, sanitizeScanSize,
-             taxMark, We, Ye, Xe, M };
+             taxMark, We, Ye, Xe, M,
+             // 金額の逆算（販売金額・利益額・利益率の入力から販売単価を出す）
+             et, tt, nt, rt, $e };
   `;
   // eslint-disable-next-line no-new-func
   return new Function(code)();

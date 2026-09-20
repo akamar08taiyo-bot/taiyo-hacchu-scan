@@ -22,6 +22,15 @@ test("status messages, PDF filename and known price notes are readable Japanese"
   }
 });
 
+test("読み取り失敗のときに原因の分かる日本語を出す", () => {
+  // worker の読み込み失敗は Error ではない値で飛んでくるため、e.message をそのまま
+  // 出すと「認識失敗: undefined」になっていた。手入力で続けられることも伝える。
+  assert.match(source, /function scanFailureMessage\(e\)/);
+  assert.match(source, /h\(scanFailureMessage\(e\)\)/);
+  assert.doesNotMatch(source, /認識失敗: \$\{e\.message\}/);
+  assert.match(source, /受注簿に直接入力してください/);
+});
+
 test("OCR recognizes readable Japanese labels for identifiers and prices", () => {
   assert.match(source, /JAN\(\?:コード\|CODE\)/);
   assert.match(source, /TAIS\(\?:コード\|CODE\)/);
