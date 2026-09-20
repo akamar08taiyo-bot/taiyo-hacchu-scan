@@ -22,18 +22,24 @@ function loadParser() {
   const src = fs.readFileSync(SRC, 'utf8');
 
   // 色名リスト・数値変換・税計算などの共通ユーティリティ
-  const utils = sliceBetween(src, ',He=[`オレンジ`', 'function multiItemSnapshot(e)').replace(/^,/, 'var ');
+  // 集計（複数商品）まで含めたいので、JSXが始まる MultiSummaryPage の手前まで取る
+  const utils = sliceBetween(src, ',He=[`オレンジ`', 'function MultiSummaryPage(').replace(/^,/, 'var ');
+  // 手入力訂正の取り出し（集計・見積書がこれを使う）
+  const manualAmount = sliceBetween(src, 'function orderManualAmount(value, calculated) {', '// OCR sometimes places');
   // 解析本体（価格ラベル抽出 〜 OCR結果の統合まで）
   const parser = sliceBetween(src, 'function et(e,t){let n=M(e);return n<=0', '\nfunction benefitYen(');
 
   const code = `
     ${utils}
+    ${manualAmount}
     ${parser}
     return { wt, bt, at, it, pt, kaientaiLabeledDetailFix, kaientaiTitleFallback,
              scanTitleName, normalizeProductNameText, sanitizeScanName, sanitizeScanSize,
              taxMark, We, Ye, Xe, M,
              // 金額の逆算（販売金額・利益額・利益率の入力から販売単価を出す）
-             et, tt, nt, rt, $e };
+             et, tt, nt, rt, $e,
+             // 複数商品の集計
+             multiBuildItems, multiProductTotals, orderManualAmount };
   `;
   // eslint-disable-next-line no-new-func
   return new Function(code)();

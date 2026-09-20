@@ -88,3 +88,22 @@ test("新しい商品ページに前の商品の手入力訂正を持ち越さ�
   assert.ok(sliceAt("function le(){", 400).includes(cleared), "再認識・商品追加時のクリアに手入力訂正が含まれていない");
   assert.ok(sliceAt("function multiBlankOrder(){", 400).includes(cleared), "新規商品ページの初期値に手入力訂正のクリアが無い");
 });
+
+test("複数商品でも、手入力で訂正した合計が集計に反映される", () => {
+  // 受注簿の各商品ページで訂正した「送料込合計(税込/税抜)」は、
+  // 集計ページと複数商品の見積書でもその金額を使う（自動計算に戻さない）。
+  const { multiBuildItems, multiProductTotals } = loadParser();
+  const productA = { productName: "商品A", quantity: "1", listPrice: "20000", saleUnitPrice: "16000", cost: "9000", shippingFee: "0", taxType: "10%", _multiId: "a" };
+  const productB = { productName: "商品B", quantity: "1", listPrice: "10000", saleUnitPrice: "8000", cost: "4000", shippingFee: "0", taxType: "10%", _multiId: "b" };
+
+  const auto = multiProductTotals(multiBuildItems({}, [productA, productB]));
+  assert.equal(auto.grandTotalTaxIn, 17600 + 8800);
+
+  // 商品Bの合計(税込)を8,800→9,000に訂正
+  const corrected = multiProductTotals(multiBuildItems({}, [productA, { ...productB, manualGrandTotalTaxIn: "9000" }]));
+  assert.equal(corrected.grandTotalTaxIn, 17600 + 9000);
+
+  // 税抜側の訂正は利益の計算根拠（送料込合計(税抜)）にも効く
+  const taxOut = multiProductTotals(multiBuildItems({}, [productA, { ...productB, manualGrandTotalTaxOut: "8500" }]));
+  assert.equal(taxOut.grandTotalTaxOut, 16000 + 8500);
+});
