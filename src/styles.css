@@ -3642,61 +3642,6 @@ body,
   }
 }
 
-/* 2026-08-31: official adult-diaper product photo catalog */
-.productPhotoPicker {
-  display: grid;
-  grid-template-columns: minmax(150px, auto) minmax(0, 1fr);
-  gap: 6px 10px;
-  align-items: center;
-  margin: 10px 0;
-  padding: 10px 12px;
-  border: 1px solid #b8d8de;
-  border-radius: 9px;
-  background: #f4fbfc;
-}
-
-.productPhotoPicker label {
-  color: #075d68;
-  font-size: 13px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.productPhotoPicker select {
-  min-width: 0;
-  width: 100%;
-  min-height: 36px;
-  padding: 6px 9px;
-  border: 1px solid #9fc7ce;
-  border-radius: 6px;
-  background: #fff;
-  color: #122d35;
-  font: inherit;
-}
-
-.productPhotoPicker small {
-  grid-column: 2;
-  color: #58747a;
-  font-size: 11px;
-  line-height: 1.45;
-}
-
-@media (max-width: 720px) {
-  .productPhotoPicker {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .productPhotoPicker small {
-    grid-column: 1;
-  }
-}
-
-@media print {
-  .productPhotoPicker {
-    display: none !important;
-  }
-}
-
 /* 2026-09-04: benefit order layout finalization
    給付にチェックを入れても、販売（チェックなし）のときのレイアウトと項目は
    そのまま使う。給付で増えるのは先頭グリッドの「給付割合」欄と、管理情報の
