@@ -461,7 +461,7 @@ function simpleEstimateHtml(e,t,n,q){
 <div class="toolbar"><button onclick="window.print()">印刷</button><button onclick="window.print()">PDF保存</button></div>
 <main class="sheet"><div class="quoteTop"><div><div class="title">御 見 積 書</div><div class="client"><span class="clientName">${client}</span><span class="clientSuffix">様</span></div><p class="quoteLead">下記の通り、お見積り申し上げます。<br>ご検討のほど、よろしくお願い申し上げます。</p><table class="condition"><tbody><tr><th>見積有効期限</th><td>お見積日より30日間</td></tr><tr><th>お支払条件</th><td>月末締め翌月末払い</td></tr><tr><th>納期</th><td>ご注文後、通常2〜3営業日</td></tr></tbody></table></div>
 <aside class="companyBox"><div class="companyMeta"><label>発行日</label><input id="quoteDate" value="${simpleEstimateEscape(today)}"></div><div class="officeSelect"><label>営業所</label><select id="officeSelect"></select></div><div class="companyName"><span id="officeCompanyText">${simpleEstimateEscape(office.company||'太陽シルバーサービス(株)')}</span><br><span id="officeNameText">${simpleEstimateEscape(office.name||'')}</span></div><div class="office">〒<span id="officePostal">${simpleEstimateEscape(office.postal||'')}</span><br><span id="officeAddress">${simpleEstimateEscape(office.address||'')}</span><br>TEL <span id="officeTel">${simpleEstimateEscape(office.tel||'')}</span><br>FAX <span id="officeFax">${simpleEstimateEscape(office.fax||'')}</span><br><strong>登録番号</strong> <span id="officeRegistration">${simpleEstimateEscape(office.registration||'')}</span><br><br>所長　<span id="officeManager">${simpleEstimateEscape(office.manager||'')}</span><br>担当　<span id="officeStaff">${simpleEstimateEscape(office.staff||'')}</span></div><div class="stampRow"><div class="stamp">所長印<div></div></div><div class="stamp">担当印<div></div></div></div></aside></div>
-<div class="total"><span>御見積金額　合計</span><strong>${totalDisplay}</strong></div><table class="itemTable"><colgroup><col class="colProduct"><col class="colQty"><col class="colUnit"><col class="colPrice"><col class="colAmount"><col class="colTax"></colgroup><thead><tr><th>商品名</th><th>数量</th><th>単位</th><th>単価</th><th>金額</th><th>消費税</th></tr></thead><tbody><tr><td class="name"><div class="productTitle">${product}</div>${optionText?'<div class="productOption">'+simpleEstimateEscape(optionText)+'</div>':''}<div class="productListPrice">定価 ${simpleEstimateYen(listPrice)}</div></td><td>${qtyNumber}</td><td>${safeUnit}</td><td>${yen(unitPrice)}</td><td>${yen(saleTotal)}</td><td>${yen(productTax)}</td></tr>${shippingRow}</tbody></table><div class="taxSummary"><div><b>小計(税抜)</b><span>${simpleEstimateYen(subtotal)}</span></div><div><b>消費税(${taxLabel})</b><span>${simpleEstimateYen(taxAmount)}</span></div><div><b>合計(税込)</b><span>${simpleEstimateYen(totalTaxIn)}</span></div></div><div class="remarks"><b>備考</b><div class="remarksBody"></div></div></main>
+<div class="total"><span>御見積金額　合計</span><strong>${totalDisplay}</strong></div><table class="itemTable"><colgroup><col class="colProduct"><col class="colQty"><col class="colUnit"><col class="colPrice"><col class="colAmount"><col class="colTax"></colgroup><thead><tr><th>商品名</th><th>数量</th><th>単位</th><th>単価</th><th>金額</th><th>消費税</th></tr></thead><tbody><tr><td class="name"><div class="productTitle">${product}</div>${optionText?'<div class="productOption">'+simpleEstimateEscape(optionText)+'</div>':''}<div class="productListPrice">定価${(e.listPriceTaxIn?simpleEstimateNumber(e.listPriceTaxIn):Math.floor(simpleEstimateNumber(e.listPrice)*(1+taxRate))).toLocaleString('ja-JP')}円${taxRate===0?'（非課税）':'（税込）'}</div></td><td>${qtyNumber}</td><td>${safeUnit}</td><td>${yen(unitPrice)}</td><td>${yen(saleTotal)}</td><td>${yen(productTax)}</td></tr>${shippingRow}</tbody></table><div class="taxSummary"><div><b>小計(税抜)</b><span>${simpleEstimateYen(subtotal)}</span></div><div><b>消費税(${taxLabel})</b><span>${simpleEstimateYen(taxAmount)}</span></div><div><b>合計(税込)</b><span>${simpleEstimateYen(totalTaxIn)}</span></div></div><div class="remarks"><b>備考</b><div class="remarksBody"></div></div></main>
 <script>const offices=${officeJson},defaultOfficeName=${defaultOfficeJson};function setOfficeText(id,value){const el=document.getElementById(id);if(el)el.textContent=value||""}function renderOffice(name){const office=offices.find(function(item){return item&&item.name===name})||offices[0]||{};setOfficeText("officeCompanyText",office.company||"太陽シルバーサービス(株)");setOfficeText("officeNameText",office.name);setOfficeText("officePostal",office.postal);setOfficeText("officeAddress",office.address);setOfficeText("officeTel",office.tel);setOfficeText("officeFax",office.fax);setOfficeText("officeRegistration",office.registration);setOfficeText("officeManager",office.manager);setOfficeText("officeStaff",office.staff);if(office.name)localStorage.setItem("solar_estimate_office",office.name)}function setupOffice(){const select=document.getElementById("officeSelect");if(!select)return;offices.forEach(function(office){const option=document.createElement("option");option.value=office.name||"";option.textContent=office.name||"";select.appendChild(option)});const saved=localStorage.getItem("solar_estimate_office")||defaultOfficeName;select.value=offices.some(function(office){return office.name===saved})?saved:(offices[0]?.name||"");renderOffice(select.value);select.addEventListener("change",function(){renderOffice(select.value)})}setupOffice();</script></body></html>`
 }
 function simpleEstimateHtmlReadable(e,t,n,q){
@@ -546,7 +546,11 @@ function simpleEstimateHtmlReference(e,t,n,q){
     .filter(function(part){return !tidy(rawProduct).includes(part)}).join(' / ');
   var noteParts=[];
   if(optionText) noteParts.push(optionText);
-  if(listPrice) noteParts.push('定価'+listPrice.toLocaleString('ja-JP')+'\u5186');
+  /* 見積書の定価は税込で「定価39,380円（税込）」と表記する。
+     税込定価が取り込まれていればそれを、無ければ税抜定価に税率を掛けて求める（販売受注簿の税計算＝切り捨てに合わせる）。 */
+  var listPriceTaxIn=order.listPriceTaxIn?simpleEstimateNumber(order.listPriceTaxIn)
+    :(order.listPrice?Math.floor(simpleEstimateNumber(order.listPrice)*(1+taxRate)):0);
+  if(listPriceTaxIn) noteParts.push('定価'+listPriceTaxIn.toLocaleString('ja-JP')+(taxRate===0?'円（非課税）':'円（税込）'));
   var note=noteParts.join(' / ')||'';
   var lines=String(order.customerName||'').split(/\r?\n/).map(function(v){return v.trim()}).filter(Boolean);
   var clientFirst=lines[0]||'';
@@ -819,8 +823,13 @@ simpleEstimateHtml = simpleEstimateHtmlReadable;
 const simpleEstimateHtmlBeforeTitleFix = simpleEstimateHtml;
 simpleEstimateHtml = function(order) {
   let html = simpleEstimateHtmlBeforeTitleFix.apply(this, arguments);
-  const custName = String((order && order.customerName) || '').replace(/\s+/g, ' ').trim();
-  html = html.replace(/<title>[^<]*<\/title>/, '<title>' + simpleEstimateEscape(custName || 'お客様') + '御見積</title>');
+  // 印刷→PDF保存のときのファイル名になる。例「吉永栄様　特定福祉用具　見積もり」
+  const firstLine = String((order && order.customerName) || '').split(/\r?\n/)[0] || '';
+  const custName = firstLine.replace(/\s+/g, '').replace(/(様|御中|殿)$/, '').trim();
+  const honorific = String((order && order.honorific) || '').trim() || '様';
+  const kind = String((order && (order.categoryName || order.productCategory)) || '').trim() || '特定福祉用具';
+  const title = (custName ? custName + honorific : 'お客様') + '　' + kind + '　見積もり';
+  html = html.replace(/<title>[^<]*<\/title>/, '<title>' + simpleEstimateEscape(title) + '</title>');
   return html;
 };
 simpleEstimateHtmlReadable = simpleEstimateHtml;
