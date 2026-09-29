@@ -2162,6 +2162,16 @@ button:hover {
   z-index: 4;
 }
 
+/* スマホでは固定表示だと本文（使い方の説明など）の上に重なるため、ページ末尾の通常表示にする */
+@media screen and (max-width: 720px) {
+  .companyName {
+    position: static;
+    display: block;
+    text-align: right;
+    padding: 8px 14px 12px;
+  }
+}
+
 .drawer {
   position: fixed;
   inset: 0;
@@ -3639,61 +3649,6 @@ body,
   .multiPrintPages .orderAttachedImage img {
     max-width: 100% !important;
     overflow: hidden !important;
-  }
-}
-
-/* 2026-08-31: official adult-diaper product photo catalog */
-.productPhotoPicker {
-  display: grid;
-  grid-template-columns: minmax(150px, auto) minmax(0, 1fr);
-  gap: 6px 10px;
-  align-items: center;
-  margin: 10px 0;
-  padding: 10px 12px;
-  border: 1px solid #b8d8de;
-  border-radius: 9px;
-  background: #f4fbfc;
-}
-
-.productPhotoPicker label {
-  color: #075d68;
-  font-size: 13px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.productPhotoPicker select {
-  min-width: 0;
-  width: 100%;
-  min-height: 36px;
-  padding: 6px 9px;
-  border: 1px solid #9fc7ce;
-  border-radius: 6px;
-  background: #fff;
-  color: #122d35;
-  font: inherit;
-}
-
-.productPhotoPicker small {
-  grid-column: 2;
-  color: #58747a;
-  font-size: 11px;
-  line-height: 1.45;
-}
-
-@media (max-width: 720px) {
-  .productPhotoPicker {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .productPhotoPicker small {
-    grid-column: 1;
-  }
-}
-
-@media print {
-  .productPhotoPicker {
-    display: none !important;
   }
 }
 

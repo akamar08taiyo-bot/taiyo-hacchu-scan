@@ -40,7 +40,10 @@ test("見積書のPDFはウィンドウ幅によらずA4レイアウトで1ペ�
   // わずかなはみ出しで2ページに割らず、1ページに収める
   assert.match(source, /if\(imgH<=availH\*1\.45\)\{if\(imgH>availH\)\{imgW=imgW\*availH\/imgH;imgH=availH;\}/);
   // PDFのファイル名に改行が混ざらないようにする
-  assert.match(source, /order\.customerName\) \|\| ''\)\.replace\(\/\\s\+\/g, ' '\)\.trim\(\)/);
+  // （宛名の1行目だけを使い、空白・改行を詰める。例「吉永栄様　特定福祉用具　見積もり」）
+  assert.match(source, /order\.customerName\) \|\| ''\)\.split\(\/\\r\?\\n\/\)\[0\]/);
+  assert.match(source, /firstLine\.replace\(\/\\s\+\/g, ''\)/);
+  assert.match(source, /'　' \+ kind \+ '　見積もり'/);
 });
 
 test("見積書は太字を使いすぎない", () => {
