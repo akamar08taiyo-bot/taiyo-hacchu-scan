@@ -3741,3 +3741,35 @@ body,
     object-fit: contain !important;
   }
 }
+
+/* print-one-page-2026-10-02
+   給付モードは帳票の高さを用紙いっぱい（202mm）に固定しているが、画面用の
+   外側の余白（.workspace の padding 14px など）が印刷にも残り、その分だけ
+   2枚目に押し出されて白紙の2ページ目が出ていた。印刷では外側の余白・最小高さを
+   なくし、帳票は用紙の高さより1mm低くして必ず1枚に収める。 */
+@media print {
+  html,
+  body {
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .app,
+  .workspace,
+  .workspace.twoColumn,
+  .orderEntryPanel {
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  .orderEntrySheet.benefitMode {
+    height: 201mm !important;
+    min-height: 201mm !important;
+    max-height: 201mm !important;
+  }
+}
