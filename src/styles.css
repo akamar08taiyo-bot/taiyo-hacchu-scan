@@ -3773,3 +3773,24 @@ body,
     max-height: 201mm !important;
   }
 }
+
+/* saved-orders-2026-10-02: 保存一覧・白紙に戻す */
+.savedOrdersPanel { max-width: 640px; }
+.savedOrdersList { list-style: none; margin: 8px 0 12px; padding: 0; max-height: 55vh; overflow-y: auto; border: 1px solid #d5e3ef; border-radius: 10px; }
+.savedOrdersList li { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid #e6eef6; }
+.savedOrdersList li:last-child { border-bottom: 0; }
+.savedOrdersList li.current { background: #eef7ff; }
+.savedOrdersInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.savedOrdersInfo b { overflow-wrap: anywhere; color: #0f2740; }
+.savedOrdersInfo span { font-size: 12px; color: #4a5d70; }
+.savedOrdersActions { display: flex; gap: 6px; flex-shrink: 0; }
+.savedOrdersActions button { padding: 6px 12px; border-radius: 8px; border: 1px solid #b8cde0; background: #fff; font-weight: 700; cursor: pointer; }
+.savedOrdersActions button.primary { background: #147fc1; border-color: #147fc1; color: #fff; }
+.savedOrdersActions button.danger { color: #b42318; border-color: #f0b4ad; }
+.savedOrdersEmpty { color: #4a5d70; }
+.resetBlankButton { color: #b42318 !important; }
+@media (max-width: 520px) {
+  .savedOrdersList li { flex-wrap: wrap; }
+  .savedOrdersActions { width: 100%; justify-content: flex-end; }
+}
+@media print { .savedOrdersPanel { display: none !important; } }
