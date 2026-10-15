@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import {
   PRODUCT_PHOTOS,
   applyProductPhotoToOrder,
@@ -93,4 +93,20 @@ test("manual images take precedence and selecting a catalog photo preserves othe
   assert.equal(next.note, current.note);
   assert.equal(next.productName, photo.name);
   assert.equal(next.maker, photo.manufacturer);
+});
+
+test("the sales order tool neither shows the facility photo picker nor fills in catalog photos", () => {
+  // 販売受注簿では施設・病院向け商品写真を使わない（2026-10-15 ユーザー指示）。
+  // 選択欄の表示・商品名からの自動照合・画像欄と受注簿の画像・複数商品の控えの画像が、
+  // すべて同じ切り替えを通り、その切り替えが off になっていること。
+  const source = readFileSync(new URL("../src/main.jsx", import.meta.url), "utf8");
+  assert.match(source, /^const SHOW_FACILITY_PRODUCT_PHOTOS = false;$/m);
+  assert.match(source, /SHOW_FACILITY_PRODUCT_PHOTOS&&\(0,j\.jsxs\)\(`div`,\{className:`productPhotoPicker no-print`/);
+  assert.match(source, /catalogPhoto=\(0,A\.useMemo\)\(\(\)=>SHOW_FACILITY_PRODUCT_PHOTOS\?findProductPhoto\(e\):null,/);
+  assert.match(source, /resolvedImageUrl=SHOW_FACILITY_PRODUCT_PHOTOS\?resolveProductPhotoUrl\(e,i,import\.meta\.env\.BASE_URL\):\(i\|\|``\);/);
+  assert.match(source, /itemImage=SHOW_FACILITY_PRODUCT_PHOTOS\?resolveProductPhotoUrl\(item,itemSnapUrl,import\.meta\.env\.BASE_URL\):itemSnapUrl;/);
+  // 切り替えを通さずに写真集を使っている箇所が残っていないこと（import 文は除く）
+  const body = source.slice(source.indexOf("const SHOW_FACILITY_PRODUCT_PHOTOS"));
+  assert.equal(body.match(/findProductPhoto\(e\)/g)?.length, 1);
+  assert.equal(body.match(/resolveProductPhotoUrl\(/g)?.length, 2);
 });
