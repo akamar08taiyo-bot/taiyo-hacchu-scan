@@ -820,6 +820,77 @@ button:hover {
   color: #fff;
 }
 
+/* 住宅改修の見積もり（発注書）から届いた部材を受注簿に入れるかを選ぶダイアログ。
+   届いた部材の一覧（品名・品番・数量）を出し、多いときは一覧だけをスクロールさせる。 */
+.jutakuImportPanel {
+  width: min(640px, calc(100vw - 48px));
+}
+
+.jutakuImportList {
+  max-height: min(46vh, 360px);
+  margin: 0 0 14px;
+  overflow: auto;
+  border: 1px solid #dbe6ef;
+  border-radius: 10px;
+}
+
+.jutakuImportList table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.jutakuImportList th {
+  position: sticky;
+  top: 0;
+  padding: 6px 10px;
+  background: #f6fafd;
+  color: #6b7c8d;
+  font-weight: 500;
+  text-align: left;
+}
+
+.jutakuImportList td {
+  padding: 6px 10px;
+  border-top: 1px solid #eef3f7;
+  color: #16283a;
+  overflow-wrap: anywhere;
+}
+
+.jutakuImportList th:last-child,
+.jutakuImportList td.qty {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.jutakuImportList td:nth-child(2) {
+  white-space: nowrap;
+}
+
+.draftPanel p.jutakuImportNote {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fff6e5;
+  color: #8a4b00;
+}
+
+/* 商品ページの数量の横に単位（台・本・枚・個など）を出す。印刷・PDFでは「1本」のように数量のうしろに付く（printValue）。 */
+.qtyWithUnit {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.qtyWithUnit input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.qtyUnit {
+  flex: none;
+  font-size: 12px;
+}
+
 /* 営業担当・発注者・発注先・型番は手打ちで自由に入力できる。登録済みの名前は
    自前の候補リストとして入力欄の真下に出す（datalistは位置がブラウザ依存のため不使用）。 */
 .namePicker {
