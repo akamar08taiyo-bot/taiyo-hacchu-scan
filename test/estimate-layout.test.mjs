@@ -120,25 +120,35 @@ test("商品名にすでに入っている色・サイズは明細の下段に�
 });
 
 // 見積書（文字列連結のHTML）を組み立てる部分を取り出し、受注簿と同じ値を渡して実際に作らせる
-function loadEstimateBuilder() {
+function loadEstimateBuilders() {
   // 1行で書かれた補助関数（行の途中から始まるものもある）を行末まで取り出す
   const helper = (name) => {
     const m = source.match(new RegExp(`function ${name}\\(.*$`, "m"));
     assert.ok(m, `${name} が見つからない`);
     return m[0];
   };
-  const from = source.indexOf("/* estimate-print-reference-v3 */");
-  const to = source.indexOf("simpleEstimateHtmlReadable=simpleEstimateHtmlReference;", from);
-  assert.ok(from > 0 && to > from);
+  const slice = (startText, endText) => {
+    const from = source.indexOf(startText);
+    const to = source.indexOf(endText, from);
+    assert.ok(from > 0 && to > from, `${startText} 〜 ${endText} が見つからない`);
+    return source.slice(from, to);
+  };
   return new Function([
-    "var simpleEstimateHtml;",
+    "var simpleEstimateHtml, simpleEstimateHtmlReadable, latestEstimateItems = [];",
     "var sanitizeScanSize=function(v){return String(v||'')};",
+    // 複数商品の集計は受注簿側（multiProductTotals）で作る。テストでは allTotals として渡す
+    "var multiProductTotals=function(){throw new Error('allTotals を渡すこと')};",
     ...["simpleEstimateNumber", "simpleEstimateEscape", "simpleEstimateQty", "simpleEstimateQtyNumber", "simpleEstimateJapaneseDate"].map(helper),
-    source.slice(from, to),
-    "return simpleEstimateHtmlReference;",
+    slice("/* estimate-print-reference-v3 */", "simpleEstimateHtmlReadable=simpleEstimateHtmlReference;"),
+    "simpleEstimateHtmlReadable=simpleEstimateHtmlReference;",
+    "var single=simpleEstimateHtmlReference;",
+    slice("function estimateHtmlEscape(value)", "simpleEstimateHtml = simpleEstimateHtmlReadable;"),
+    "return {single:single, multi:simpleEstimateHtmlReadable};",
   ].join("\n"))();
 }
-const buildEstimate = loadEstimateBuilder();
+const builders = loadEstimateBuilders();
+const buildEstimate = builders.single;
+const buildMultiEstimate = builders.multi;
 const yen = (value) => "¥" + value.toLocaleString("ja-JP");
 const field = (html, name) => {
   const m = html.match(new RegExp(`data-field="${name}">([^<]*)<`));
@@ -236,6 +246,7 @@ test("見積書で金額を打ち直すと、全角数字でも上部の御見�
   // 行の消費税：商品は商品の税率、送料の行は受注簿と同じ10%
   const row = (className, amount) => ({
     classList: { contains: (name) => className.split(" ").includes(name) },
+    getAttribute: () => null,
     children: [{}, { textContent: "1" }, { textContent: amount }, { textContent: amount }, { textContent: "" }],
   });
   const product = row("itemRow", "１０，０００");
@@ -244,4 +255,114 @@ test("見積書で金額を打ち直すと、全角数字でも上部の御見�
   const shipping = row("shippingRow itemRow", "1000");
   estRecalcRow(shipping, 3);
   assert.equal(shipping.children[4].textContent, yen(100));
+});
+
+// 商品2つ（トイレ1台・防水シーツ2枚）。受注簿の集計（multiProductTotals）と同じ計算で allTotals を作って渡す
+const sheetItem = { ...toiletOrder, productName: "安寿 ポータブルトイレ用防水シーツ", modelNumber: "533-195", listPrice: "3000", listPriceTaxIn: "3300", quantity: "2", saleTotal: 4800 };
+const multiTotals = (items) => items.reduce((t, item) => {
+  const rate = item.taxType === "8%" ? 0.08 : item.taxType === "非課税" ? 0 : 0.1;
+  const shipping = Number(item.shippingFee) || 0;
+  t.saleTotal += item.saleTotal;
+  t.shippingFee += shipping;
+  t.grandTotalTaxOut += item.saleTotal + shipping;
+  t.grandTotalTaxIn += Math.floor(item.saleTotal * (1 + rate)) + Math.floor(shipping * 1.1);
+  return t;
+}, { saleTotal: 0, shippingFee: 0, grandTotalTaxOut: 0, grandTotalTaxIn: 0 });
+const buildMulti = (items) => buildMultiEstimate(items[0], { saleTotal: items[0].saleTotal, shippingFee: Number(items[0].shippingFee) || 0 }, null, {}, items, multiTotals(items));
+// 明細の行ごとに、行の印（class・税率）と 数量・単価・金額・消費税 を読み取る
+const multiRows = (html) => {
+  const start = html.indexOf('<table class="estimateItemsTable">');
+  const table = html.slice(start, html.indexOf("</table>", start));
+  return [...table.matchAll(/<tr([^>]*)>([\s\S]*?)<\/tr>/g)].filter((m) => !m[2].includes("<th")).map((m) => ({
+    attrs: m[1].trim(),
+    cells: [...m[2].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].slice(1).map((c) => c[1].replace(/<[^>]+>/g, "").trim()),
+  }));
+};
+
+test("商品が2つ以上の見積書も、明細の合計と小計・消費税・御見積金額が一致する", () => {
+  const html = buildMulti([{ ...toiletOrder, saleTotal: 98400, shippingFee: "1000" }, { ...sheetItem, taxType: "8%", shippingFee: "500" }]);
+  const rows = multiRows(html);
+  // 商品の行は税率を持つ（8%の商品が混ざっても行ごとに計算し直せる）。送料は単品の見積書と同じく送料の行にまとめる
+  assert.deepEqual(rows.map((row) => row.attrs), ['class="itemRow" data-tax-rate="0.1"', 'class="itemRow" data-tax-rate="0.08"', 'class="shippingRow itemRow"']);
+  assert.deepEqual(rows.map((row) => row.cells), [
+    ["1", yen(98400), yen(98400), yen(9840)],
+    ["2", yen(2400), yen(4800), yen(384)],
+    // 以前は送料が見えず（小計と商品の消費税にだけ入っていた）、明細を足しても小計にならなかった
+    ["1", yen(1500), yen(1500), yen(150)],
+  ]);
+  const sum = (index) => rows.reduce((total, row) => total + Number(row.cells[index].replace(/\D/g, "")), 0);
+  assert.equal(field(html, "subtotalTable"), yen(sum(2)));
+  assert.equal(field(html, "taxTable"), yen(sum(3)));
+  assert.deepEqual([field(html, "subtotalTable"), field(html, "taxTable"), field(html, "grandTotalTable"), field(html, "grandTotalTaxIn")], [yen(104700), yen(10374), yen(115074), yen(115074)]);
+  // 送料が無ければ送料の行は出さない
+  const plain = buildMulti([{ ...toiletOrder, saleTotal: 98400 }, sheetItem]);
+  assert.equal(multiRows(plain).length, 2);
+  assert.equal(field(plain, "grandTotalTaxIn"), yen(113520));
+});
+
+test("商品が2つ以上の見積書でも、金額を打ち直すと小計・消費税・合計・御見積金額を計算し直す", () => {
+  const html = buildMulti([{ ...toiletOrder, saleTotal: 98400 }, { ...sheetItem, taxType: "8%" }]);
+  const from = html.indexOf("var ESTIMATE_TAX_RATE=");
+  const to = html.indexOf("function estEnsureRowTools()", from);
+  assert.ok(from > 0 && to > from);
+  const cell = (text) => ({ textContent: text });
+  const fakeRow = (rate, qty, unit, amount, tax) => ({
+    classList: { contains: (name) => name === "itemRow" },
+    getAttribute: (name) => (name === "data-tax-rate" ? rate : null),
+    children: [cell(""), cell(qty), cell(unit), cell(amount), cell(tax)],
+  });
+  const rows = [fakeRow("0.1", "1", yen(98400), yen(98400), yen(9840)), fakeRow("0.08", "2", yen(2400), yen(4800), yen(384))];
+  const fields = { subtotalTable: cell(""), taxTable: cell(""), grandTotalTable: cell(""), grandTotalTaxIn: { innerHTML: "" } };
+  const document = {
+    // 明細の行は、複数商品の表（.estimateItemsTable）からも拾うこと（以前は単品の表だけで、何も計算し直さなかった）
+    querySelectorAll: (selector) => (selector.split(",").map((s) => s.trim()).includes(".estimateItemsTable tbody tr.itemRow") ? rows : []),
+    querySelector: (selector) => fields[(selector.match(/^\[data-field=(\w+)\]$/) || [])[1]] || null,
+  };
+  const est = new Function("document", `${html.slice(from, to)};return {estRecalcRow:estRecalcRow,estRecalcTotals:estRecalcTotals};`)(document);
+  // 1行目の金額を 90,909 に打ち直す
+  rows[0].children[3].textContent = "90909";
+  est.estRecalcRow(rows[0], 3);
+  // 2行目（8%の商品）の数量を全角で「３」に打ち直す → 金額 2,400×3、消費税は8%
+  rows[1].children[1].textContent = "３";
+  est.estRecalcRow(rows[1], 1);
+  est.estRecalcTotals();
+  assert.equal(rows[0].children[4].textContent, yen(9090));
+  assert.deepEqual([rows[1].children[3].textContent, rows[1].children[4].textContent], [yen(7200), yen(576)]);
+  assert.deepEqual([fields.subtotalTable.textContent, fields.taxTable.textContent, fields.grandTotalTable.textContent], [yen(98109), yen(9666), yen(107775)]);
+  assert.equal(fields.grandTotalTaxIn.innerHTML, yen(107775) + "&nbsp;&mdash;");
+});
+
+test("商品が2つ以上の見積書でも、明細行の追加・×での削除ができる", () => {
+  const html = buildMulti([{ ...toiletOrder, saleTotal: 98400 }, sheetItem]);
+  const script = html.slice(html.indexOf("function setupEstimateEditing()"), html.indexOf("setupOffice();setupClientLines();setupEstimateEditing();"));
+  // 打ち直しの監視・行の追加は、単品の表と複数商品の表のどちらにも効く
+  assert.match(script, /document\.querySelector\("\.itemTable, \.estimateItemsTable"\)/);
+  const addRow = html.slice(html.indexOf("function estAddItemRow()"), html.indexOf("function estAddRemarkLine()"));
+  assert.match(addRow, /document\.querySelector\("\.itemTable tbody, \.estimateItemsTable tbody"\)/);
+  // 追加した行も複数商品の表の見た目（商品名の欄）にそろえる
+  assert.match(addRow, /estimateItemsTableName/);
+  // × は商品名の欄の右上に置く（位置の基準を作る）
+  assert.match(html, /\.estimateItemsTable \.estimateItemsTableName\{[^}]*position:relative/);
+  // 打ち直して桁が増えても欄からはみ出さないよう、文字の大きさを合わせ直す
+  assert.match(html, /addEventListener\('focusout',function\(\)\{setTimeout\(autoFitEstimateItems,0\)\}\)/);
+});
+
+test("商品が2つ以上の見積書も太字を使わない", () => {
+  const from = source.indexOf("const multiEstimateCss = '<style>");
+  const to = source.indexOf("</style>';", from);
+  assert.ok(from > 0 && to > from);
+  const css = source.slice(from, to);
+  const heavy = [...css.matchAll(/([^{}]+)\{[^}]*font-weight:\s*(?:[7-9]00|bold)[^}]*\}/g)].map((m) => m[1]);
+  assert.deepEqual(heavy, []);
+  // 見出し（th）と集計の金額（strong）はブラウザの既定が太字なので、500を明記する
+  assert.match(css, /\.estimateItemsTable thead th\{[^}]*font-weight:500/);
+  assert.match(css, /\.estimateAmountSummaryRow strong\{[^}]*font-weight:500/);
+});
+
+test("商品が2つ以上の見積書のPDFも、画面の幅によらず同じ文字の大きさで作る", () => {
+  // 文字の大きさの自動調整（autoFitEstimateItems）は表示中のレイアウトで測る。以前は画面幅で測った大きさのまま
+  // A4のレイアウト（html.pdfExport）に切り替えて取り込んでいたため、狭い画面で作るとPDFの文字の大きさが変わっていた
+  assert.match(source, /docRoot\.classList\.add\("pdfExport"\);window\.dispatchEvent\(new Event\("estimatelayoutchange"\)\);await new Promise/);
+  assert.match(source, /finally\{[^}]*classList\.remove\("pdfExport"\);window\.dispatchEvent\(new Event\("estimatelayoutchange"\)\);\}/);
+  assert.match(source, /window\.addEventListener\('estimatelayoutchange',autoFitEstimateItems\)/);
 });
