@@ -101,6 +101,14 @@
    消す指示では、同じ機能が商品名からの自動照合で画像欄・受注簿に写真を入れていた。
    部品を隠すときは、その部品に紐づく自動入力・自動表示を `grep` で洗い出し、まとめて止める
    （今回は `SHOW_FACILITY_PRODUCT_PHOTOS` で一括。Learnings.md 第16項）。
+8. **受注簿で手入力した金額が見積書に届いていなかった**: 「合計金額（税込）」などの手入力欄
+   （`manualGrandTotalTaxIn`/`manualGrandTotalTaxOut`）を見積書だけが無視し、御見積金額が自動計算のまま
+   だった（Learnings.md 第18項）。→ 金額を直せる欄に手を入れるときは `grep -n "manualGrandTotal"` で
+   全出力を確認する。見積書の金額計算は `simpleEstimateAmounts()` に集約してある。
+9. **見積書（contenteditable）の数値は全角で入ってくる**: 日本語入力のままだと「９５０００」になり、
+   以前は0円扱いで合計まで¥0になった（Learnings.md 第19項）。数値として読む前に `normalize("NFKC")` する。
+10. **`src/main.jsx` の `\uXXXX` 付近を Edit ツールで直すと、新しく書いた日本語も `\uXXXX` で書き込まれる**
+   （Learnings.md 第20項）。編集後は diff の追加行に意図しない `\uXXXX` が無いか確認する。
 
 ## デザイン方針（このリポジトリの帳票全般）
 - 受注簿・見積書とも「太字は使いすぎない」。強調は文字サイズ・色・背景色で

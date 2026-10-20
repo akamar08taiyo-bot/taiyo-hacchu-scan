@@ -118,3 +118,130 @@ test("商品名にすでに入っている色・サイズは明細の下段に�
   // 型番も同じ考え方で重複を避けている（既存の扱いを壊していないこと）
   assert.match(source, /model&&rawProduct&&!rawProduct\.includes\(model\)/);
 });
+
+// 見積書（文字列連結のHTML）を組み立てる部分を取り出し、受注簿と同じ値を渡して実際に作らせる
+function loadEstimateBuilder() {
+  // 1行で書かれた補助関数（行の途中から始まるものもある）を行末まで取り出す
+  const helper = (name) => {
+    const m = source.match(new RegExp(`function ${name}\\(.*$`, "m"));
+    assert.ok(m, `${name} が見つからない`);
+    return m[0];
+  };
+  const from = source.indexOf("/* estimate-print-reference-v3 */");
+  const to = source.indexOf("simpleEstimateHtmlReadable=simpleEstimateHtmlReference;", from);
+  assert.ok(from > 0 && to > from);
+  return new Function([
+    "var simpleEstimateHtml;",
+    "var sanitizeScanSize=function(v){return String(v||'')};",
+    ...["simpleEstimateNumber", "simpleEstimateEscape", "simpleEstimateQty", "simpleEstimateQtyNumber", "simpleEstimateJapaneseDate"].map(helper),
+    source.slice(from, to),
+    "return simpleEstimateHtmlReference;",
+  ].join("\n"))();
+}
+const buildEstimate = loadEstimateBuilder();
+const yen = (value) => "¥" + value.toLocaleString("ja-JP");
+const field = (html, name) => {
+  const m = html.match(new RegExp(`data-field="${name}">([^<]*)<`));
+  return m ? m[1].replace(/&nbsp;|&mdash;/g, "").trim() : null;
+};
+const amounts = (html) => ({
+  header: field(html, "grandTotalTaxIn"),
+  unitPrice: field(html, "unitPrice"),
+  amount: field(html, "amount"),
+  tax: field(html, "tax"),
+  subtotal: field(html, "subtotalTable"),
+  taxTotal: field(html, "taxTable"),
+  grandTotal: field(html, "grandTotalTable"),
+});
+// 不具合の報告と同じ商品（定価123,000円・割引20%で販売金額98,400円）
+const toiletOrder = {
+  customerName: "テスト 太郎",
+  productName: "安寿 家具調 トイレセレクトR はねあげ",
+  modelNumber: "533-870 暖房・快適脱臭",
+  listPrice: "123000",
+  listPriceTaxIn: "135300",
+  quantity: "1",
+  taxType: "10%",
+  shippingFee: "0",
+};
+
+test("見積書の定価には税抜・税込を書き添える", () => {
+  // 受注簿の定価は税抜。以前は「定価123,000円」だけで、税抜かどうかを手で書き足していた
+  const html = buildEstimate(toiletOrder, { saleTotal: 98400, shippingFee: 0 }, null, {});
+  assert.equal(field(html, "productNote"), "定価123,000円（税抜）");
+  // 税込の定価しか無いときは、その金額を税込として出す
+  const taxInOnly = buildEstimate({ ...toiletOrder, listPrice: "" }, { saleTotal: 98400, shippingFee: 0 }, null, {});
+  assert.equal(field(taxInOnly, "productNote"), "定価135,300円（税込）");
+  // 色・サイズと並ぶときも同じ
+  const withColor = buildEstimate({ ...toiletOrder, color: "ブラウン" }, { saleTotal: 98400, shippingFee: 0 }, null, {});
+  assert.equal(field(withColor, "productNote"), "ブラウン / 定価123,000円（税抜）");
+});
+
+test("受注簿で合計金額を手入力で直すと、見積書の御見積金額・明細・合計もその金額になる", () => {
+  // 手入力なし：従来どおり販売金額から計算する
+  assert.deepEqual(amounts(buildEstimate(toiletOrder, { saleTotal: 98400, shippingFee: 0 }, null, {})), {
+    header: yen(108240), unitPrice: yen(98400), amount: yen(98400), tax: yen(9840),
+    subtotal: yen(98400), taxTotal: yen(9840), grandTotal: yen(108240),
+  });
+  // 合計金額（税込）だけを100,000円に直した：税抜と消費税は合計から割り戻す（以前は108,240円のままだった）
+  const rounded = {
+    header: yen(100000), unitPrice: yen(90909), amount: yen(90909), tax: yen(9091),
+    subtotal: yen(90909), taxTotal: yen(9091), grandTotal: yen(100000),
+  };
+  assert.deepEqual(amounts(buildEstimate({ ...toiletOrder, manualGrandTotalTaxIn: "100000" }, { saleTotal: 98400, shippingFee: 0 }, null, {})), rounded);
+  // 販売金額を90,909円にしたうえで合計を100,000円に直した：販売金額はそのまま、端数1円を消費税で合わせる
+  assert.deepEqual(amounts(buildEstimate({ ...toiletOrder, saleUnitPrice: 90909, manualGrandTotalTaxIn: "100000" }, { saleTotal: 90909, shippingFee: 0 }, null, {})), rounded);
+  // 手入力した値が自動計算と同じなら、明細は1円も動かさない
+  assert.deepEqual(amounts(buildEstimate({ ...toiletOrder, manualGrandTotalTaxIn: "99999" }, { saleTotal: 90909, shippingFee: 0 }, null, {})), {
+    header: yen(99999), unitPrice: yen(90909), amount: yen(90909), tax: yen(9090),
+    subtotal: yen(90909), taxTotal: yen(9090), grandTotal: yen(99999),
+  });
+  // 空欄に戻したら自動計算へ戻る
+  assert.equal(field(buildEstimate({ ...toiletOrder, manualGrandTotalTaxIn: "" }, { saleTotal: 98400, shippingFee: 0 }, null, {}), "grandTotalTaxIn"), yen(108240));
+  // 送料込合計（税抜）を直したときは、それを小計にする
+  assert.deepEqual(amounts(buildEstimate({ ...toiletOrder, manualGrandTotalTaxOut: "90000" }, { saleTotal: 98400, shippingFee: 0 }, null, {})), {
+    header: yen(99000), unitPrice: yen(90000), amount: yen(90000), tax: yen(9000),
+    subtotal: yen(90000), taxTotal: yen(9000), grandTotal: yen(99000),
+  });
+});
+
+test("送料がある見積書でも、受注簿と同じく送料は10%で計算し、直した合計に合わせる", () => {
+  const withShipping = { ...toiletOrder, shippingFee: "1000" };
+  const shippingRow = (html) => [field(html, "shippingAmount"), field(html, "shippingTax")];
+  // 合計金額（税込）を110,000円に直した：送料はそのまま、商品行で合計に合わせる
+  const html = buildEstimate({ ...withShipping, manualGrandTotalTaxIn: "110000" }, { saleTotal: 98400, shippingFee: 1000 }, null, {});
+  assert.deepEqual(shippingRow(html), [yen(1000), yen(100)]);
+  assert.deepEqual(amounts(html), {
+    header: yen(110000), unitPrice: yen(99000), amount: yen(99000), tax: yen(9900),
+    subtotal: yen(100000), taxTotal: yen(10000), grandTotal: yen(110000),
+  });
+  // 軽減税率(8%)の商品でも送料の税は10%（受注簿の合計金額と一致させる）
+  const reduced = buildEstimate({ ...withShipping, taxType: "8%" }, { saleTotal: 10000, shippingFee: 1000 }, null, {});
+  assert.deepEqual(shippingRow(reduced), [yen(1000), yen(100)]);
+  assert.equal(field(reduced, "tax"), yen(800));
+  assert.equal(field(reduced, "grandTotalTaxIn"), yen(Math.floor(10000 * 1.08) + Math.floor(1000 * 1.1)));
+});
+
+test("見積書で金額を打ち直すと、全角数字でも上部の御見積金額まで計算し直す", () => {
+  const html = buildEstimate({ ...toiletOrder, taxType: "8%", shippingFee: "1000" }, { saleTotal: 10000, shippingFee: 1000 }, null, {});
+  const from = html.indexOf("var ESTIMATE_TAX_RATE=");
+  const to = html.indexOf("function estRecalcTotals()", from);
+  assert.ok(from > 0 && to > from);
+  const { estNum, estRecalcRow } = new Function(`${html.slice(from, to)};return {estNum:estNum,estRecalcRow:estRecalcRow};`)();
+  // 日本語入力のまま打つと全角になる。以前は0円として扱われ、合計も御見積金額も¥0になっていた
+  assert.equal(estNum("９５，０００"), 95000);
+  assert.equal(estNum("￥１２３，４５６"), 123456);
+  assert.equal(estNum("ー５，０００"), -5000);
+  assert.equal(estNum("¥90,909"), 90909);
+  // 行の消費税：商品は商品の税率、送料の行は受注簿と同じ10%
+  const row = (className, amount) => ({
+    classList: { contains: (name) => className.split(" ").includes(name) },
+    children: [{}, { textContent: "1" }, { textContent: amount }, { textContent: amount }, { textContent: "" }],
+  });
+  const product = row("itemRow", "１０，０００");
+  estRecalcRow(product, 3);
+  assert.equal(product.children[4].textContent, yen(800));
+  const shipping = row("shippingRow itemRow", "1000");
+  estRecalcRow(shipping, 3);
+  assert.equal(shipping.children[4].textContent, yen(100));
+});
