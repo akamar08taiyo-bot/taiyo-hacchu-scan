@@ -8,6 +8,14 @@
 // 介援隊の商品ページは次の並びで表示される:
 //   商品名 / 申込番号 / メーカー / JANコード / WEBコード / TAISコード / 小売価格 / 卸売価格
 // 価格改定予告がある商品は、卸売価格の下に予告ボックスが入る。
+const fs = require('fs');
+const path = require('path');
+
+/** 実際の読み取り結果（OCRの文字そのもの）を保存したファイルを、1行ずつの配列にする */
+function ocrFixture(name) {
+  return fs.readFileSync(path.join(__dirname, 'fixtures', name), 'utf8').split('\n');
+}
+
 function kaientaiPage(o) {
   const lines = [
     o.title,
@@ -169,6 +177,51 @@ const cases = [
       retail: '3,300円', wholesale: '1,650円',
     }).map(l => l.replace('(課10)', '(課8)')),
     expect: { listPrice: 3300, cost: 1650, taxType: '8%' },
+  },
+  // --- 介援隊の販売店向けの商品ページ（2026-10-20 のご指摘：「金額や名前を上手く読み取ってくれない」） ---
+  // 申込番号のすぐ下に小売価格・卸売価格が並び、卸売価格に「22,950円（45.0%）（課10）」の割合が付き、
+  // 右上に「在庫商品」「送料対象」「メーカー直送不可（個人宅）」の印がある。
+  // 同じ見た目の画面をいくつかの文字の大きさ（Windows の表示倍率）・字体で作り、アプリそのもの（同じ前処理・tesseract.js）で
+  // 読み取った文字をそのまま保存してある（test/fixtures/ocr-anju-toilet-*.txt）。
+  //   1回目の読み取り（画像の上の3分の1）が申込番号の行を途中で切り、「snB5: 0767 FE Ea ERY」のような崩れた行ができる
+  //   → 商品名・色のうしろに付いていた。メーカーは見出しの次の行（JANコード…）が入っていた。
+  //   卸売価格は「22.950円」（カンマが点）「22,9508」（円が8）「FI CARA 22.950円」（見出しの崩れ）などで取れない・ずれることがあった。
+  ...['ipap-1', 'ipap-1.25', 'ipap-2', 'ipa-1', 'wqy-1', 'wqy-1.25'].map((v) => ({
+    name: `安寿 家具調トイレ コンパクト（販売店向けページ・卸売価格に割合／OCR ${v}）`,
+    lines: ocrFixture(`ocr-anju-toilet-${v}.txt`),
+    expect: {
+      productName: '安寿 家具調トイレ コンパクト / 533-670 標準便座',
+      maker: 'アロン化成',
+      listPrice: 51000,
+      cost: 22950,
+      catalogNumber: 'T0767',
+      webCode: '303028',
+    },
+  })),
+  {
+    // WEBコードの行が読めず、TAISコード（00221-000438）のうしろ6桁を WEBコードにしていた。間違うより空にする
+    name: '安寿 家具調トイレ コンパクト（WEBコードの行が読めない／OCR ipa-1.5）',
+    lines: ocrFixture('ocr-anju-toilet-ipa-1.5.txt'),
+    expect: {
+      productName: '安寿 家具調トイレ コンパクト / 533-670 標準便座',
+      maker: 'アロン化成',
+      listPrice: 51000,
+      cost: 22950,
+      catalogNumber: 'T0767',
+      webCode: '',
+    },
+  },
+  {
+    // 小売価格が「51,0003 (310)」（円が3）。WEBコードの数字の読み違い（203028）は文字からは直せないので見ない
+    name: '安寿 家具調トイレ コンパクト（小売価格の円が数字に読まれる／OCR ipap-1.5）',
+    lines: ocrFixture('ocr-anju-toilet-ipap-1.5.txt'),
+    expect: {
+      productName: '安寿 家具調トイレ コンパクト / 533-670 標準便座',
+      maker: 'アロン化成',
+      listPrice: 51000,
+      cost: 22950,
+      catalogNumber: 'T0767',
+    },
   },
 ];
 

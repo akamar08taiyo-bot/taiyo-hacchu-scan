@@ -216,6 +216,138 @@ function dropRepeatedScanName(name){
 }
 const sanitizeScanNameBeforeRepeatFix=sanitizeScanName;
 sanitizeScanName=function(e,t,n){return dropRepeatedScanName(sanitizeScanNameBeforeRepeatFix(e,t,n))};
+/* 2026-10-20 介援隊の販売店向けの商品ページ（申込番号のすぐ下に小売価格・卸売価格。卸売価格には「22,950円（45.0%）（課10）」のように
+   小売価格に対する割合が付き、右上に「在庫商品」「送料対象」「メーカー直送不可（個人宅）」の印が並ぶ）で、
+   商品名のうしろにゴミ文字が付く・卸売価格が取れない／ずれる・メーカーに別の行が入る、を直す。 */
+
+/* 1回目の読み取り（画像の上の3分の1）は、見出しのすぐ下の行（申込番号と右上の印）を途中で切って読むので、
+   「snB5: 0767 FE Ea ERY」のような崩れた行ができる。商品名の候補には「見出しの行＋次の行」もあり、
+   長い方が点数で勝って、ゴミ文字の付いた名前になっていた。次の行が見出しの続きに見えないときは、つないだ候補を使わない。 */
+function scanNoiseLine(line){
+  let t=String(line||``).replace(/\s+/g,` `).trim(),compact=t.replace(/\s/g,``);
+  if(!compact)return true;
+  /* 見出しの行（「申込番号:」など）：「:」・見出しの言葉・申込番号（T0767） */
+  if(/[:：]/.test(t)||/(?:申込|込番|番号|価格|コード|在庫|送料|直送|個人宅|数量|メモ)/.test(compact)||/(?:^|\s)[A-Z][0-9O]{4}(?:\s|$)/.test(t))return true;
+  /* 意味のない英字の切れ端（「FE Ea ERY」）：日本語がなく2つ以上、または日本語が半分に満たず3つ以上。
+     「PN-L41831A ブルー」「Air SP ワンタッチ…」のような見出しの続きは残す */
+  let junk=t.split(` `).filter(w=>/^[A-Za-z]{1,4}$/.test(w)).length,jp=(compact.match(/[ぁ-んァ-ヶ一-龠]/g)||[]).length;
+  return (junk>=2&&jp===0)||(junk>=3&&jp*2<compact.length);
+}
+const productTitleCandidatesBeforeNoisePair=productTitleCandidates;
+productTitleCandidates=function(e,t=``){
+  let lines=(e||[]).map(x=>String(x||``).replace(/\s+/g,` `).trim()),noisy=new Set();
+  for(let i=0;i+1<lines.length;i++)if(scanNoiseLine(lines[i+1]))noisy.add(normalizeProductNameText(`${lines[i]} ${lines[i+1]}`));
+  return productTitleCandidatesBeforeNoisePair(e,t).filter(c=>!noisy.has(normalizeProductNameText(c.raw)));
+};
+
+/* メーカーは「メーカー：アロン化成」のように見出しと同じ行に書かれている。前は見出しの次の行を使っていたので、
+   「JANコード：4970…」が入っていた。右上の「メーカー直送不可」の印は見出しではない（「：」が続かない）。
+   右の欄（お客様用メモ・数量など）が同じ行に読まれたときは、そこから先を落とす。 */
+const SCAN_MAKER_LABEL=/メ\s*[ー一-]?\s*カ\s*[ー一-]?\s*[:：]/;
+function scanMakerValue(value){
+  let s=String(value||``).replace(/\s+/g,` `).trim(),cut=s.search(/(?:お客様|メモ|数量|※|在庫|送料|直送|個人宅|介・購入|カート)/);
+  if(cut>=0)s=s.slice(0,cut).trim();
+  s=s.replace(/^[:：\s]+|[\s:：;；,，、.．。・'"`|/\\~-]+$/g,``);
+  if(!s||s.length>30||/(?:JAN|WEB|TAIS|申込|番号|価格|コード)/i.test(s))return ``;
+  return /[ぁ-んァ-ヶ一-龠]/.test(s)||/^[A-Za-z][A-Za-z .&-]{2,}$/.test(s)?s:``;
+}
+function scanMakerFromLines(lines){
+  let list=(lines||[]).map(x=>String(x||``).trim());
+  for(let i=0;i<list.length;i++){
+    let m=list[i].match(SCAN_MAKER_LABEL);
+    if(!m)continue;
+    let same=scanMakerValue(list[i].slice(m.index+m[0].length));
+    if(same)return same;
+    /* 見出しと値が別の行に読まれたとき（psm 11 など） */
+    let next=String(list[i+1]||``);
+    if(!/^(?:JAN|WEB|TAIS|申込|小売|卸売)/.test(next.replace(/\s/g,``))&&scanMakerValue(next))return scanMakerValue(next);
+  }
+  return ``;
+}
+const btBeforeMakerFix=bt;
+bt=function(e,t){
+  let r=btBeforeMakerFix(e,t);
+  return {...r,maker:scanMakerFromLines(e)||scanMakerValue(r.maker)};
+};
+
+/* 卸売価格の行の「（45.0%）」を目印にする。OCRでは「22.950円」（カンマが点）、「22,9508」（円が8）、
+   「卸売価格」の見出しの崩れ（「FI CARA 22.950円…」）が起きるので、割合の付いた行の金額を卸売価格とし、
+   小売価格×割合に合う金額を選ぶ（金額が読めなかったときは小売価格×割合）。割合の付かないページは今までどおり。 */
+const SCAN_RATE=/[(（〔[{]\s*(\d{1,2})\s*[.,．]\s*(\d)\s*(?:%|％|9o|o|0\/0)?\s*[)）〕\]}]|(\d{1,2})\s*[.,．]\s*(\d)\s*[%％]/;
+function scanPriceNumbers(text){
+  /* 3桁ごとの区切りが点・読点・空白に読まれても1つの金額にする。区切りのある金額のすぐうしろの数字1つは「円」の読み違い */
+  let s=String(text||``).replace(/(\d)\s*[,，、.．]+\s*(?=\d{3}(?!\d{2}))/g,`$1,`),out=[];
+  for(let m of s.matchAll(/(\d{1,3}(?:,\d{3})+)\d?(?!\d)|(?<![\d,])(\d{3,7})(?![\d,])/g)){
+    let n=Number(String(m[1]||m[2]).replace(/,/g,``));
+    if(n>=100)out.push(n);
+  }
+  return out;
+}
+function scanMostCommon(values){
+  let count=new Map();
+  for(let v of values)count.set(v,(count.get(v)||0)+1);
+  return [...count.entries()].sort((a,b)=>b[1]-a[1])[0]?.[0]||0;
+}
+function kaientaiRatePrices(text){
+  let costs=[],rates=[],lists=[],all=String(text||``).split(`\n`).map(x=>x.replace(/\s+/g,` `));
+  for(let i=0;i<all.length;i++){
+    let line=all[i],m=line.match(SCAN_RATE),rate=m?Number(`${m[1]??m[3]}.${m[2]??m[4]}`):0,near=`${all[i-1]||``} ${all[i+1]||``}`;
+    /* 卸売価格の行：割合が15〜95%で、卸・仕切・課・特価のどれかがあるか、隣が小売価格の行（見出しが崩れても読めるように） */
+    if(m&&rate>=15&&rate<=95&&(/[卸仕課]|特価/.test(line)||/小\s*[売元]|卸/.test(near))){
+      let nums=scanPriceNumbers(line.slice(0,m.index));
+      rates.push(rate);
+      if(nums.length)costs.push(nums[nums.length-1]);
+      continue;
+    }
+    let label=line.match(/小\s*[売元]\s*(?:価\s*格)?[^0-9]*/);
+    if(label&&!/卸/.test(line)){let nums=scanPriceNumbers(line.slice(label.index+label[0].length));nums.length&&lists.push(nums[0])}
+  }
+  return {costs,rates,lists};
+}
+/* WEBコード：見出し（「WEBコード：」が「WEコード」「WEBコーード」などに崩れたものも）の付いた6桁を使う。
+   何度か読んだうち多い方、同じ数なら見出しがきれいに読めた方。TAISコード（00221-000438）のうしろ6桁は使わない */
+function kaientaiWebCode(text,current){
+  let src=String(text||``),tais=new Set([...src.matchAll(/\d{5}\s*[-‐ー:：.\s]\s*(\d{6})(?!\d)/g)].map(m=>m[1])),found=[];
+  for(let line of src.split(`\n`)){
+    let m=line.match(/W\s*E\s*B?\s*([コニロ]?\s*ー*\s*ド?)\s*([:：])?\s*(\d{6})(?!\d)/);
+    if(m&&!tais.has(m[3]))found.push({code:m[3],score:(/ード/.test(m[1])?2:0)+(m[2]?1:0)});
+  }
+  if(!found.length)return tais.has(current)?``:current;
+  let count=new Map();
+  for(let f of found)count.set(f.code,(count.get(f.code)||0)+1);
+  return found.sort((a,b)=>count.get(b.code)-count.get(a.code)||b.score-a.score)[0].code;
+}
+/* 申込番号の見出しが崩れた（「品込秋号 T0767」）・番号だけの行に読まれた（「T0767」）ときも申込番号を取る */
+function kaientaiCatalogFallback(text){
+  let lines=String(text||``).split(`\n`).map(x=>x.trim());
+  for(let line of lines){
+    if(!/(?:[申品甲中]\s*込|込\s*[番秋]|番\s*号)/.test(line))continue;
+    let m=line.match(/(?:^|[^A-Z0-9])([A-Z])\s?([0-9O]{4})(?![0-9])/);
+    if(m)return m[1]+m[2].replace(/O/g,`0`);
+  }
+  return lines.find(x=>/^[A-Z]\d{4}$/.test(x))||``;
+}
+const wtBeforeRatePrice=wt;
+wt=function(e){
+  let r=wtBeforeRatePrice(e);
+  if(!r||r.supplier===`ウェルファン`)return r;
+  let {costs,rates,lists}=kaientaiRatePrices(r.rawText),out={...r};
+  if(/(?:小売|卸売|WEB|TAIS)/.test(String(r.rawText||``))){
+    if(!out.catalogNumber)out.catalogNumber=kaientaiCatalogFallback(r.rawText);
+    out.webCode=kaientaiWebCode(r.rawText,out.webCode);
+  }
+  if(!rates.length)return out;
+  let list=Number(r.listPrice)||0,listRead=scanMostCommon(lists);
+  /* 「51,0003」（円が3）をそのまま読んだ 510003 などは、区切りから読み直した金額にする */
+  if(listRead&&(!list||(String(list).length===String(listRead).length+1&&String(list).startsWith(String(listRead)))))list=listRead;
+  let rate=scanMostCommon(rates),expected=list?Math.round(list*rate/100):0,cost=Number(r.cost)||0;
+  let near=v=>!!expected&&Math.abs(v-expected)<=Math.max(2,expected*.005);
+  /* 読んだ卸売価格を変えるのは、小売価格×割合にぴったり合う金額が読めたときだけ。読めていなければ、割合の行の金額か小売価格×割合 */
+  if(!near(cost)){let hit=costs.find(near);if(hit)cost=hit;else if(!cost)cost=scanMostCommon(costs)||expected}
+  if(list){out.listPrice=list;out.listPriceTaxIn=Ye(list,r.taxType)}
+  if(cost)out.cost=cost;
+  return out;
+};
 function benefitYen(e){return Ge(Math.round(benefitNum(e)))}
 function benefitRatio(e){let t=benefitNum(e.burdenRatio||1);return t===2?2:t===3?3:1}
 function benefitDetails(e){let t=Array.isArray(e.benefitDetails)&&e.benefitDetails.length?e.benefitDetails:[{amount:e.saleUnitPrice||``,cost:e.cost||``}];return t.map(e=>({amount:e?.amount??``,cost:e?.cost??``}))}
