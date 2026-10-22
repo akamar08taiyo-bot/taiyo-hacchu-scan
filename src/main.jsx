@@ -418,18 +418,20 @@ function draftSavedLabel(savedAt){
 }
 /* jutaku-import-begin
    住宅改修 見積書・請求書（太陽ポータルの sasaoka/・jutaku-mitsumori/）の発注書から、部材を受け取る。
+   特定福祉用具 購入申請書・見積もり作成（太陽ポータルの tokutei/）の見積もりからも、商品を受け取る（kind が taiyo-tokutei-order、?from=tokutei）。
    同じサイト（akamar08taiyo-bot.github.io）なので、見積もり側が「販売受注簿に転記」で localStorage に置いた内容を読む。
    入れても入れなくても読んだら消す（読み直したときに、また出ないように）。
-   リンクから開いていない（?from=jutaku がない）のに1日より前のものは、もう使わないので黙って消す。 */
+   リンクから開いていない（?from=jutaku・?from=tokutei がない）のに1日より前のものは、もう使わないので黙って消す。 */
 var JUTAKU_IMPORT_KEY=`taiyo-hacchu-import-v1`;
 function readJutakuImport(){
   try{
     let raw=localStorage.getItem(JUTAKU_IMPORT_KEY);
     if(!raw)return null;
     let data=JSON.parse(raw);
-    let fromLink=/[?&]from=jutaku(?:&|$)/.test(location.search);
+    let from=data&&data.kind===`taiyo-jutaku-order`?`jutaku`:data&&data.kind===`taiyo-tokutei-order`?`tokutei`:``;
+    let fromLink=!!from&&new RegExp(`[?&]from=${from}(?:&|$)`).test(location.search);
     let fresh=Date.now()-Number(data&&data.createdAt||0)<24*60*60*1000;
-    if(!data||data.kind!==`taiyo-jutaku-order`||!Array.isArray(data.items)||!data.items.length||(!fromLink&&!fresh)){
+    if(!data||!from||!Array.isArray(data.items)||!data.items.length||(!fromLink&&!fresh)){
       localStorage.removeItem(JUTAKU_IMPORT_KEY);
       return null;
     }
@@ -455,21 +457,75 @@ function jutakuImportPages(data,base,discountRate){
       saleUnitPrice:list?Math.floor(list*(100-rate)/100):``,note:text(item.note),_multiId:`jutaku-${Number(data.createdAt)||0}-${index}`};
   });
 }
+/* 特定福祉用具の見積もりの商品1点を、受注簿の1ページにする。受注区分「給付」・給付割合・SMARTれん太の販売分類「特定福祉用具」。
+   販売単価と購入金額（税込）は、特定福祉用具のアプリの見積書・申請書と同じ（アプリが計算して送る。定価がなければ仕切×125% など）。
+   介護保険の残り（careInsuranceBalance）は、そのページより前の商品の分を引いた今年度の残り。残りがなければ全額自己負担（fullSelfPay）。
+   ページの給付内訳は、アプリが見積書・申請書と同じ合計になるように商品ごとに分けたもの（tokuteiBenefit。tokuteiFixedBenefit で使う）。 */
+function tokuteiImportPages(data,base,discountRate){
+  let rate=Number.isFinite(Number(discountRate))?Number(discountRate):20,
+      text=v=>String(v??``).trim(),
+      yen=v=>Math.max(0,Math.round(Number(v)||0)),
+      ratio=[1,2,3].includes(Number(data.burdenRatio))?Number(data.burdenRatio):1,
+      header={...base,orderType:`給付`,burdenRatio:ratio,smartRentaSalesCategory:`特定福祉用具`,
+        customerName:text(data.customerName),furigana:text(data.furigana),address:text(data.address),tel:text(data.tel)};
+  if(text(data.sales))header.sales=text(data.sales);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(text(data.deliveryDate)))header.deliveryDate=text(data.deliveryDate);
+  if(data.welfare===true)header.livingProtection=true;
+  return data.items.map((item,index)=>{
+    let list=yen(item.listPrice),cost=yen(item.cost),price=yen(item.saleUnitPrice),
+        taxType=[`10%`,`8%`,`非課税`].includes(item.taxType)?item.taxType:`10%`,
+        itemRate=Number.isFinite(Number(item.discountRate))?Number(item.discountRate):rate,
+        benefit=item.benefit||{},
+        page={...header,productName:text(item.productName),catalogNumber:``,webCode:``,maker:text(item.maker),modelNumber:text(item.modelNumber),
+          color:``,size:``,shippingFee:0,quantity:String(Math.max(1,Math.round(Number(item.quantity)||1))),unit:text(item.unit)||`台`,
+          listPrice:list?String(list):``,listPriceTaxIn:list?Ye(list,taxType):``,cost:cost?String(cost):``,taxType,discountRate:itemRate,
+          saleUnitPrice:price||(list?Math.floor(list*(100-itemRate)/100):``),note:text(item.note),
+          tokuteiBenefit:{productName:text(item.productName),totalTaxIn:yen(item.totalTaxIn),ratio,
+            target:yen(benefit.target),userBurden:yen(benefit.userBurden),insurerBurden:yen(benefit.insurerBurden)},
+          _multiId:`tokutei-${Number(data.createdAt)||0}-${index}`};
+    if(text(item.supplier))page.supplier=text(item.supplier);
+    if(typeof item.careInsuranceBalance===`number`&&Number.isFinite(item.careInsuranceBalance)){
+      page.careInsuranceBalance=yen(item.careInsuranceBalance);
+      if(page.careInsuranceBalance<=0)page.fullSelfPay=true;
+    }
+    return page;
+  });
+}
+/* 特定福祉用具の見積もりから入れたページは、アプリが分けた給付内訳を出す（ページごとに切り上げると、利用者負担の合計が
+   見積書・申請書と1円ずれることがあるため）。受注簿で商品名・合計金額（税込）・給付割合を直したら、ふつうの計算（bc）に戻す。
+   全額自己負担のページも、ふつうの計算（購入金額をすべて利用者負担として出す）。 */
+function tokuteiFixedBenefit(order,bc){
+  let fx=order&&order.tokuteiBenefit;
+  if(!fx||typeof fx!==`object`||!bc||order.fullSelfPay)return null;
+  let total=Math.round(Number(bc.totalTaxIn)||0),target=Math.round(Number(fx.target)||0);
+  if(String(fx.productName??``)!==String(order.productName??``).trim()||Math.round(Number(fx.totalTaxIn)||0)!==total||Number(fx.ratio)!==Number(bc.ratio)||target<0||target>total)return null;
+  let user=Math.max(0,Math.round(Number(fx.userBurden)||0)),insurer=Math.max(0,Math.round(Number(fx.insurerBurden)||0));
+  return{target,userBurden:user,insurerBurden:insurer,userPay:user+total-target};
+}
 /* jutaku-import-end */
+/* tokutei-benefit-begin：特定福祉用具の見積もりから入れたページの給付内訳（tokuteiFixedBenefit）を、受注簿の画面・印刷・PDF のすべてで使う */
+var benefitCalcBeforeTokutei=benefitCalc;
+benefitCalc=function(e,t){let bc=benefitCalcBeforeTokutei(e,t),fx=tokuteiFixedBenefit(e,bc);return fx?{...bc,...fx}:bc};
+/* tokutei-benefit-end */
 function JutakuImportDrawer({data,hasDraft,onAccept,onDecline}){
   let items=Array.isArray(data.items)?data.items:[];
-  return (0,j.jsx)(`div`,{className:`drawer`,"aria-label":`住宅改修の見積もりから`,children:(0,j.jsxs)(`div`,{className:`drawerPanel draftPanel jutakuImportPanel`,children:[
-    (0,j.jsx)(`h2`,{children:`住宅改修の見積もりから部材が届いています`}),
-    (0,j.jsxs)(`p`,{children:[String(data.title||`住宅改修`).trim(),` の発注書の部材 ${items.length}点です。受注簿に入れると、1点ずつ商品ページになります（${draftSavedLabel(data.createdAt)}）。`]}),
+  /* 特定福祉用具の見積もりからは「商品」（受注区分「給付」。購入金額も出す）、住宅改修の発注書からは「部材」 */
+  let tokutei=data.kind===`taiyo-tokutei-order`,what=tokutei?`商品`:`部材`,ratio=[1,2,3].includes(Number(data.burdenRatio))?Number(data.burdenRatio):1;
+  return (0,j.jsx)(`div`,{className:`drawer`,"aria-label":tokutei?`特定福祉用具の見積もりから`:`住宅改修の見積もりから`,children:(0,j.jsxs)(`div`,{className:`drawerPanel draftPanel jutakuImportPanel`,children:[
+    (0,j.jsx)(`h2`,{children:tokutei?`特定福祉用具の見積もりから商品が届いています`:`住宅改修の見積もりから部材が届いています`}),
+    (0,j.jsxs)(`p`,{children:tokutei
+      ?[String(data.title||`特定福祉用具`).trim(),` の商品 ${items.length}点です。受注簿に入れると、1点ずつ受注区分「給付」（${ratio}割）の商品ページになります（${draftSavedLabel(data.createdAt)}）。`]
+      :[String(data.title||`住宅改修`).trim(),` の発注書の部材 ${items.length}点です。受注簿に入れると、1点ずつ商品ページになります（${draftSavedLabel(data.createdAt)}）。`]}),
     (0,j.jsx)(`div`,{className:`jutakuImportList`,children:(0,j.jsxs)(`table`,{children:[
-      (0,j.jsx)(`thead`,{children:(0,j.jsxs)(`tr`,{children:[(0,j.jsx)(`th`,{children:`品名`}),(0,j.jsx)(`th`,{children:`品番`}),(0,j.jsx)(`th`,{children:`数量`})]})}),
+      (0,j.jsx)(`thead`,{children:(0,j.jsxs)(`tr`,{children:[(0,j.jsx)(`th`,{children:`品名`}),(0,j.jsx)(`th`,{children:`品番`}),(0,j.jsx)(`th`,{children:`数量`}),tokutei&&(0,j.jsx)(`th`,{children:`購入金額(税込)`})]})}),
       (0,j.jsx)(`tbody`,{children:items.map((item,index)=>(0,j.jsxs)(`tr`,{children:[
         (0,j.jsx)(`td`,{children:String(item.productName||``)}),
         (0,j.jsx)(`td`,{children:String(item.modelNumber||``)}),
-        (0,j.jsx)(`td`,{className:`qty`,children:`${Math.max(1,Math.round(Number(item.quantity)||1))}${String(item.unit||``)}`})
+        (0,j.jsx)(`td`,{className:`qty`,children:`${Math.max(1,Math.round(Number(item.quantity)||1))}${String(item.unit||``)}`}),
+        tokutei&&(0,j.jsx)(`td`,{className:`qty`,children:Ge(item.totalTaxIn)})
       ]},index))})
     ]})}),
-    hasDraft&&(0,j.jsx)(`p`,{className:`jutakuImportNote`,children:`入力途中の受注簿が残っています。入れると、その入力は消えて見積もりの部材に置き換わります。`}),
+    hasDraft&&(0,j.jsx)(`p`,{className:`jutakuImportNote`,children:`入力途中の受注簿が残っています。入れると、その入力は消えて見積もりの${what}に置き換わります。`}),
     (0,j.jsxs)(`div`,{className:`draftActions`,children:[
       (0,j.jsx)(`button`,{type:`button`,className:`primary`,onClick:onAccept,children:`受注簿に入れる`}),
       (0,j.jsx)(`button`,{type:`button`,onClick:onDecline,children:`入れない`})
@@ -504,14 +560,16 @@ function Ot(){let[e,t]=(0,A.useState)(Be),[n,r]=(0,A.useState)(Ve),[i,a]=(0,A.us
   function acceptJutakuImport(){
     let data=jutakuOffer;
     if(!data)return;
+    /* 特定福祉用具の見積もりからは「商品」（給付のページ）、住宅改修の発注書からは「部材」 */
+    let tokutei=data.kind===`taiyo-tokutei-order`,what=tokutei?`商品`:`部材`;
     /* 入力途中の受注簿が残っているときは、消える前に一度だけ確認する（第13項）。 */
     if(draftOffer){
       let label=String(draftOffer?.order?.customerName||draftOffer?.order?.productName||``).trim();
-      if(!window.confirm(`前回の入力${label?`（${label}）`:``}は消えて、見積もりの部材に置き換わります。よろしいですか？`))return;
+      if(!window.confirm(`前回の入力${label?`（${label}）`:``}は消えて、見積もりの${what}に置き換わります。よろしいですか？`))return;
       setDraftOffer(null);
       clearOrderDraft();
     }
-    let pages=jutakuImportPages(data,{...Be,createdAt:todayInTokyo()},n.defaultDiscountRate);
+    let pages=(tokutei?tokuteiImportPages:jutakuImportPages)(data,{...Be,createdAt:todayInTokyo()},n.defaultDiscountRate);
     clearJutakuImport();
     setJutakuOffer(null);
     setMultiSaved(pages);
@@ -520,12 +578,12 @@ function Ot(){let[e,t]=(0,A.useState)(Be),[n,r]=(0,A.useState)(Ve),[i,a]=(0,A.us
     t({...pages[0]});
     x({modelNumber:pages[0].modelNumber?[pages[0].modelNumber]:[],color:[],size:[],taxType:[`10%`,`8%`,`非課税`]});
     clearImageSnapshot();
-    h(`見積もりの部材${pages.length}点を入れました`);
+    h(tokutei?`特定福祉用具${pages.length}点を入れました`:`見積もりの部材${pages.length}点を入れました`);
   }
   function declineJutakuImport(){
     clearJutakuImport();
     setJutakuOffer(null);
-    h(`見積もりの部材は入れませんでした`);
+    h(jutakuOffer&&jutakuOffer.kind===`taiyo-tokutei-order`?`特定福祉用具は入れませんでした`:`見積もりの部材は入れませんでした`);
   }
   function discardOrderDraft(){
     /* 押し間違いで前回の入力を失わないよう、消す前に一度だけ確認する。 */

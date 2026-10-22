@@ -820,8 +820,8 @@ button:hover {
   color: #fff;
 }
 
-/* 住宅改修の見積もり（発注書）から届いた部材を受注簿に入れるかを選ぶダイアログ。
-   届いた部材の一覧（品名・品番・数量）を出し、多いときは一覧だけをスクロールさせる。 */
+/* 住宅改修の見積もり（発注書）から届いた部材・特定福祉用具の見積もりから届いた商品を、受注簿に入れるかを選ぶダイアログ。
+   届いたものの一覧（品名・品番・数量。特定福祉用具は購入金額も）を出し、多いときは一覧だけをスクロールさせる。 */
 .jutakuImportPanel {
   width: min(640px, calc(100vw - 48px));
 }
@@ -857,6 +857,7 @@ button:hover {
   overflow-wrap: anywhere;
 }
 
+.jutakuImportList th:nth-child(3),
 .jutakuImportList th:last-child,
 .jutakuImportList td.qty {
   text-align: right;

@@ -94,7 +94,8 @@ test("受注簿に入れるか選ぶダイアログ（入力途中の受注簿�
   assert.match(source, /jutakuOffer&&\(0,j\.jsx\)\(JutakuImportDrawer,\{data:jutakuOffer,hasDraft:!!draftOffer/);
   // 届いた部材を選んでいるあいだは「前回の入力」のダイアログを重ねない
   assert.match(source, /draftOffer&&!jutakuOffer&&\(0,j\.jsx\)\(`div`,\{className:`drawer`/);
-  assert.match(source, /function acceptJutakuImport\(\)\{[\s\S]{0,300}if\(draftOffer\)\{[\s\S]{0,200}window\.confirm\(`前回の入力[\s\S]{0,60}は消えて、見積もりの部材に置き換わります。よろしいですか？`\)/);
+  // 特定福祉用具の見積もりからは「商品」（tokutei-import.test.mjs）。住宅改修の発注書からは「部材」
+  assert.match(source, /function acceptJutakuImport\(\)\{[\s\S]{0,300}what=tokutei\?`商品`:`部材`[\s\S]{0,200}if\(draftOffer\)\{[\s\S]{0,200}window\.confirm\(`前回の入力[\s\S]{0,60}は消えて、見積もりの\$\{what\}に置き換わります。よろしいですか？`\)/);
   // 入れたら全部を商品ページにして、1ページ目を開く
   assert.match(source, /setMultiSaved\(pages\);\s*setMultiDraft\(null\);\s*setMultiPageIndex\(0\);\s*t\(\{\.\.\.pages\[0\]\}\);/);
   assert.match(source, /function declineJutakuImport\(\)\{\s*clearJutakuImport\(\);/);
