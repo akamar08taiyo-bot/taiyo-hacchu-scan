@@ -25,9 +25,8 @@ test("中身が無いときは残さず、容量超過でも文字データは�
 
 test("次に開いたとき「続きから」か「新しく」を選べる", () => {
   // 確認中に空の初期値で上書きしないこと
-  // 特定福祉用具の販売見積書の中に出したとき（?embed=tokutei）は、この端末の下書きを使わない（受注簿は見積書の案件に保存する）
-  assert.match(source, /useState\)\(\(\)=>TOKUTEI_EMBED\?null:readOrderDraft\(\)\)/);
-  assert.match(source, /if\(draftOffer\|\|TOKUTEI_EMBED\)return;/);
+  assert.match(source, /useState\)\(\(\)=>readOrderDraft\(\)\)/);
+  assert.match(source, /if\(draftOffer\)return;/);
   // 続きから：受注簿・商品ページ・現在ページ・画像を戻す
   assert.match(source, /function acceptOrderDraft\(\)/);
   assert.match(source, /setMultiSaved\(Array\.isArray\(saved\.multiSaved\)\?saved\.multiSaved:\[\]\)/);
