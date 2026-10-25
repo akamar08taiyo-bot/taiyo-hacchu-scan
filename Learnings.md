@@ -554,3 +554,49 @@
 - 送り手の `test/tokutei/e2e-hacchu.mjs`（📤 販売受注簿に転記 → 受注簿に入れる）も、フリガナの欄を足したあとで通ることを確かめた。
 - 修正前に `master` をビルドし、`docs/` とバイト一致することを確認してから着手した（第16項の手順）。
 
+
+## 2026-10-25 受注簿と見積書を Excel で保存する
+
+ユーザーの指示（特定福祉用具のセッション）：「販売受注簿や見積もりは全てExcelで保存できるようにする。ページは3ページまでいけるようにする」。
+特定福祉用具の販売見積書は原本の Excel で3ページ（116点）まで（送り手のリポジトリ）。このリポジトリでは、受注簿と見積書（御見積書）に「Excel保存」を足した。
+
+### 37. Excel保存の作り（印刷・PDF と同じ中身を、測った位置の結合セルに）
+- **事実**: 受注簿は React の画面、見積書は文字列で組み立てた別ウィンドウ（第12項の2系統）。Excel をどちらから作るかで、同じ中身が2通りに作られるおそれがあった。
+- **対処**: どちらも「印刷に出ている中身」を DOM から読む形にした（データから組み立て直さない。手で打ち直した値もそのまま入る）。
+  - 受注簿：`xlsxDownload`（`pdfDownload` のすぐ下）。PDF と同じく `collectPrintCssText()` を当てて見えているシート（複数ページなら印刷用の控え＋集計）を
+    `readOrderSheet`・`readSummarySheet`（`src/lib/orderXlsx.mjs`）で読む。ファイル名は PDF と同じ `k('xlsx')`。
+    位置は PDF を作るときの幅（`.orderEntrySheet{width:289mm}`）で測った mm（`ORDER_EDGES`。測り方：Playwright の viewport を 1122px にして
+    `emulateMedia({media:'print'})`、各欄の `getBoundingClientRect`）。A4 横・余白 6mm・拡大縮小 96%・1点ごとに手動の改ページ
+    （「1ページに収める」だと Excel は手動の改ページを使わない）。貼り付けた画像も画像の枠に入れる（`imageToJpeg`→`ws.picture`。xl/drawings）。
+    金額は受注簿で手で直せる欄が多いので値のまま。集計の販売・送料・仕切りの合計だけ、明細の和と同じときは `SUM` の式、利益額は 販売−仕切り。
+  - 見積書：窓の「PDF保存」の右に `#xlsxButton`。窓の中の script から `window.opener.__taiyoXlsx.estimate(document)` を呼び（PDF の `__taiyoPdfLibs` と同じ形）、
+    `readEstimateDoc`→`buildEstimateXlsx`（`src/lib/estimateXlsx.mjs`）→その窓で保存（`downloadXlsx(…, doc)`）。名前は PDF と同じ `document.title`＋.xlsx。
+    金額＝`ROUND(数量×単価,0)`、消費税＝`INT(金額×税率)`（窓の `estRecalcRow` と同じ。税率は行の `data-tax-rate`／送料は 10%／ほかは窓の `ESTIMATE_TAX_RATE`）、
+    小計・消費税は和、合計は小計＋消費税、上の御見積金額は合計の欄を指す。**見積書の表示と式の答えが同じときだけ式**にし、手で直して合わない欄は値のまま。
+    A4 縦・余白は印刷と同じ（上下 17mm・左右 22mm）・横1ページ・縦は続く。明細の見出しを印刷タイトルにしたので、60点で3ページなどに続いても各ページに見出しが出る。
+- **今後**: 印刷・PDF の見た目（位置・色・字の大きさ）を変えたら、`ORDER_EDGES` や `estimateXlsx.mjs` の `X`・`C` も合わせる。見積書の窓の欄（data-field・class）を
+  変えたら `readEstimateDoc` も直す（`test/e2e-xlsx.mjs` で落ちる）。
+
+### 38. JS の `\s` は全角の空白も含む
+- **事実**: 見積書の文字の空白を `replace(/[\s\u00a0]+/g,' ')` でまとめたら、題名「御　見　積　書」が「御 見 積 書」、「御見積金額　合計（税込）」が「御見積金額 合計（税込）」になった
+  （LibreOffice で画像にして気づいた）。
+- **対処**: `SPACES = /[ \t\n\r\f\v\u00a0]+/g`（半角の空白だけ）にした。`test/xlsx-export.test.mjs`・`test/e2e-xlsx.mjs` で「御　 見　 積　 書」（字間のまね）を確かめる。
+
+### 39. Write ツールで書いた `\u00a0` が、見えない空白の文字そのもので入った
+- **事実**: 新しいファイル（estimateXlsx.mjs）を Write ツールで書いたら、正規表現の `\u00a0` が U+00A0 の文字そのものになっていた（第20項と同じ種類）。
+  この Learnings.md に Bash の heredoc で書き足したときも同じだった（`\u00a0` と書いた所が U+00A0 に）。
+- **対処**: python でファイルの U+00A0・U+FFFE・U+FFFF・制御文字を数え、`\u00a0` の書き方に直した。
+  python の文字列の中で `'\\u00a0'` と書けば、文字そのものにならずに書ける。xlsxBook.mjs の XML に書けない文字を除く正規表現も `￾￿` の書き方にした。
+
+### 40. ボタンを1つ足したら、スマホの幅で「Excel保存」が「Excel保 / 存」に割れた
+- **事実**: 上の段のボタンは 760px 以下で3つずつ並ぶ（`flex: 1 1 30%`）。6つ目の「Excel保存」と「見積もり作成」が左右の余白 18px で2行に割れた。
+  見積書の窓の上の段も、ボタンが1つ増えて「明細行を追加」「営業所」が2行に割れた。
+- **対処**: 640px 以下は `.actions button` の左右の余白を 6px・`white-space: nowrap`。見積書の窓は `.toolbar button`・`.toolbarOffice` に `white-space:nowrap`。
+  390px・1366px の画像で確かめた。
+
+### 検証について
+- `test/xlsx-export.test.mjs`：架空のデータで作った xlsx を開いて（無圧縮の zip を読む）、結合セルの重なりなし・A4 の向きと余白・改ページ・画像・式と答え
+  （全角の数量・8% の商品・手で直した金額は値のまま）・60点で3ページ分の高さ・ボタンのつなぎを確かめる。
+- `test/e2e-xlsx.mjs`（ビルドのあと）：受注簿2点（画像を貼り付け）→ Excel保存 → 見積もり作成 → 数量を「２」に打ち直す → 窓の Excel保存、1点の受注簿と単品の見積書も。
+  保存した .xlsx は taiyo-excel-export スキルの validate.py（ALL VALID / EXCEL CHECKS OK）・recalc.py（mismatches: 0）・render.sh で確かめ、印刷の画像と見比べた。
+- 着手前の `master` は `docs/` と同じ（第16項の手順）。作業はブランチ `claude/tokutei-embed`（`?embed=scan` の続き）。

@@ -3890,6 +3890,16 @@ body,
   }
 }
 
+/* スマホの幅：上の段のボタン（「Excel保存」を足して6つ）は、字が2行に割れないよう左右の余白を詰める */
+@media (max-width: 640px) {
+  .actions button,
+  .actions .primary,
+  .actions .softPrimary {
+    padding: 0 6px;
+    white-space: nowrap;
+  }
+}
+
 /* 顧客名の上のフリガナ（特定福祉用具の見積もりから転記したときの読み） */
 .furiganaInput {
   display: block;

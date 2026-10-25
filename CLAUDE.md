@@ -30,6 +30,12 @@
 - 特定福祉用具の販売見積書の「📷 スクショから自動認識」の窓の中に、**画像の欄（読み取り）だけ**を出す（`?embed=scan`。`main.jsx` の
   `tokutei-scan-begin`〜`end`・`tokutei-scan-app-begin`〜`end`、Learnings.md 第32・33項）。読み取った商品（受注簿の欄に入れた値）を postMessage
   `taiyo-hacchu-scanned` で窓に送り、窓で貼り付けた画像は `taiyo-scan-image` で受けて読む。受注簿・上の段・ダイアログは出さず、この端末の下書きにも保存しない。
+- **Excel保存**（ユーザーの指示「販売受注簿や見積もりは全てExcelで保存できるようにする。ページは3ページまでいけるようにする」2026-10-25。Learnings.md 第37〜40項）：
+  上の段の「PDF保存」の右の「Excel保存」（`xlsxDownload`）は、PDF と同じく印刷CSSで見えているシート（1点1ページ＋集計）を読んで .xlsx にする（`src/lib/orderXlsx.mjs`）。
+  見積書の窓の「PDF保存」の右の「Excel保存」は、受注簿の画面の `window.__taiyoXlsx.estimate(document)` で、その窓の中身（打ち直した値も）を .xlsx にする
+  （`src/lib/estimateXlsx.mjs`。単品・複数商品の両方。明細が多ければ2・3ページと続き、明細の見出しを各ページの上にくり返す）。
+  書き出しの部品は `src/lib/xlsxBook.mjs`（特定福祉用具の xlsxBook.ts を写したもの＋画像・拡大縮小・改ページ・印刷タイトル。zip は無圧縮で自前）。
+  作り方・確かめ方は特定福祉用具のリポジトリの taiyo-excel-export スキル。印刷・PDF の見た目を変えたら、Excel の位置（mm）・色も合わせて直す。
 - 技術構成: Vite + React（`src/main.jsx`, 1ファイルに集約・圧縮された生成コード
   相当のスタイルでベタ書きされている＝手で読むには `grep -n -o` でパターン検索が
   現実的。整形されていないので awk/sed で該当行を fold して読むこと）。
@@ -63,6 +69,9 @@
   読み取った文字そのものは `test/fixtures/ocr-*.txt` に置ける（`scan-cases.js` の `ocrFixture`）。
 - この作業環境では CDN を読めないが、npm の tesseract.js・言語データを Playwright で CDN の代わりに返せば、
   docs/ をそのまま動かして OCR を再現できる（Learnings.md 第24項）。
+- `npm run build && node test/e2e-xlsx.mjs <出力フォルダ>` — 受注簿（2点＋貼り付けた画像・1点）と見積書（複数商品で数量を全角で直す・単品）の
+  「Excel保存」を実際に押し、保存された .xlsx の中身を確かめる（Playwright。`node --test` には含まれない）。保存したファイルは
+  taiyo-excel-export スキルの `validate.py`・`recalc.py`・`render.sh` で検査・画像にして、印刷と見比べる。
 - UIの見た目・PDFの崩れなどを直したときは、Playwright を使い
   実際にボタンを押させて検証する（下記「実機検証パターン」参照）。
   スクリーンショット目視だけで「直った」と判断しない。
@@ -133,6 +142,10 @@
 14. **ほかのアプリからの受け取り口は1つ（`taiyo-hacchu-import-v1`）にして `kind` で分ける**。知らない kind は黙って消す作りなので、
    新しい送り手を足すときは**受け取る側を先に公開**する（逆だと送った内容が消える）。ページをまたぐ合計の決まり（限度額・切り上げ）がある送り手は、
    送り手の計算を正にして内訳を送ってもらう（受注簿のページごとの切り上げだと1円ずれる。Learnings.md 第30・31項）。
+15. **JS の `\s` は全角の空白（U+3000）も含む**: 見積書の文字を `replace(/\s+/g,' ')` でまとめたら、題名「御　見　積　書」が「御 見 積 書」になった
+   （Learnings.md 第38項）。帳票の文字の空白をまとめるときは `[ \t\n\r\f\v\u00a0]` のように半角だけを書く。
+16. **Write ツール・Bash の heredoc で `\u00a0` などを書くと、その文字そのもの（見えない空白）でファイルに入る**（第10項と同じ。Learnings.md 第39項）。
+   新しいファイルを書いたあとは、U+00A0・U+FFFE などが入っていないか python で確かめ、入っていたら `\uXXXX` に直す。
 
 ## デザイン方針（このリポジトリの帳票全般）
 - 受注簿・見積書とも「太字は使いすぎない」。強調は文字サイズ・色・背景色で
