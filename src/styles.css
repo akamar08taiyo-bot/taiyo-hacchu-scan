@@ -3858,3 +3858,139 @@ body,
     object-fit: contain !important;
   }
 }
+
+/* 特定福祉用具の販売見積書の中に出したとき（?embed=tokutei。main.jsx の tokutei-live-begin）。
+   はじめは受注簿だけを広く。「📷 カタログから商品を自動認識」で左の画像の欄を開く（ふつうの2列） */
+.workspace.twoColumn.tokuteiOrderOnly {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.workspace.twoColumn.tokuteiOrderOnly > .imagePanel {
+  display: none;
+}
+
+.workspace.twoColumn.tokuteiOrderOnly > .orderEntryPanel:not(.multiSummaryPanel),
+.workspace.twoColumn.tokuteiOrderOnly > .panel {
+  grid-column: 1;
+  grid-row: auto;
+  min-height: 0;
+}
+
+.tokuteiEmbed .workspace {
+  min-height: 0;
+}
+
+.tokuteiScanBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border: 1px dashed #8fb2ce;
+  border-radius: 10px;
+  background: #f3f9fd;
+}
+
+.tokuteiScanBar button {
+  padding: 9px 16px;
+  border: 1px solid #1769aa;
+  border-radius: 8px;
+  background: #1769aa;
+  color: #fff;
+  font-weight: 500;
+}
+
+.tokuteiScanBar button:hover {
+  background: #0d5a96;
+}
+
+.tokuteiScanBar span {
+  color: #48606f;
+  font-size: 12px;
+}
+
+.tokuteiScanBar button.scanClose {
+  border-color: #b8c7d3;
+  background: #fff;
+  color: #334a5c;
+}
+
+.tokuteiScanBar button.scanClose:hover {
+  background: #f1f5f8;
+}
+
+.catalogLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 8px 0;
+}
+
+.catalogLinks a {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border: 1px solid #8fb2ce;
+  border-radius: 8px;
+  background: #eef6fb;
+  color: #0d4f8b;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.catalogLinks a:hover {
+  background: #e1f0fa;
+  border-color: #1769aa;
+}
+
+.catalogLinks small {
+  flex-basis: 100%;
+  color: #5b7183;
+  font-size: 11px;
+}
+
+/* スマホの幅：受注簿の題名の段は折り返す（ページの切り替え「1/3 2/3 3/3」があると、題名が1文字ずつ縦に並んでいた） */
+@media (max-width: 640px) {
+  .orderTitleWithAdd {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .orderTitleWithAdd .orderTitleSpacer {
+    display: none;
+  }
+
+  .orderTitleWithAdd h2 {
+    flex-basis: 100%;
+    text-align: center;
+  }
+}
+
+/* 顧客名の上のフリガナ（見積書から届く読み。受注簿の中に出したときと、フリガナが入っているとき） */
+.furiganaInput {
+  display: block;
+  width: 100%;
+  margin: 0 0 2px;
+  padding: 1px 4px;
+  border: 0;
+  border-bottom: 1px dotted #b8c7d3;
+  background: transparent;
+  color: #4b5d6b;
+  font-size: 11px;
+}
+
+small.furigana {
+  display: block;
+  color: #555;
+  font-size: 8pt;
+}
+
+@media print {
+  .tokuteiScanBar,
+  .catalogLinks {
+    display: none !important;
+  }
+}

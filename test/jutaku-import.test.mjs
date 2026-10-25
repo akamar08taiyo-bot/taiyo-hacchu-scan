@@ -90,7 +90,8 @@ test("部材1点を受注簿の1ページにする（数量・単位・定価・
 });
 
 test("受注簿に入れるか選ぶダイアログ（入力途中の受注簿は確認してから置き換える）", () => {
-  assert.match(source, /let\[jutakuOffer,setJutakuOffer\]=\(0,A\.useState\)\(\(\)=>readJutakuImport\(\)\)/);
+  // 特定福祉用具の販売見積書の中に出したとき（?embed=tokutei）は、届いた部材のダイアログを出さない（見積書と直接つながっているので）
+  assert.match(source, /let\[jutakuOffer,setJutakuOffer\]=\(0,A\.useState\)\(\(\)=>TOKUTEI_EMBED\?null:readJutakuImport\(\)\)/);
   assert.match(source, /jutakuOffer&&\(0,j\.jsx\)\(JutakuImportDrawer,\{data:jutakuOffer,hasDraft:!!draftOffer/);
   // 届いた部材を選んでいるあいだは「前回の入力」のダイアログを重ねない
   assert.match(source, /draftOffer&&!jutakuOffer&&\(0,j\.jsx\)\(`div`,\{className:`drawer`/);
