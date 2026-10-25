@@ -27,6 +27,8 @@
 - 特定福祉用具 購入申請書・見積もり作成（同じリポジトリ akamar08taiyo-bot/- の `src/tokutei`、ポータルの `tokutei/`）の見積もりからも、
   同じ口で商品を受け取る（`kind: 'taiyo-tokutei-order'`・`?from=tokutei`。1点ずつ受注区分「給付」のページ。
   給付内訳は送り手が見積書と同じ合計になるように分けて送り、`tokuteiFixedBenefit` がそのまま出す。Learnings.md 第30・31項）。
+  特定福祉用具の見積もりを「承認」（か「納品」）にすると、送り手が1回だけ列 `taiyo-hacchu-import-queue-v1`（配列。`saleId` で重ならない・30件・30日まで）にも入れる。
+  ?from なしで開いたときは `readJutakuImport` が列の古いものを読み、「受注簿に入れる／入れない」のどちらでも `clearJutakuImport(data)` が列からその1件を消す（Learnings.md 第41項）。
 - 特定福祉用具の販売見積書の「📷 スクショから自動認識」の窓の中に、**画像の欄（読み取り）だけ**を出す（`?embed=scan`。`main.jsx` の
   `tokutei-scan-begin`〜`end`・`tokutei-scan-app-begin`〜`end`、Learnings.md 第32・33項）。読み取った商品（受注簿の欄に入れた値）を postMessage
   `taiyo-hacchu-scanned` で窓に送り、窓で貼り付けた画像は `taiyo-scan-image` で受けて読む。受注簿・上の段・ダイアログは出さず、この端末の下書きにも保存しない。
