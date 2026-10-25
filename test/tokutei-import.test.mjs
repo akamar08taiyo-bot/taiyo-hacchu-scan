@@ -238,3 +238,28 @@ test("届いた商品を選ぶダイアログ・入れる・入れない（住�
   // お知らせは短く（第29項）
   for (const m of ["特定福祉用具9点を入れました", "特定福祉用具は入れませんでした"]) assert.ok(m.length <= 16, m);
 });
+
+test("承認した見積もり（自動で送られた列 taiyo-hacchu-import-queue-v1）：受け取り口が空なら古い順に1つずつ。出したものは列から消す・30日より前は消す", () => {
+  const order = (saleId, createdAt, name) => ({ kind: "taiyo-tokutei-order", v: 1, createdAt, saleId, title: `${name}様 特定福祉用具`, customerName: name, items: [{ productName: "見本の商品", quantity: 1, listPrice: 10000, saleUnitPrice: 8000, totalTaxIn: 8800, benefit: { target: 8800, userBurden: 880, aid: 0, insurerBurden: 7920 } }] });
+  const now = Date.now();
+  const { readJutakuImport, clearJutakuImport, store } = loadImport({});
+  store.set("taiyo-hacchu-import-queue-v1", JSON.stringify([order("old", now - 40 * 24 * 3600 * 1000, "見本 古子"), order("s1", now - 1000, "見本 花子"), order("s2", now, "見本 太郎")]));
+  const first = readJutakuImport();
+  assert.equal(first.customerName, "見本 花子"); // 30日より前のものは黙って消す
+  assert.equal(first.fromQueue, true);
+  assert.equal(JSON.parse(store.get("taiyo-hacchu-import-queue-v1")).length, 2);
+  clearJutakuImport(first);
+  const second = readJutakuImport();
+  assert.equal(second.customerName, "見本 太郎");
+  clearJutakuImport(second);
+  assert.equal(store.has("taiyo-hacchu-import-queue-v1"), false);
+  assert.equal(readJutakuImport(), null);
+  // 「📤 販売受注簿に転記」（受け取り口）が先。消すのは受け取り口のほうだけ
+  store.set("taiyo-hacchu-import-v1", JSON.stringify(order("direct", now, "見本 直子")));
+  store.set("taiyo-hacchu-import-queue-v1", JSON.stringify([order("s3", now, "見本 三郎")]));
+  const direct = readJutakuImport();
+  assert.equal(direct.customerName, "見本 直子");
+  clearJutakuImport(direct);
+  assert.equal(store.has("taiyo-hacchu-import-v1"), false);
+  assert.equal(readJutakuImport().customerName, "見本 三郎");
+});

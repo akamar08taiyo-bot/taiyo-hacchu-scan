@@ -429,19 +429,42 @@ var JUTAKU_IMPORT_KEY=`taiyo-hacchu-import-v1`;
 function readJutakuImport(){
   try{
     let raw=localStorage.getItem(JUTAKU_IMPORT_KEY);
-    if(!raw)return null;
+    if(!raw)return readHacchuQueue();
     let data=JSON.parse(raw);
     let from=data&&data.kind===`taiyo-jutaku-order`?`jutaku`:data&&data.kind===`taiyo-tokutei-order`?`tokutei`:``;
     let fromLink=!!from&&new RegExp(`[?&]from=${from}(?:&|$)`).test(location.search);
     let fresh=Date.now()-Number(data&&data.createdAt||0)<24*60*60*1000;
     if(!data||!from||!Array.isArray(data.items)||!data.items.length||(!fromLink&&!fresh)){
       localStorage.removeItem(JUTAKU_IMPORT_KEY);
-      return null;
+      return readHacchuQueue();
     }
     return data;
   }catch{return null}
 }
-function clearJutakuImport(){try{localStorage.removeItem(JUTAKU_IMPORT_KEY)}catch{}}
+/* 特定福祉用具のアプリで状態を「承認」にした見積もりは、自動でこの列に入る（taiyo-hacchu-import-queue-v1。ユーザーの指示「販売受注簿にも自動で転記する」2026-10-25。
+   特定福祉用具の handoff.ts の queueHacchu）。上の受け取り口が空のとき、古い順に1つずつ出す（fromQueue）。30日より前のものは黙って消す。
+   入れても入れなくても、出したものは列から消す（clearJutakuImport）。 */
+var HACCHU_QUEUE_KEY=`taiyo-hacchu-import-queue-v1`;
+function readHacchuQueue(){
+  try{
+    let raw=localStorage.getItem(HACCHU_QUEUE_KEY);
+    if(!raw)return null;
+    let list=JSON.parse(raw);
+    list=(Array.isArray(list)?list:[]).filter(d=>d&&d.kind===`taiyo-tokutei-order`&&Array.isArray(d.items)&&d.items.length&&Date.now()-Number(d.createdAt||0)<30*24*60*60*1000);
+    if(list.length)localStorage.setItem(HACCHU_QUEUE_KEY,JSON.stringify(list));
+    else localStorage.removeItem(HACCHU_QUEUE_KEY);
+    return list.length?{...list[0],fromQueue:true}:null;
+  }catch{return null}
+}
+function clearJutakuImport(data){
+  try{
+    if(!(data&&data.fromQueue)){localStorage.removeItem(JUTAKU_IMPORT_KEY);return}
+    let list=JSON.parse(localStorage.getItem(HACCHU_QUEUE_KEY)||`[]`);
+    list=(Array.isArray(list)?list:[]).filter(d=>!(d&&d.saleId===data.saleId&&Number(d.createdAt)===Number(data.createdAt)));
+    if(list.length)localStorage.setItem(HACCHU_QUEUE_KEY,JSON.stringify(list));
+    else localStorage.removeItem(HACCHU_QUEUE_KEY);
+  }catch{}
+}
 /* 部材1点を受注簿の1ページにする。顧客名・住所・営業担当・発注先は全ページ同じ。
    販売単価は、手で定価を打ったときと同じく 定価×(100−値引率)%（住宅改修の見積の単価 定価×0.8 と同じ）。
    数量は整数（受注簿の数量は1以上の整数）。 */
@@ -611,7 +634,7 @@ function Ot(){let[e,t]=(0,A.useState)(Be),[n,r]=(0,A.useState)(Ve),[i,a]=(0,A.us
       clearOrderDraft();
     }
     let pages=(tokutei?tokuteiImportPages:jutakuImportPages)(data,{...Be,createdAt:todayInTokyo()},n.defaultDiscountRate);
-    clearJutakuImport();
+    clearJutakuImport(data);
     setJutakuOffer(null);
     setMultiSaved(pages);
     setMultiDraft(null);
@@ -622,7 +645,7 @@ function Ot(){let[e,t]=(0,A.useState)(Be),[n,r]=(0,A.useState)(Ve),[i,a]=(0,A.us
     h(tokutei?`特定福祉用具${pages.length}点を入れました`:`見積もりの部材${pages.length}点を入れました`);
   }
   function declineJutakuImport(){
-    clearJutakuImport();
+    clearJutakuImport(jutakuOffer);
     setJutakuOffer(null);
     h(jutakuOffer&&jutakuOffer.kind===`taiyo-tokutei-order`?`特定福祉用具は入れませんでした`:`見積もりの部材は入れませんでした`);
   }
