@@ -25,8 +25,9 @@ test("中身が無いときは残さず、容量超過でも文字データは�
 
 test("次に開いたとき「続きから」か「新しく」を選べる", () => {
   // 確認中に空の初期値で上書きしないこと
-  assert.match(source, /useState\)\(\(\)=>readOrderDraft\(\)\)/);
-  assert.match(source, /if\(draftOffer\)return;/);
+  // 特定福祉用具の販売見積書の「スクショから自動認識」の中（?embed=scan）では、この端末の下書きを使わない（読み取るだけ）
+  assert.match(source, /useState\)\(\(\)=>TOKUTEI_SCAN\?null:readOrderDraft\(\)\)/);
+  assert.match(source, /if\(draftOffer\|\|TOKUTEI_SCAN\)return;/);
   // 続きから：受注簿・商品ページ・現在ページ・画像を戻す
   assert.match(source, /function acceptOrderDraft\(\)/);
   assert.match(source, /setMultiSaved\(Array\.isArray\(saved\.multiSaved\)\?saved\.multiSaved:\[\]\)/);

@@ -3858,3 +3858,53 @@ body,
     object-fit: contain !important;
   }
 }
+
+/* 特定福祉用具の販売見積書の「📷 スクショから自動認識」の中に出したとき（?embed=scan。main.jsx の tokutei-scan-begin）：画像の欄だけを広く */
+.workspace.twoColumn.tokuteiScanOnly {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+  padding: 8px;
+}
+
+.workspace.twoColumn.tokuteiScanOnly > .panel {
+  grid-column: 1;
+  grid-row: auto;
+  min-height: 0;
+}
+
+/* スマホの幅：受注簿の題名の段は折り返す（ページの切り替え「1/3 2/3 3/3」があると、題名が1文字ずつ縦に並んでいた） */
+@media (max-width: 640px) {
+  .orderTitleWithAdd {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .orderTitleWithAdd .orderTitleSpacer {
+    display: none;
+  }
+
+  .orderTitleWithAdd h2 {
+    flex-basis: 100%;
+    text-align: center;
+  }
+}
+
+/* 顧客名の上のフリガナ（特定福祉用具の見積もりから転記したときの読み） */
+.furiganaInput {
+  display: block;
+  width: 100%;
+  margin: 0 0 2px;
+  padding: 1px 4px;
+  border: 0;
+  border-bottom: 1px dotted #b8c7d3;
+  background: transparent;
+  color: #4b5d6b;
+  font-size: 11px;
+}
+
+small.furigana {
+  display: block;
+  color: #555;
+  font-size: 8pt;
+}
