@@ -5,6 +5,7 @@ import { todayInTokyo } from './lib/businessDate.mjs';
 import { buildOrderXlsx, readOrderSheet, readSummarySheet } from './lib/orderXlsx.mjs';
 import { buildEstimateXlsx, estimateXlsxName, readEstimateDoc } from './lib/estimateXlsx.mjs';
 import { downloadXlsx } from './lib/xlsxBook.mjs';
+import { addressList, sendMailDraft } from './lib/mailDraft.mjs';
 import {
   PRODUCT_PHOTOS,
   applyProductPhotoToOrder,
@@ -719,17 +720,15 @@ function pdfFreezeFormControls(cloneDoc){
     el.replaceWith(span);
   }
 }
-async function pdfDownload(){
-  if(ge()){h(`商品名を確認してください`);return}
-  if(!validateMultiCosts())return;
-  if(!document.querySelector(`.orderEntrySheet`)){h(`PDFにする販売受注簿が見つかりません`);return}
+/* PDF（印刷と同じシート）を作る。保存（pdfDownload）とメールの添付（mailWith）で使う。作れなければ例外 */
+async function buildOrderPdf(){
+  if(!document.querySelector(`.orderEntrySheet`))throw Error(`PDFにする販売受注簿が見つかりません`);
   let printCss=document.createElement(`style`);
   /* ウィンドウ幅で仕上がりが変わらないよう、取り込み中はA4横の実寸
      （余白4mmを引いた 289mm×202mm）に固定する。 */
   printCss.textContent=collectPrintCssText()+`
 .orderEntrySheet{width:289mm!important;max-width:289mm!important;min-height:202mm!important;max-height:202mm!important}`;
   try{
-    h(`PDF作成中`);
     document.head.appendChild(printCss);
     await new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done)));
     /* 複数ページのときは印刷用の控え（.multiPrintPages）だけが表示され、編集中のシートは
@@ -748,19 +747,26 @@ async function pdfDownload(){
       if(imgH>availH){imgW=imgW*availH/imgH;imgH=availH}
       pdf.addImage(canvas.toDataURL(`image/jpeg`,.95),`JPEG`,margin+(availW-imgW)/2,margin+(availH-imgH)/2,imgW,imgH);
     }
-    pdf.save(k(`pdf`));
-    h(`PDFを保存しました`);
-  }catch(e){
-    h(`PDF作成に失敗しました: ${e.message}`);
+    return pdf;
   }finally{
     printCss.remove();
   }
 }
-/* Excel保存（ユーザーの指示「販売受注簿や見積もりは全てExcelで保存できるようにする」2026-10-25）。
-   PDF と同じく、印刷CSSを当てたときに見えているシート（複数ページなら印刷用の控え＋集計）を読み、同じ並びの .xlsx にする（src/lib/orderXlsx.mjs）。 */
-function xlsxDownload(){
+async function pdfDownload(){
   if(ge()){h(`商品名を確認してください`);return}
   if(!validateMultiCosts())return;
+  try{
+    h(`PDF作成中`);
+    (await buildOrderPdf()).save(k(`pdf`));
+    h(`PDFを保存しました`);
+  }catch(e){
+    h(`PDF作成に失敗しました: ${e.message}`);
+  }
+}
+/* Excel保存（ユーザーの指示「販売受注簿や見積もりは全てExcelで保存できるようにする」2026-10-25）。
+   PDF と同じく、印刷CSSを当てたときに見えているシート（複数ページなら印刷用の控え＋集計）を読み、同じ並びの .xlsx にする（src/lib/orderXlsx.mjs）。 */
+/* Excel（.xlsx のバイト列）を作る。保存（xlsxDownload）とメールの添付（mailWith）で使う。作れなければ例外 */
+function buildOrderXlsxBytes(){
   let printCss=document.createElement(`style`);
   printCss.textContent=collectPrintCssText();
   try{
@@ -772,15 +778,45 @@ function xlsxDownload(){
     let pages=sheets.filter(el=>!el.classList.contains(`multiSummarySheet`)).map(readOrderSheet);
     if(!pages.length)throw Error(`表示中の販売受注簿が見つかりません`);
     let summary=readSummarySheet(sheets.find(el=>el.classList.contains(`multiSummarySheet`)));
-    downloadXlsx(buildOrderXlsx(pages,summary,`販売受注簿`),k(`xlsx`));
-    h(`Excelを保存しました`);
-  }catch(e){
-    h(`Excel作成に失敗しました: ${e.message}`);
+    return buildOrderXlsx(pages,summary,`販売受注簿`);
   }finally{
     printCss.remove();
   }
 }
-async function ye(){if(!validateMultiCosts())return;let t=Ke([C,...(n.emailRecipients||[])]).map(e=>String(e||``).trim()).filter(Boolean).join(`,`);if(!t){h(`固定メール宛先が未設定です。設定から宛先を登録してください`);return}let r=`https://ai-ui-ux-5-5-1.vercel.app/`,e=encodeURIComponent(`お疲れ様です。\n表題の通り、発注をお願いします。\n\n発注スキャンURL：${r}\n\n上記URLより販売受注簿をご確認ください。`);window.location.href=`mailto:${t}?subject=%E7%99%BA%E6%B3%A8%E4%BE%9D%E9%A0%BC%EF%BC%88%E8%B2%A9%E5%A3%B2%E5%8F%97%E6%B3%A8%E7%B0%BF%E9%80%81%E4%BB%98%EF%BC%89%E3%81%AE%E4%BB%B6&body=${e}`}function be(e){let n=e.pricingMode===`profit`?`profit`:`discount`,a={...e,pricingMode:n,defaultDiscountRate:M(e.defaultDiscountRate??20),costMarkupRate:M(e.costMarkupRate??25)};r(a),localStorage.setItem(ze,JSON.stringify(a)),t(e=>{let t=M(a.defaultDiscountRate),r=M(a.costMarkupRate),i=e.saleUnitPrice;if(n===`profit`){i=e.cost?Math.floor(M(e.cost)*(100+r)/100):e.saleUnitPrice}else i=e.listPrice?Math.floor(M(e.listPrice)*(100-t)/100):e.saleUnitPrice;let o=e.listPrice?et(M(e.listPrice),M(i)):e.discountRate;return{...e,discountRate:o,saleUnitPrice:i}}),S(!1)}return(0,j.jsxs)(`div`,{className:TOKUTEI_SCAN?`app tokuteiScan`:`app`,children:[!TOKUTEI_SCAN&&(0,j.jsx)(`a`,{href:`https://akamar08taiyo-bot.github.io/taiyo-portal/`,style:{display:`inline-flex`,alignItems:`center`,gap:`4px`,fontSize:`11px`,color:`#94a3b8`,textDecoration:`none`,margin:`6px 0 0 6px`},className:`no-print`,children:`← 業務アプリポータルへ戻る`}),!TOKUTEI_SCAN&&(0,j.jsxs)(`header`,{className:`topbar`,children:[(0,j.jsxs)(`div`,{className:`brand`,children:[(0,j.jsx)(`div`,{className:`logoMark`,children:`発`}),(0,j.jsxs)(`div`,{children:[(0,j.jsx)(`h1`,{children:`発注スキャン`}),(0,j.jsx)(`p`,{children:`貼り付けた画像を自動認識して販売受注簿へ反映`})]})]}),(0,j.jsxs)(`nav`,{className:`actions`,"aria-label":`主要操作`,children:[(0,j.jsx)(`button`,{className:`primary`,onClick:ve,children:`印刷`}),(0,j.jsx)(`button`,{onClick:pdfDownload,children:`PDF保存`}),(0,j.jsx)(`button`,{onClick:xlsxDownload,children:`Excel保存`}),(0,j.jsx)(`button`,{onClick:ye,children:`メール`}),(0,j.jsx)(`button`,{className:`softPrimary`,onClick:()=>openSimpleEstimate(e,T,i,n),children:`見積もり作成`}),(0,j.jsx)(`button`,{onClick:()=>S(!0),children:`設定`}),(0,j.jsxs)(`div`,{className:`topProfitAlerts no-print`,"aria-live":`polite`,children:[profitAlertValue!==null&&profitAlertValue<0?(0,j.jsx)(`span`,{className:`profitAlert profitError`,children:`利益額マイナス ${Ge(profitAlertValue)}`}):null,profitAlertRate!==null&&profitAlertRate<profitAlertThreshold?(0,j.jsx)(`span`,{className:`profitAlert profitWarning`,children:`利益率 ${Math.round(profitAlertRate*10)/10}%（基準 ${profitAlertThreshold}%未満）`}):null]})]})]}),(0,j.jsxs)(`main`,{className:TOKUTEI_SCAN?`workspace twoColumn tokuteiScanOnly`:`workspace twoColumn`,children:[(0,j.jsxs)(`section`,{className:`panel imagePanel`,"aria-label":`画像プレビュー`,children:[(0,j.jsxs)(`div`,{className:`panelHead`,children:[(0,j.jsxs)(`div`,{children:[(0,j.jsx)(`h2`,{children:`画像`}),(0,j.jsx)(`p`,{children:`Ctrl + Vで貼り付けると自動認識します`})]}),(0,j.jsx)(`span`,{className:`status`,children:m})]}),SHOW_FACILITY_PRODUCT_PHOTOS&&(0,j.jsxs)(`div`,{className:`productPhotoPicker no-print`,children:[(0,j.jsx)(`label`,{htmlFor:`productPhotoSelect`,children:`施設・病院向け商品写真（${PRODUCT_PHOTOS.length}点）`}),(0,j.jsxs)(`select`,{id:`productPhotoSelect`,value:catalogPhoto?.id||``,onChange:event=>selectCatalogPhoto(event.target.value),children:[(0,j.jsx)(`option`,{value:``,children:`商品名から自動選択／一覧から指定`}),...PRODUCT_PHOTOS.map(photo=>(0,j.jsx)(`option`,{value:photo.id,children:`${photo.manufacturer}｜${photo.name}${photo.spec?`（${photo.spec}）`:``}`},photo.id))]}),(0,j.jsx)(`small`,{children:i?`貼り付け画像を優先表示中`:catalogPhoto?`${catalogPhoto.manufacturer}の商品写真を表示中`:`商品名から自動照合します。見つからない場合は一覧から選択してください`})]}),(0,j.jsxs)(`div`,{className:`imagePasteArea usageAbove`,children:[(0,j.jsxs)(`aside`,{className:`usageGuide`,children:[(0,j.jsx)(`h3`,{children:`使い方サンプル`}),(0,j.jsxs)(`div`,{className:`catalogVersionTabs`,children:[(0,j.jsx)(`button`,{type:`button`,className:catalogTab===`kaientai`?`active`:undefined,onClick:()=>{setCatalogTab(`kaientai`),D(`supplier`,`介援隊`)},children:`介援隊`}),(0,j.jsx)(`button`,{type:`button`,className:catalogTab===`welfan`?`active`:undefined,onClick:()=>{setCatalogTab(`welfan`),D(`supplier`,`ウェルファン`)},children:`ウェルファン版`})]}),(0,j.jsx)(`img`,{src:catalogTab===`welfan`?`${import.meta.env.BASE_URL}welfan-sample.jpg`:`${import.meta.env.BASE_URL}usage-sample.jpg`,alt:catalogTab===`welfan`?`ウェルファン商品ページを切り取る見本`:`仕切り金額入りの商品ページを切り取る見本`}),(0,j.jsxs)(`ol`,{children:[(0,j.jsx)(`li`,{children:(0,j.jsxs)(j.Fragment,{children:[catalogTab===`welfan`?`ウェルファン便利帳を開く `:`介援隊ログインをおこなう `,(0,j.jsx)(`a`,{href:catalogTab===`welfan`?`https://www.welfan.shop/`:`https://www.kaientai.cc/Default.aspx`,target:`_blank`,rel:`noreferrer`,children:catalogTab===`welfan`?`https://www.welfan.shop/`:`https://www.kaientai.cc/Default.aspx`})]})}),(0,j.jsx)(`li`,{children:`商品ページを開く（仕切り金額の入った画面）`}),(0,j.jsx)(`li`,{children:`Windows + Shift + S でスクリーンショットを撮る`}),(0,j.jsx)(`li`,{children:`この下の枠内をクリックして Ctrl + V で貼り付ける`})]}),(0,j.jsx)(`p`,{children:`商品名・申込番号・WEBコード・小売価格・仕切り金額まで入るように切り取ると認識しやすくなります。`})]}),(0,j.jsxs)(`div`,{className:`dropZone`,children:[resolvedImageUrl?(0,j.jsx)(`img`,{src:resolvedImageUrl,alt:i?`貼り付けた商品カタログ`:`${catalogPhoto?.manufacturer||``} ${catalogPhoto?.name||`商品写真`}`}):(0,j.jsxs)(`div`,{className:`emptyImage`,children:[(0,j.jsx)(`strong`,{children:`商品部分を貼り付け`}),(0,j.jsx)(`span`,{children:`1. Windows + Shift + S で商品部分を切り取り`}),(0,j.jsx)(`span`,{children:`2. 範囲を選んだら、この枠内で Ctrl + V`}),(0,j.jsx)(`span`,{children:`画像添付にも対応`}),(0,j.jsx)(`span`,{children:`正しく読み込めない場合は、もう一度スクリーンショットを撮って貼り付けてください`}),(0,j.jsx)(`span`,{children:TOKUTEI_SCAN?`目視で確認し、必要に応じて右の欄を直してください`:`目視で確認し、必要に応じて右の受注簿を修正してください`})]}),(0,j.jsx)(`div`,{className:`cropFrame`,"aria-hidden":`true`})]})]}),(0,j.jsxs)(`div`,{className:`imageToolbar`,children:[(0,j.jsx)(`button`,{type:`button`,onClick:ce,disabled:!o,children:`再認識`}),(0,j.jsx)(`button`,{type:`button`,onClick:()=>f&&se(f),disabled:!f,children:`この画像を削除`})]}),(0,j.jsx)(`div`,{className:`progressTrack`,"aria-label":`OCR進捗`,children:(0,j.jsx)(`span`,{style:{width:`${g}%`}})}),(0,j.jsxs)(`div`,{className:`scanSummary`,children:[(0,j.jsx)(`span`,{className:`ok`,children:resolvedImageUrl?(i?`貼り付け画像あり`:`商品写真あり`):`読取準備`}),(0,j.jsxs)(`span`,{className:`ok`,children:[`画像 `,u.length,`枚`]}),c&&(0,j.jsxs)(`span`,{className:`ok`,children:[`画像サイズ `,c.width,`×`,c.height,`px`]}),(0,j.jsxs)(`span`,{className:e.listPrice?`ok`:`danger`,children:[`定価 `,e.listPrice?`入力済み`:`要入力`]})]}),u.length>0&&(0,j.jsx)(`div`,{className:`imageList`,"aria-label":`読み取り画像一覧`,children:u.map((e,t)=>(0,j.jsxs)(`div`,{className:`imageThumb ${e.id===f?`active`:``}`,children:[(0,j.jsxs)(`button`,{type:`button`,onClick:()=>ae(e,!1),children:[(0,j.jsx)(`img`,{src:e.dataUrl,alt:`読み取り画像 ${t+1}`}),(0,j.jsx)(`span`,{children:t+1}),(0,j.jsx)(`em`,{children:e.status})]}),(0,j.jsx)(`button`,{type:`button`,className:`thumbDelete`,onClick:()=>se(e.id),children:`削除`})]},e.id))}),v&&(0,j.jsxs)(`details`,{className:`ocrText`,children:[(0,j.jsx)(`summary`,{children:`OCRテキストを確認`}),(0,j.jsx)(`pre`,{children:v})]})]}),!TOKUTEI_SCAN&&(0,j.jsxs)(j.Fragment,{children:[(0,j.jsx)(kt,{order:e,totals:T,candidates:b,settings:n,emailTo:C,setEmailTo:te,update:D,updateDiscount:ue,updateSalePrice:de,updateSaleTotal:fe,updateProfit:pe,updateProfitRate:O,orderFileName:k,attachmentTitle:me,imageUrl:resolvedImageUrl,onAddProduct:addProduct,onDeletePage:deletePage,pageIndex:multiPageIndex,pageCount:multiPageCount,onPageChange:goMultiPage}),multiSaved.length>0&&(0,j.jsx)(MultiPrintPages,{items:multiPrintBuildItems(e,multiSaved,multiDraft,multiPageIndex),candidates:b,settings:n,imageUrl:resolvedImageUrl}),multiProducts.length>1&&(0,j.jsx)(MultiSummaryPage,{order:e,items:multiProducts,totals:multiTotals})]})]}),jutakuOffer&&(0,j.jsx)(JutakuImportDrawer,{data:jutakuOffer,hasDraft:!!draftOffer,onAccept:acceptJutakuImport,onDecline:declineJutakuImport}),draftOffer&&!jutakuOffer&&(0,j.jsx)(`div`,{className:`drawer`,"aria-label":`前回の入力`,children:(0,j.jsxs)(`div`,{className:`drawerPanel draftPanel`,children:[
+function xlsxDownload(){
+  if(ge()){h(`商品名を確認してください`);return}
+  if(!validateMultiCosts())return;
+  try{
+    downloadXlsx(buildOrderXlsxBytes(),k(`xlsx`));
+    h(`Excelを保存しました`);
+  }catch(e){
+    h(`Excel作成に失敗しました: ${e.message}`);
+  }
+}
+/* メール（PDF付き・Excel付き）：販売受注簿の PDF か Excel を付け、件名・本文を入れた下書きのメールをワンタッチで作る（ユーザーの依頼 2026-10-27
+   「販売受注簿…を作成したら、メールでそのまま、PDFかもしくは、Excelの資料送れる機能…添付とメールの文面の作成をワンタッチで」）。
+   会社のパソコンは Outlook なので、開くと送信前のメールになる下書き（.eml）を保存する。スマホ・iPad は共有メニュー（src/lib/mailDraft.mjs）。
+   宛先は設定の固定メール宛先（なければ Outlook で入れる）。前は mailto: で本文に発注スキャンの URL だけだった */
+async function mailWith(kind){
+  if(ge()){h(`商品名を確認してください`);return}
+  if(!validateMultiCosts())return;
+  try{
+    h(kind===`xlsx`?`Excel作成中`:`PDF作成中`);
+    let attachment=kind===`xlsx`
+      ?{name:k(`xlsx`),type:`application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`,bytes:buildOrderXlsxBytes()}
+      :{name:k(`pdf`),type:`application/pdf`,bytes:new Uint8Array((await buildOrderPdf()).output(`arraybuffer`))};
+    let products=(multiProducts.length?multiProducts:[e]).filter(o=>String(o.productName||``).trim()),
+        lines=products.map(o=>`・${String(o.productName).trim()}${o.modelNumber?`（${o.modelNumber}）`:``}　${o.quantity||1}${o.unit||``}`),
+        to=addressList(Ke([C,...(n.emailRecipients||[])]).join(`,`)),
+        body=[`お疲れ様です。`,`表題の通り、発注をお願いします。`,`販売受注簿を添付しております（${kind===`xlsx`?`Excel`:`PDF`}）。`,``,
+          `顧客名：${String(e.customerName||``).trim()?`${String(e.customerName).trim()} 様`:``}`,`発注先：${e.supplier||``}`,`商品：`,...lines,``,`よろしくお願いいたします。`].join(`\n`),
+        how=await sendMailDraft({to,subject:`発注依頼（販売受注簿送付）の件${String(e.customerName||``).trim()?` ${String(e.customerName).trim()}様`:``}`,body,attachment});
+    h(how===`eml`?`メールの下書きを保存しました（開くと${kind===`xlsx`?`Excel`:`PDF`}付きのメール）`:how===`shared`?`メールのアプリに渡しました`:``);
+  }catch(err){
+    h(`メールを作成できませんでした: ${err.message}`);
+  }
+}
+function be(e){let n=e.pricingMode===`profit`?`profit`:`discount`,a={...e,pricingMode:n,defaultDiscountRate:M(e.defaultDiscountRate??20),costMarkupRate:M(e.costMarkupRate??25)};r(a),localStorage.setItem(ze,JSON.stringify(a)),t(e=>{let t=M(a.defaultDiscountRate),r=M(a.costMarkupRate),i=e.saleUnitPrice;if(n===`profit`){i=e.cost?Math.floor(M(e.cost)*(100+r)/100):e.saleUnitPrice}else i=e.listPrice?Math.floor(M(e.listPrice)*(100-t)/100):e.saleUnitPrice;let o=e.listPrice?et(M(e.listPrice),M(i)):e.discountRate;return{...e,discountRate:o,saleUnitPrice:i}}),S(!1)}return(0,j.jsxs)(`div`,{className:TOKUTEI_SCAN?`app tokuteiScan`:`app`,children:[!TOKUTEI_SCAN&&(0,j.jsx)(`a`,{href:`https://akamar08taiyo-bot.github.io/taiyo-portal/`,style:{display:`inline-flex`,alignItems:`center`,gap:`4px`,fontSize:`11px`,color:`#94a3b8`,textDecoration:`none`,margin:`6px 0 0 6px`},className:`no-print`,children:`← 業務アプリポータルへ戻る`}),!TOKUTEI_SCAN&&(0,j.jsxs)(`header`,{className:`topbar`,children:[(0,j.jsxs)(`div`,{className:`brand`,children:[(0,j.jsx)(`div`,{className:`logoMark`,children:`発`}),(0,j.jsxs)(`div`,{children:[(0,j.jsx)(`h1`,{children:`発注スキャン`}),(0,j.jsx)(`p`,{children:`貼り付けた画像を自動認識して販売受注簿へ反映`})]})]}),(0,j.jsxs)(`nav`,{className:`actions`,"aria-label":`主要操作`,children:[(0,j.jsx)(`button`,{className:`primary`,onClick:ve,children:`印刷`}),(0,j.jsx)(`button`,{onClick:pdfDownload,children:`PDF保存`}),(0,j.jsx)(`button`,{onClick:xlsxDownload,children:`Excel保存`}),(0,j.jsx)(`button`,{onClick:()=>mailWith(`pdf`),children:`PDFでメール`}),(0,j.jsx)(`button`,{onClick:()=>mailWith(`xlsx`),children:`Excelでメール`}),(0,j.jsx)(`button`,{className:`softPrimary`,onClick:()=>openSimpleEstimate(e,T,i,n),children:`見積もり作成`}),(0,j.jsx)(`button`,{onClick:()=>S(!0),children:`設定`}),(0,j.jsxs)(`div`,{className:`topProfitAlerts no-print`,"aria-live":`polite`,children:[profitAlertValue!==null&&profitAlertValue<0?(0,j.jsx)(`span`,{className:`profitAlert profitError`,children:`利益額マイナス ${Ge(profitAlertValue)}`}):null,profitAlertRate!==null&&profitAlertRate<profitAlertThreshold?(0,j.jsx)(`span`,{className:`profitAlert profitWarning`,children:`利益率 ${Math.round(profitAlertRate*10)/10}%（基準 ${profitAlertThreshold}%未満）`}):null]})]})]}),(0,j.jsxs)(`main`,{className:TOKUTEI_SCAN?`workspace twoColumn tokuteiScanOnly`:`workspace twoColumn`,children:[(0,j.jsxs)(`section`,{className:`panel imagePanel`,"aria-label":`画像プレビュー`,children:[(0,j.jsxs)(`div`,{className:`panelHead`,children:[(0,j.jsxs)(`div`,{children:[(0,j.jsx)(`h2`,{children:`画像`}),(0,j.jsx)(`p`,{children:`Ctrl + Vで貼り付けると自動認識します`})]}),(0,j.jsx)(`span`,{className:`status`,children:m})]}),SHOW_FACILITY_PRODUCT_PHOTOS&&(0,j.jsxs)(`div`,{className:`productPhotoPicker no-print`,children:[(0,j.jsx)(`label`,{htmlFor:`productPhotoSelect`,children:`施設・病院向け商品写真（${PRODUCT_PHOTOS.length}点）`}),(0,j.jsxs)(`select`,{id:`productPhotoSelect`,value:catalogPhoto?.id||``,onChange:event=>selectCatalogPhoto(event.target.value),children:[(0,j.jsx)(`option`,{value:``,children:`商品名から自動選択／一覧から指定`}),...PRODUCT_PHOTOS.map(photo=>(0,j.jsx)(`option`,{value:photo.id,children:`${photo.manufacturer}｜${photo.name}${photo.spec?`（${photo.spec}）`:``}`},photo.id))]}),(0,j.jsx)(`small`,{children:i?`貼り付け画像を優先表示中`:catalogPhoto?`${catalogPhoto.manufacturer}の商品写真を表示中`:`商品名から自動照合します。見つからない場合は一覧から選択してください`})]}),(0,j.jsxs)(`div`,{className:`imagePasteArea usageAbove`,children:[(0,j.jsxs)(`aside`,{className:`usageGuide`,children:[(0,j.jsx)(`h3`,{children:`使い方サンプル`}),(0,j.jsxs)(`div`,{className:`catalogVersionTabs`,children:[(0,j.jsx)(`button`,{type:`button`,className:catalogTab===`kaientai`?`active`:undefined,onClick:()=>{setCatalogTab(`kaientai`),D(`supplier`,`介援隊`)},children:`介援隊`}),(0,j.jsx)(`button`,{type:`button`,className:catalogTab===`welfan`?`active`:undefined,onClick:()=>{setCatalogTab(`welfan`),D(`supplier`,`ウェルファン`)},children:`ウェルファン版`})]}),(0,j.jsx)(`img`,{src:catalogTab===`welfan`?`${import.meta.env.BASE_URL}welfan-sample.jpg`:`${import.meta.env.BASE_URL}usage-sample.jpg`,alt:catalogTab===`welfan`?`ウェルファン商品ページを切り取る見本`:`仕切り金額入りの商品ページを切り取る見本`}),(0,j.jsxs)(`ol`,{children:[(0,j.jsx)(`li`,{children:(0,j.jsxs)(j.Fragment,{children:[catalogTab===`welfan`?`ウェルファン便利帳を開く `:`介援隊ログインをおこなう `,(0,j.jsx)(`a`,{href:catalogTab===`welfan`?`https://www.welfan.shop/`:`https://www.kaientai.cc/Default.aspx`,target:`_blank`,rel:`noreferrer`,children:catalogTab===`welfan`?`https://www.welfan.shop/`:`https://www.kaientai.cc/Default.aspx`})]})}),(0,j.jsx)(`li`,{children:`商品ページを開く（仕切り金額の入った画面）`}),(0,j.jsx)(`li`,{children:`Windows + Shift + S でスクリーンショットを撮る`}),(0,j.jsx)(`li`,{children:`この下の枠内をクリックして Ctrl + V で貼り付ける`})]}),(0,j.jsx)(`p`,{children:`商品名・申込番号・WEBコード・小売価格・仕切り金額まで入るように切り取ると認識しやすくなります。`})]}),(0,j.jsxs)(`div`,{className:`dropZone`,children:[resolvedImageUrl?(0,j.jsx)(`img`,{src:resolvedImageUrl,alt:i?`貼り付けた商品カタログ`:`${catalogPhoto?.manufacturer||``} ${catalogPhoto?.name||`商品写真`}`}):(0,j.jsxs)(`div`,{className:`emptyImage`,children:[(0,j.jsx)(`strong`,{children:`商品部分を貼り付け`}),(0,j.jsx)(`span`,{children:`1. Windows + Shift + S で商品部分を切り取り`}),(0,j.jsx)(`span`,{children:`2. 範囲を選んだら、この枠内で Ctrl + V`}),(0,j.jsx)(`span`,{children:`画像添付にも対応`}),(0,j.jsx)(`span`,{children:`正しく読み込めない場合は、もう一度スクリーンショットを撮って貼り付けてください`}),(0,j.jsx)(`span`,{children:TOKUTEI_SCAN?`目視で確認し、必要に応じて右の欄を直してください`:`目視で確認し、必要に応じて右の受注簿を修正してください`})]}),(0,j.jsx)(`div`,{className:`cropFrame`,"aria-hidden":`true`})]})]}),(0,j.jsxs)(`div`,{className:`imageToolbar`,children:[(0,j.jsx)(`button`,{type:`button`,onClick:ce,disabled:!o,children:`再認識`}),(0,j.jsx)(`button`,{type:`button`,onClick:()=>f&&se(f),disabled:!f,children:`この画像を削除`})]}),(0,j.jsx)(`div`,{className:`progressTrack`,"aria-label":`OCR進捗`,children:(0,j.jsx)(`span`,{style:{width:`${g}%`}})}),(0,j.jsxs)(`div`,{className:`scanSummary`,children:[(0,j.jsx)(`span`,{className:`ok`,children:resolvedImageUrl?(i?`貼り付け画像あり`:`商品写真あり`):`読取準備`}),(0,j.jsxs)(`span`,{className:`ok`,children:[`画像 `,u.length,`枚`]}),c&&(0,j.jsxs)(`span`,{className:`ok`,children:[`画像サイズ `,c.width,`×`,c.height,`px`]}),(0,j.jsxs)(`span`,{className:e.listPrice?`ok`:`danger`,children:[`定価 `,e.listPrice?`入力済み`:`要入力`]})]}),u.length>0&&(0,j.jsx)(`div`,{className:`imageList`,"aria-label":`読み取り画像一覧`,children:u.map((e,t)=>(0,j.jsxs)(`div`,{className:`imageThumb ${e.id===f?`active`:``}`,children:[(0,j.jsxs)(`button`,{type:`button`,onClick:()=>ae(e,!1),children:[(0,j.jsx)(`img`,{src:e.dataUrl,alt:`読み取り画像 ${t+1}`}),(0,j.jsx)(`span`,{children:t+1}),(0,j.jsx)(`em`,{children:e.status})]}),(0,j.jsx)(`button`,{type:`button`,className:`thumbDelete`,onClick:()=>se(e.id),children:`削除`})]},e.id))}),v&&(0,j.jsxs)(`details`,{className:`ocrText`,children:[(0,j.jsx)(`summary`,{children:`OCRテキストを確認`}),(0,j.jsx)(`pre`,{children:v})]})]}),!TOKUTEI_SCAN&&(0,j.jsxs)(j.Fragment,{children:[(0,j.jsx)(kt,{order:e,totals:T,candidates:b,settings:n,emailTo:C,setEmailTo:te,update:D,updateDiscount:ue,updateSalePrice:de,updateSaleTotal:fe,updateProfit:pe,updateProfitRate:O,orderFileName:k,attachmentTitle:me,imageUrl:resolvedImageUrl,onAddProduct:addProduct,onDeletePage:deletePage,pageIndex:multiPageIndex,pageCount:multiPageCount,onPageChange:goMultiPage}),multiSaved.length>0&&(0,j.jsx)(MultiPrintPages,{items:multiPrintBuildItems(e,multiSaved,multiDraft,multiPageIndex),candidates:b,settings:n,imageUrl:resolvedImageUrl}),multiProducts.length>1&&(0,j.jsx)(MultiSummaryPage,{order:e,items:multiProducts,totals:multiTotals})]})]}),jutakuOffer&&(0,j.jsx)(JutakuImportDrawer,{data:jutakuOffer,hasDraft:!!draftOffer,onAccept:acceptJutakuImport,onDecline:declineJutakuImport}),draftOffer&&!jutakuOffer&&(0,j.jsx)(`div`,{className:`drawer`,"aria-label":`前回の入力`,children:(0,j.jsxs)(`div`,{className:`drawerPanel draftPanel`,children:[
       (0,j.jsx)(`h2`,{children:`前回の入力が残っています`}),
       (0,j.jsxs)(`p`,{children:[`保存日時 `,draftSavedLabel(draftOffer.savedAt),`。続きから入力するか、新しく始めるかを選んでください。`]}),
       (0,j.jsxs)(`dl`,{className:`draftSummary`,children:[

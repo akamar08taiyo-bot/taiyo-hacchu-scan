@@ -232,7 +232,11 @@ test("zip：名前は UTF-8・CRC つき（Excel が開ける形）", () => {
 test("ボタン：受注簿の「PDF保存」の右に「Excel保存」、見積書の窓の「PDF保存」の右に「Excel保存」", () => {
   assert.match(source, /\(0,j\.jsx\)\(`button`,\{onClick:pdfDownload,children:`PDF保存`\}\),\(0,j\.jsx\)\(`button`,\{onClick:xlsxDownload,children:`Excel保存`\}\)/);
   assert.match(source, /function xlsxDownload\(\)\{/);
-  assert.match(source, /downloadXlsx\(buildOrderXlsx\(pages,summary,`販売受注簿`\),k\(`xlsx`\)\)/);
+  // Excel を作る所（buildOrderXlsxBytes）は Excel保存とメール（Excel付き）で同じ（2026-10-27）
+  assert.match(source, /return buildOrderXlsx\(pages,summary,`販売受注簿`\);/);
+  assert.match(source, /downloadXlsx\(buildOrderXlsxBytes\(\),k\(`xlsx`\)\)/);
+  // Excel保存の右に、PDFでメール・Excelでメール（スマホの3列の幅に入る短い名前）
+  assert.match(source, /children:`Excel保存`\}\),\(0,j\.jsx\)\(`button`,\{onClick:\(\)=>mailWith\(`pdf`\),children:`PDFでメール`\}\),\(0,j\.jsx\)\(`button`,\{onClick:\(\)=>mailWith\(`xlsx`\),children:`Excelでメール`\}\)/);
   assert.match(source, /<button type="button" id="pdfButton">PDF保存<\/button><button type="button" id="xlsxButton">Excel保存<\/button>/);
   assert.match(source, /document\.getElementById\("xlsxButton"\)\.addEventListener\("click"/);
   assert.match(source, /window\.__taiyoXlsx = \{ estimate\(doc\) \{ downloadXlsx\(buildEstimateXlsx\(readEstimateDoc\(doc\)/);

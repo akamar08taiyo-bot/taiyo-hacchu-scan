@@ -100,6 +100,28 @@ const save = async (download, name) => {
   assert.match(text, /<f>SUM\(/, '集計の合計は式');
   console.log('受注簿（2点）:', name);
 
+  // メール（Excel付き・PDF付き）：Outlook で開く下書き（.eml）。添付は Excel保存・PDF保存と同じもの、本文に顧客名と商品
+  // （ユーザーの依頼 2026-10-27「メールでそのまま、PDFかもしくは、Excelの資料送れる機能…添付とメールの文面の作成をワンタッチで」）
+  for (const [button, ext, magic] of [['Excelでメール', 'xlsx', 'PK'], ['PDFでメール', 'pdf', '%PDF-']]) {
+    const [mail] = await Promise.all([page.waitForEvent('download', {timeout: 60000}), page.getByRole('button', {name: button}).click()]);
+    assert.equal(mail.suggestedFilename(), '発注依頼（販売受注簿送付）の件 見本 花子様.eml');
+    await mail.saveAs(join(out, `メール_${ext}.eml`));
+    const eml = readFileSync(join(out, `メール_${ext}.eml`), 'latin1');
+    const head = eml.split('\r\n\r\n')[0];
+    assert.match(head, /\r\nX-Unsent: 1\r\n/);
+    const boundary = /boundary="([^"]+)"/.exec(head)[1];
+    const parts = eml.split(`--${boundary}`).slice(1, -1).map((p) => p.replace(/^\r\n/, ''));
+    const b64 = (x) => Buffer.from(x.replace(/\r\n/g, ''), 'base64');
+    const body = b64(parts[0].split('\r\n\r\n')[1]).toString('utf8');
+    for (const t of ['表題の通り、発注をお願いします。', '顧客名：見本 花子 様', '・シャワーチェア 見本A（A-100）', '・浴槽台 見本B（B-200）']) assert.ok(body.includes(t), body);
+    const [fileHead, fileData] = parts[1].split('\r\n\r\n');
+    assert.match(fileHead, ext === 'pdf' ? /application\/pdf/ : /spreadsheetml\.sheet/);
+    const file = b64(fileData);
+    assert.equal(file.subarray(0, magic.length).toString('latin1'), magic);
+    if (ext === 'xlsx') assert.match(file.toString('latin1'), /xl\/worksheets\/sheet1\.xml/);
+    console.log(`${button}: OK（添付 ${file.length} バイト）`);
+  }
+
   // 2) 同じ受注簿から見積書を開き、数量を全角で直してから Excel保存（複数商品の表）
   const [pop] = await Promise.all([ctx.waitForEvent('page'), page.getByRole('button', {name: '見積もり作成'}).click()]);
   await pop.waitForLoadState();
