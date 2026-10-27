@@ -100,7 +100,7 @@ const save = async (download, name) => {
   assert.match(text, /<f>SUM\(/, '集計の合計は式');
   console.log('受注簿（2点）:', name);
 
-  // メール（Excel付き・PDF付き）：Outlook で開く下書き（.eml）。添付は Excel保存・PDF保存と同じもの、本文に顧客名と商品
+  // メール（Excel付き・PDF付き）：Thunderbird・Outlook で開く下書き（.eml）。添付は Excel保存・PDF保存と同じもの、本文に顧客名と商品
   // （ユーザーの依頼 2026-10-27「メールでそのまま、PDFかもしくは、Excelの資料送れる機能…添付とメールの文面の作成をワンタッチで」）
   for (const [button, ext, magic] of [['Excelでメール', 'xlsx', 'PK'], ['PDFでメール', 'pdf', '%PDF-']]) {
     const [mail] = await Promise.all([page.waitForEvent('download', {timeout: 60000}), page.getByRole('button', {name: button}).click()]);
@@ -167,6 +167,55 @@ const save = async (download, name) => {
   assert.match(est, /シャワーチェア 見本A/);
   assert.match(est, /<f>INT\([A-Z]+\d+\*0\.1\)<\/f><v>1264<\/v>/, '消費税＝金額×10%の切り捨て');
   console.log('受注簿（1点）・見積書（単品）: OK');
+  await ctx.close();
+}
+
+// 4) タブレット（ユーザーの話「タブレットからもおくります」）：共有メニュー（メールのアプリ）に Excel・PDF と件名・本文を渡す（下書きのファイルは保存しない）。
+//    Android のタブレットの「PC版サイト」の表示（名前は Linux のパソコン）・iPad（名前はパソコンの Mac と同じ）。
+//    ファイルを作っているあいだに押した操作の続きと見なされなくなったとき（iPad の Safari など）は「📤 メールのアプリに渡す」をもう一度押す
+for (const [name, userAgent, refuse] of [
+  ['android', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 0],
+  ['ipad', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15', 1],
+]) {
+  const ctx = await browser.newContext({viewport: {width: 1180, height: 820}, locale: 'ja-JP', userAgent, hasTouch: true});
+  await ctx.route('https://cdn.jsdelivr.net/**', (r) => r.abort());
+  await ctx.addInitScript(() => {
+    Object.defineProperty(Navigator.prototype, 'maxTouchPoints', {get: () => 5});
+    window.__shared = [];
+    window.__refuse = 0;
+    navigator.canShare = (d) => !!d?.files?.length;
+    navigator.share = async (d) => {
+      if (window.__refuse-- > 0) throw new DOMException('not allowed', 'NotAllowedError');
+      const files = await Promise.all(d.files.map(async (f) => ({name: f.name, type: f.type, head: new TextDecoder().decode((await f.arrayBuffer()).slice(0, 5))})));
+      window.__shared.push({title: d.title, text: d.text, files});
+    };
+  });
+  const page = await ctx.newPage();
+  page.on('dialog', (d) => d.accept());
+  page.on('pageerror', (e) => console.log('pageerror', e.message));
+  let downloaded = false;
+  page.on('download', () => (downloaded = true));
+  await fillOrder(page, [['シャワーチェア 見本A', 'A-100', 15800, 9480]]);
+  for (const [button, ext, magic] of [['Excelでメール', 'xlsx', 'PK'], ['PDFでメール', 'pdf', '%PDF-']]) {
+    await page.evaluate((n) => (window.__refuse = n), refuse); // メールごとに、最初の共有を断る
+    await page.getByRole('button', {name: button}).click();
+    if (refuse) {
+      const again = page.getByRole('dialog', {name: 'メールのアプリに渡す'});
+      await again.getByRole('button', {name: '📤 メールのアプリに渡す'}).click({timeout: 60000});
+      await again.waitFor({state: 'detached'});
+    }
+    await page.waitForFunction((n) => window.__shared.length === n, ext === 'xlsx' ? 1 : 2, {timeout: 60000});
+  }
+  const shared = await page.evaluate(() => window.__shared);
+  assert.deepEqual(shared.map((x) => x.files.map((f) => f.head.slice(0, 2))), [['PK'], ['%P']], name);
+  assert.match(shared[0].files[0].name, /\.xlsx$/);
+  assert.equal(shared[1].files[0].type, 'application/pdf');
+  for (const x of shared) {
+    assert.equal(x.title, '発注依頼（販売受注簿送付）の件 見本 花子様');
+    assert.ok(x.text.includes('・シャワーチェア 見本A（A-100）'), x.text);
+  }
+  assert.equal(downloaded, false, `${name}：下書きのファイルは保存しない`);
+  console.log(`タブレット（${name}）：共有メニューに Excel・PDF を渡す OK`);
   await ctx.close();
 }
 

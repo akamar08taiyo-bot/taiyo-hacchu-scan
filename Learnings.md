@@ -615,3 +615,25 @@
   入力途中の受注簿があれば、前と同じ「前回の入力は消えて…置き換わります」と確かめる。
 - **今後**: 受け取る形（kind・項目）を変えるときは、1件の口と列の両方を見る。送り手より先にこの受け取り側を公開する（第14項の落とし穴と同じ）。
   ブラウザの確かめは特定福祉用具のリポジトリの `test/tokutei/e2e-hacchu.mjs`（承認 → 列に1件 → 受注簿ツールをふつうに開く → 受注簿に入れる → 列が空になって消える）。
+
+## 2026-10-27 「PDFでメール」「Excelでメール」（会社は Thunderbird・タブレットからも送る）
+
+### 42. 添付つきのメールは .eml（X-Unsent: 1）。Thunderbird も 91 以降は送信前のメールとして開く
+- **事実**: ユーザーの依頼「作成したら、メールでそのまま、PDFかもしくは、Excelの資料送れる…添付とメールの文面の作成をワンタッチで」。
+  はじめにメールのソフトを聞いたら「Outlook（パソコンのソフト）」、そのあと「Thunderbirdです」「タブレットからもおくります」と答えが変わった。
+- **原因**: mailto: はファイルを付けられない。.eml は Outlook も Thunderbird（91 以降。それより前はアドオン「X-Unsent support」）も、`X-Unsent: 1` があれば
+  送信前の新しいメール（件名・本文・添付・宛先入り）として開く。Thunderbird が .eml の既定のアプリでないと、Windows の「メール」などで開いてしまう。
+- **対処**: `src/lib/mailDraft.mjs`（売上伝票発行依頼書の `src/lib/mailDraft.js` の写し）の `buildEml`・`sendMailDraft`。件名は 39 バイトごとの
+  =?UTF-8?B?…?=（1行 78字以内）、添付の名前は1つの =?UTF-8?B?…?=、本文は base64 の UTF-8。
+  スマホ・タブレットは共有メニュー（`navigator.share` に files・title・text）。宛先は共有メニューでは渡せない（メールのアプリで入れる）。
+- **今後**: ユーザーには「.eml を Thunderbird で開くように（右クリック → プログラムから開く → 常に）」を伝える。この作業環境に Thunderbird・Outlook はないので、
+  .eml の中身（見出し・本文・添付）をテストで確かめ、最後は会社のパソコンで一度開いてもらう。
+
+### 43. タブレットの見分けと、共有メニューが開かないとき
+- **事実**: iPad は名前（userAgent）がパソコンの Mac と同じ。Android のタブレットは「PC版サイト」の表示（大きな画面では初めからこれ）だと Linux のパソコンの名前で来る。
+  また iPad の Safari などは、押してから数秒たつと「押した操作の続き」と見なさず、`navigator.share` が NotAllowedError になる（PDF・Excel を作るのに時間がかかる）。
+- **対処**: `isMobileDevice` は iPhone・iPad・Android の名前、`userAgentData.platform === 'Android'`、Mac・Linux の名前で指で触れる画面（maxTouchPoints > 1）。
+  Windows は指で触れる画面でも .eml（共有メニューに Thunderbird が出ないので）。NotAllowedError のときは画面の下に「📤 メールのアプリに渡す」「やめる」
+  （`shareOnTap`。押したその場で共有メニューを開く）。それでもだめなら .eml。
+- **今後**: ブラウザのテストは `test/e2e-xlsx.mjs` の 4)（userAgent・hasTouch・maxTouchPoints を変え、`navigator.share` をにせものにして、最初の1回を NotAllowedError で断る）。
+  にせものの断る回数はメールごとに戻す（前は最初のメールだけ断って、2つめのメールの「もう一度押す」を待って止まった）。

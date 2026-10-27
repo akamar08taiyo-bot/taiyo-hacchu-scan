@@ -795,8 +795,8 @@ function xlsxDownload(){
 }
 /* メール（PDF付き・Excel付き）：販売受注簿の PDF か Excel を付け、件名・本文を入れた下書きのメールをワンタッチで作る（ユーザーの依頼 2026-10-27
    「販売受注簿…を作成したら、メールでそのまま、PDFかもしくは、Excelの資料送れる機能…添付とメールの文面の作成をワンタッチで」）。
-   会社のパソコンは Outlook なので、開くと送信前のメールになる下書き（.eml）を保存する。スマホ・iPad は共有メニュー（src/lib/mailDraft.mjs）。
-   宛先は設定の固定メール宛先（なければ Outlook で入れる）。前は mailto: で本文に発注スキャンの URL だけだった */
+   パソコンは、Thunderbird・Outlook で開くと送信前のメールになる下書き（.eml）を保存する。スマホ・タブレットは共有メニュー（src/lib/mailDraft.mjs）。
+   宛先は設定の固定メール宛先（なければメールのソフトで入れる）。前は mailto: で本文に発注スキャンの URL だけだった */
 async function mailWith(kind){
   if(ge()){h(`商品名を確認してください`);return}
   if(!validateMultiCosts())return;
