@@ -84,6 +84,12 @@ test("部材1点を受注簿の1ページにする（数量・単位・定価・
   }
   assert.match(pages[0].note, /4000mm 1本/);
   assert.equal(new Set(pages.map((p) => p._multiId)).size, 3);
+  // 前の版の見積もり（フリガナ・電話番号・依頼者名・施工日がない）は空のまま（base の値）
+  assert.deepEqual([pages[0].furigana, pages[0].tel, pages[0].requester, pages[0].deliveryDate], [undefined, undefined, undefined, undefined]);
+  // フリガナ・電話番号・依頼者名（ケアマネジャー）・納品予定日（施工日）（ユーザーの答え「すべてお願いします」2026-10-28）
+  const full = jutakuImportPages(payload({ furigana: "ヤマダ　ハナコ", tel: "0930-00-0000", requester: "見本 次郎", deliveryDate: "2026-11-05" }), base, 20);
+  for (const p of full) assert.deepEqual([p.furigana, p.tel, p.requester, p.deliveryDate], ["ヤマダ　ハナコ", "0930-00-0000", "見本 次郎", "2026-11-05"]);
+  assert.equal(jutakuImportPages(payload({ deliveryDate: "11/5" }), base, 20)[0].deliveryDate, undefined); // 日付でなければ入れない
   // 発注先が入っていればそれを使う。数量は1以上の整数
   const other = jutakuImportPages(payload({ supplier: "ウェルファン", items: [{ productName: "キャップ", quantity: 0.4 }] }), base, 20);
   assert.deepEqual([other[0].supplier, other[0].quantity, other[0].unit], ["ウェルファン", "1", "個"]);

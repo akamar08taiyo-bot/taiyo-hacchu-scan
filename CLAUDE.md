@@ -24,6 +24,7 @@
 - 住宅改修 見積書・請求書（リポジトリ akamar08taiyo-bot/- の `src/sasaoka`、ポータルの `sasaoka/`）の発注書から
   「販売受注簿に転記」で部材を受け取る（同じサイトの localStorage `taiyo-hacchu-import-v1`。`main.jsx` の
   `jutaku-import-begin`〜`end`、Learnings.md 第27項）。送る形を変えるときは両方のリポジトリを直す。
+  顧客名・住所・営業担当・発注先のほか、フリガナ（`furigana`）・電話番号（`tel`）・依頼者名（`requester`＝ケアマネジャー）・納品予定日（`deliveryDate`＝施工日）も受け取る（第44項）。
 - 特定福祉用具 購入申請書・見積もり作成（同じリポジトリ akamar08taiyo-bot/- の `src/tokutei`、ポータルの `tokutei/`）の見積もりからも、
   同じ口で商品を受け取る（`kind: 'taiyo-tokutei-order'`・`?from=tokutei`。1点ずつ受注区分「給付」のページ。
   給付内訳は送り手が見積書と同じ合計になるように分けて送り、`tokuteiFixedBenefit` がそのまま出す。Learnings.md 第30・31項）。

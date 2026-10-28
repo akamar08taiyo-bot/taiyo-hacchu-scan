@@ -466,7 +466,9 @@ function clearJutakuImport(data){
     else localStorage.removeItem(HACCHU_QUEUE_KEY);
   }catch{}
 }
-/* 部材1点を受注簿の1ページにする。顧客名・住所・営業担当・発注先は全ページ同じ。
+/* 部材1点を受注簿の1ページにする。顧客名・フリガナ・住所・電話番号・依頼者名・納品予定日・営業担当・発注先は全ページ同じ。
+   フリガナ・電話番号は申請書の欄、納品予定日は施工日、依頼者名はケアマネジャー（理由書の作成者）（ユーザーの答え「すべてお願いします」2026-10-28。
+   前の版の見積もりから届いたもの＝この4つがないものは空のまま）。
    販売単価は、手で定価を打ったときと同じく 定価×(100−値引率)%（住宅改修の見積の単価 定価×0.8 と同じ）。
    数量は整数（受注簿の数量は1以上の整数）。 */
 function jutakuImportPages(data,base,discountRate){
@@ -474,6 +476,10 @@ function jutakuImportPages(data,base,discountRate){
       text=v=>String(v??``).trim(),
       yen=v=>Math.max(0,Math.round(Number(v)||0)),
       header={...base,orderType:`販売`,customerName:text(data.customerName),address:text(data.address)};
+  if(text(data.furigana))header.furigana=text(data.furigana);
+  if(text(data.tel))header.tel=text(data.tel);
+  if(text(data.requester))header.requester=text(data.requester);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(text(data.deliveryDate)))header.deliveryDate=text(data.deliveryDate);
   if(text(data.sales))header.sales=text(data.sales);
   if(text(data.supplier))header.supplier=text(data.supplier);
   return data.items.map((item,index)=>{
