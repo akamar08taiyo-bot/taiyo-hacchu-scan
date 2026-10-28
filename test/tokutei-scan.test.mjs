@@ -48,7 +48,8 @@ test("読み取った商品を、受注簿の欄と同じ値で見積書の窓�
 
 test("画面：読み取りのときは画像の欄だけ（受注簿・上の段・ポータルへのリンクを出さない）。親の画面から画像を受ける", () => {
   assert.match(source, /className:TOKUTEI_SCAN\?`workspace twoColumn tokuteiScanOnly`:`workspace twoColumn`/);
-  assert.match(source, /!TOKUTEI_SCAN&&\(0,j\.jsx\)\(`a`,\{href:`https:\/\/akamar08taiyo-bot\.github\.io\/taiyo-portal\/`/);
+  // ポータルへ戻るボタンは見出しの段（.topbar）のいちばん左（全アプリ共通の形 .taiyo-portal-back。2026-10-28）。見出しの段ごと読み取りのときは出さない
+  assert.match(source, /!TOKUTEI_SCAN&&\(0,j\.jsxs\)\(`header`,\{className:`topbar`,children:\[\(0,j\.jsx\)\(`a`,\{href:`https:\/\/akamar08taiyo-bot\.github\.io\/taiyo-portal\/`,className:`taiyo-portal-back no-print`/);
   assert.match(source, /!TOKUTEI_SCAN&&\(0,j\.jsxs\)\(`header`,\{className:`topbar`/);
   assert.match(source, /!TOKUTEI_SCAN&&\(0,j\.jsxs\)\(j\.Fragment,\{children:\[\(0,j\.jsx\)\(kt,\{order:e,/);
   assert.match(source, /if\(event\.origin!==location\.origin\|\|event\.source!==window\.parent\)return;/);
