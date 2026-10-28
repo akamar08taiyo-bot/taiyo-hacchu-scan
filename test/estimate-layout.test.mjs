@@ -44,7 +44,7 @@ test("見積書のPDFはウィンドウ幅によらずA4レイアウトで1ペ�
 });
 
 test("見積書は太字を使いすぎない", () => {
-  const from = source.indexOf("'*{box-sizing:border-box}body{margin:0;background:#eef5fb");
+  const from = source.indexOf("'*{box-sizing:border-box}body{margin:0;background:#f2f6f4");
   const to = source.indexOf("@media print{body{background:#fff}", from);
   assert.ok(from > 0 && to > from);
   const sheetCss = source.slice(from, to);

@@ -72,6 +72,28 @@ async function fillOrder(page, products, {paste = false} = {}) {
   }
 }
 
+/** 上の段の「保存」「メール」を押して、出た一覧の項目（「📗 Excelで保存」など）を押す（2026-10-28 から上の段は5つ） */
+async function pick(page, menu, item) {
+  await page.locator('.actions .actionMenuButton', {hasText: menu}).click();
+  await page.getByRole('menuitem', {name: item}).click();
+}
+
+/** mailto: を開いた（メールのソフトに渡した）ことを覚える。ブラウザのテストではほかのアプリを開かない */
+const catchMailto = () => {
+  window.__mailto = [];
+  const click = HTMLAnchorElement.prototype.click;
+  HTMLAnchorElement.prototype.click = function () {
+    if (this.href.startsWith('mailto:')) return void window.__mailto.push(this.href);
+    return click.call(this);
+  };
+};
+
+/** mailto: を読み戻す */
+function readMailto(url) {
+  const [head, query] = url.replace(/^mailto:/, '').split('?');
+  return {to: head, ...Object.fromEntries(query.split('&').map((kv) => kv.split('=')).map(([k, v]) => [k, decodeURIComponent(v)]))};
+}
+
 const save = async (download, name) => {
   const file = join(out, name);
   await download.saveAs(file);
@@ -84,11 +106,12 @@ const save = async (download, name) => {
 {
   const ctx = await browser.newContext({viewport: {width: 1366, height: 900}, locale: 'ja-JP'});
   await ctx.route('https://cdn.jsdelivr.net/**', (r) => r.abort());
+  await ctx.addInitScript(catchMailto);
   const page = await ctx.newPage();
   page.on('dialog', (d) => d.accept());
   page.on('pageerror', (e) => console.log('pageerror', e.message));
   await fillOrder(page, [['シャワーチェア 見本A', 'A-100', 15800, 9480], ['浴槽台 見本B', 'B-200', 13800, 8280]], {paste: true});
-  const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', {name: 'Excel保存', exact: true}).click()]);
+  const [dl] = await Promise.all([page.waitForEvent('download'), pick(page, '保存', '📗 Excelで保存')]);
   const name = dl.suggestedFilename();
   assert.match(name, /^販売受注簿_見本花子_.*\.xlsx$/, name); // PDF保存と同じ名前（拡張子だけ .xlsx）
   const {text} = await save(dl, '受注簿_2点.xlsx');
@@ -100,26 +123,21 @@ const save = async (download, name) => {
   assert.match(text, /<f>SUM\(/, '集計の合計は式');
   console.log('受注簿（2点）:', name);
 
-  // メール（Excel付き・PDF付き）：Thunderbird・Outlook で開く下書き（.eml）。添付は Excel保存・PDF保存と同じもの、本文に顧客名と商品
-  // （ユーザーの依頼 2026-10-27「メールでそのまま、PDFかもしくは、Excelの資料送れる機能…添付とメールの文面の作成をワンタッチで」）
-  for (const [button, ext, magic] of [['Excelでメール', 'xlsx', 'PK'], ['PDFでメール', 'pdf', '%PDF-']]) {
-    const [mail] = await Promise.all([page.waitForEvent('download', {timeout: 60000}), page.getByRole('button', {name: button}).click()]);
-    assert.equal(mail.suggestedFilename(), '発注依頼（販売受注簿送付）の件 見本 花子様.eml');
-    await mail.saveAs(join(out, `メール_${ext}.eml`));
-    const eml = readFileSync(join(out, `メール_${ext}.eml`), 'latin1');
-    const head = eml.split('\r\n\r\n')[0];
-    assert.match(head, /\r\nX-Unsent: 1\r\n/);
-    const boundary = /boundary="([^"]+)"/.exec(head)[1];
-    const parts = eml.split(`--${boundary}`).slice(1, -1).map((p) => p.replace(/^\r\n/, ''));
-    const b64 = (x) => Buffer.from(x.replace(/\r\n/g, ''), 'base64');
-    const body = b64(parts[0].split('\r\n\r\n')[1]).toString('utf8');
-    for (const t of ['表題の通り、発注をお願いします。', '顧客名：見本 花子 様', '・シャワーチェア 見本A（A-100）', '・浴槽台 見本B（B-200）']) assert.ok(body.includes(t), body);
-    const [fileHead, fileData] = parts[1].split('\r\n\r\n');
-    assert.match(fileHead, ext === 'pdf' ? /application\/pdf/ : /spreadsheetml\.sheet/);
-    const file = b64(fileData);
-    assert.equal(file.subarray(0, magic.length).toString('latin1'), magic);
-    if (ext === 'xlsx') assert.match(file.toString('latin1'), /xl\/worksheets\/sheet1\.xml/);
-    console.log(`${button}: OK（添付 ${file.length} バイト）`);
+  // メール（Excel付き・PDF付き）：パソコンは、添付の Excel・PDF を保存（Excel保存・PDF保存と同じもの）して、メールのソフトで宛先・件名・本文の入った
+  // 新しいメールを開く（mailto:）。前の .eml は Edge が「デバイスに問題を起こす可能性があります」と止めた（ユーザーの報告 2026-10-28）
+  for (const [i, [item, ext, magic]] of [['📗 Excelでメール', 'xlsx', 'PK'], ['📄 PDFでメール', 'pdf', '%PDF-']].entries()) {
+    const [att] = await Promise.all([page.waitForEvent('download', {timeout: 60000}), pick(page, 'メール', item)]);
+    assert.match(att.suggestedFilename(), new RegExp(`^販売受注簿_見本花子_.*\\.${ext}$`), att.suggestedFilename());
+    await att.saveAs(join(out, `メール_${ext}.${ext}`));
+    assert.equal(readFileSync(join(out, `メール_${ext}.${ext}`)).subarray(0, magic.length).toString('latin1'), magic);
+    await page.waitForFunction((n) => window.__mailto.length === n, i + 1);
+    const url = (await page.evaluate(() => window.__mailto))[i];
+    assert.ok(url.length <= 2000, `mailto: は ${url.length} 字（Edge・Chrome は Windows で 2048 字まで）`);
+    const mail = readMailto(url);
+    assert.equal(mail.subject, '発注依頼（販売受注簿送付）の件 見本 花子様');
+    for (const t of ['表題の通り、発注をお願いします。', `販売受注簿を添付しております（${ext === 'pdf' ? 'PDF' : 'Excel'}）。`, '顧客名：見本 花子 様', '・シャワーチェア 見本A（A-100）', '・浴槽台 見本B（B-200）']) assert.ok(mail.body.includes(t), mail.body);
+    assert.ok(mail.body.includes('\r\n'), '改行は CRLF');
+    console.log(`${item}: OK（添付 ${att.suggestedFilename()}・mailto ${url.length} 字）`);
   }
 
   // 2) 同じ受注簿から見積書を開き、数量を全角で直してから Excel保存（複数商品の表）
@@ -155,7 +173,7 @@ const save = async (download, name) => {
   page.on('dialog', (d) => d.accept());
   page.on('pageerror', (e) => console.log('pageerror', e.message));
   await fillOrder(page, [['シャワーチェア 見本A', 'A-100', 15800, 9480]]);
-  const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', {name: 'Excel保存', exact: true}).click()]);
+  const [dl] = await Promise.all([page.waitForEvent('download'), pick(page, '保存', '📗 Excelで保存')]);
   const {text} = await save(dl, '受注簿_1点.xlsx');
   assert.doesNotMatch(text, /<sheet name="集計"/, '1点のときは集計のシートなし');
   assert.doesNotMatch(text, /<rowBreaks/, '1ページ');
@@ -196,9 +214,9 @@ for (const [name, userAgent, refuse] of [
   let downloaded = false;
   page.on('download', () => (downloaded = true));
   await fillOrder(page, [['シャワーチェア 見本A', 'A-100', 15800, 9480]]);
-  for (const [button, ext, magic] of [['Excelでメール', 'xlsx', 'PK'], ['PDFでメール', 'pdf', '%PDF-']]) {
+  for (const [item, ext] of [['📗 Excelでメール', 'xlsx'], ['📄 PDFでメール', 'pdf']]) {
     await page.evaluate((n) => (window.__refuse = n), refuse); // メールごとに、最初の共有を断る
-    await page.getByRole('button', {name: button}).click();
+    await pick(page, 'メール', item);
     if (refuse) {
       const again = page.getByRole('dialog', {name: 'メールのアプリに渡す'});
       await again.getByRole('button', {name: '📤 メールのアプリに渡す'}).click({timeout: 60000});
@@ -214,8 +232,34 @@ for (const [name, userAgent, refuse] of [
     assert.equal(x.title, '発注依頼（販売受注簿送付）の件 見本 花子様');
     assert.ok(x.text.includes('・シャワーチェア 見本A（A-100）'), x.text);
   }
-  assert.equal(downloaded, false, `${name}：下書きのファイルは保存しない`);
+  assert.equal(downloaded, false, `${name}：ファイルは保存しない（共有メニューで添付まで渡す）`);
   console.log(`タブレット（${name}）：共有メニューに Excel・PDF を渡す OK`);
+  await ctx.close();
+}
+
+// 5) 仕切りの入っていない商品があっても、メールは作れる（ユーザーの指示「すべて入力しなくても、メールでとばせるようにする」2026-10-28）。
+//    PDF保存は今までどおり「仕切り未入力の商品があります」で止める
+{
+  const ctx = await browser.newContext({viewport: {width: 1366, height: 900}, locale: 'ja-JP'});
+  await ctx.route('https://cdn.jsdelivr.net/**', (r) => r.abort());
+  await ctx.addInitScript(catchMailto);
+  const page = await ctx.newPage();
+  page.on('dialog', (d) => d.accept());
+  page.on('pageerror', (e) => console.log('pageerror', e.message));
+  // 2つめの商品は仕切りなし（「商品を追加」は仕切りがないと足さないので、2つめのページに残る）
+  await fillOrder(page, [['シャワーチェア 見本A', 'A-100', 15800, 9480], ['浴槽台 見本B', 'B-200', 13800, '']]);
+  let downloads = 0;
+  page.on('download', () => downloads++);
+  await pick(page, '保存', '📄 PDFで保存');
+  await page.waitForTimeout(800);
+  assert.equal(downloads, 0, 'PDF保存は止める');
+  assert.match(await page.locator('.imagePanel .status').innerText(), /仕切り未入力の商品があります/);
+  const [att] = await Promise.all([page.waitForEvent('download', {timeout: 60000}), pick(page, 'メール', '📄 PDFでメール')]);
+  assert.match(att.suggestedFilename(), /\.pdf$/);
+  await page.waitForFunction(() => window.__mailto.length === 1);
+  const mail = readMailto((await page.evaluate(() => window.__mailto))[0]);
+  assert.ok(mail.body.includes('・浴槽台 見本B（B-200）'), mail.body);
+  console.log('仕切りなしの商品があってもメール: OK（PDF保存は止める）');
   await ctx.close();
 }
 

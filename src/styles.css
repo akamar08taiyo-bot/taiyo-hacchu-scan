@@ -397,32 +397,35 @@ textarea {
   font: inherit;
 }
 
+/* ボタンは申請書・見積書作成（住宅改修 jutaku-mitsumori/。リポジトリ akamar08taiyo-bot/- の src/sasaoka/components/ui.tsx の Btn）と同じ：
+   白い地・細い灰色の枠・濃い灰色の字（ユーザーの指示「色合いも、見積もり・申請書アプリと全く同じ、緑ベース（書式なども）に統一する」2026-10-28）。
+   決める・保存する（.primary）は薄い青。見出しの段の色・ボタンの色分けは、このファイルの末尾近くの「申請書・見積書作成と同じ緑」 */
 button {
-  border: 1px solid #c9d3dc;
-  background: linear-gradient(180deg, #ffffff 0%, #f7f9fb 100%);
-  color: #1d2c3b;
-  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 6px;
   min-height: 36px;
   padding: 0 13px;
   cursor: pointer;
-  font-weight: 750;
-  box-shadow: 0 1px 2px rgba(30, 45, 60, 0.06);
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
 
 button:hover {
-  background: #f0f6f8;
-  border-color: #aebdc9;
+  background: #f8fafc;
+  border-color: #cbd5e1;
 }
 
 .primary {
-  background: linear-gradient(180deg, #1769aa 0%, #0d4f8b 100%);
-  border-color: #0d4f8b;
-  color: #ffffff;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
 }
 
-.softPrimary {
-  background: linear-gradient(180deg, #2b78b8 0%, #155f9c 100%);
-  border-color: #155f9c;
+.primary:hover {
+  background: #dbeafe;
+  border-color: #bfdbfe;
 }
 
 .app {
@@ -430,61 +433,10 @@ button:hover {
   padding-bottom: 34px;
 }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 14px;
-  padding: 13px 18px;
-  background: rgba(255, 255, 255, 0.94);
-  border-bottom: 1px solid #d9e1e8;
-  box-shadow: 0 8px 24px rgba(35, 50, 65, 0.06);
-  backdrop-filter: blur(10px);
-  position: sticky;
-  top: 0;
-  z-index: 5;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  flex: 0 0 auto;
-}
-
-.logoMark {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #0d4f8b, #2b78b8);
-  color: #ffffff;
-  font-weight: 900;
-  letter-spacing: 0;
-}
-
-.brand h1 {
-  margin: 0;
-  font-size: 21px;
-  font-weight: 850;
-  line-height: 1.2;
-}
-
-.brand p,
 .panelHead p {
   margin: 3px 0 0;
-  color: #667789;
+  color: #64748b;
   font-size: 12px;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 8px;
 }
 
 .topProfitAlerts {
@@ -518,70 +470,6 @@ button:hover {
   color: #825500;
   background: #fff8e6;
   border: 1px solid #e0b35c;
-}
-
-.actions button,
-.actions .primary,
-.actions .softPrimary {
-  min-height: 46px;
-  min-width: 84px;
-  padding: 0 18px;
-  border: 1.5px solid #a8bfd3;
-  border-radius: 11px;
-  background: linear-gradient(180deg, #ffffff 0%, #f1f6fa 100%);
-  color: #132b42;
-  font-size: 16px;
-  font-weight: 850;
-  letter-spacing: 0.02em;
-  box-shadow: 0 3px 7px rgba(30, 63, 91, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.92);
-  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
-}
-
-.actions button:hover,
-.actions .primary:hover,
-.actions .softPrimary:hover {
-  background: linear-gradient(180deg, #f9fdff 0%, #dcecf8 100%);
-  border-color: #5b91bc;
-  color: #0b4f86;
-  transform: translateY(-1px);
-  box-shadow: 0 5px 10px rgba(30, 63, 91, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.96);
-}
-
-.actions button:active,
-.actions .primary:active,
-.actions .softPrimary:active {
-  transform: translateY(0);
-  box-shadow: inset 0 2px 4px rgba(30, 45, 60, 0.16);
-}
-
-.actions button:focus-visible,
-.catalogVersionTabs button:focus-visible {
-  outline: 3px solid rgba(45, 132, 206, 0.34);
-  outline-offset: 2px;
-}
-
-.actions .primary {
-  background: linear-gradient(180deg, #1769aa 0%, #0d4f8b 100%);
-  border-color: #0d4f8b;
-  color: #fff;
-  box-shadow: 0 4px 9px rgba(13, 79, 139, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.22);
-}
-
-.actions .primary:hover {
-  background: linear-gradient(180deg, #2580c4 0%, #12639e 100%);
-  border-color: #0a477d;
-  color: #fff;
-}
-
-.actions .softPrimary {
-  background: linear-gradient(180deg, #eaf5ff 0%, #cfe7f9 100%);
-  border-color: #73a9d0;
-  color: #0b4f86;
-}
-
-.actions .softPrimary:hover {
-  background: linear-gradient(180deg, #f2faff 0%, #bfe0f5 100%);
-  border-color: #3d81b5;
 }
 
 .hidden {
@@ -644,66 +532,70 @@ button:hover {
 .addProductNearTitle {
   justify-self: end;
   padding: 9px 14px;
-  border: 1px solid #8fb2ce;
-  border-radius: 8px;
-  background: #eef6fb;
-  color: #0d4f8b;
-  font-weight: 850;
-  box-shadow: 0 2px 5px rgba(30, 45, 60, 0.09);
+  border: 1px solid #6ee7b7;
+  border-radius: 6px;
+  background: #d1fae5;
+  color: #064e3b;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
 
 .addProductNearTitle:hover {
-  background: #e1f0fa;
-  border-color: #1769aa;
+  background: #a7f3d0;
+  border-color: #6ee7b7;
 }
 
+/* 削除は白（申請書・見積書作成と同じ。消す前に確かめる） */
 .deleteProductNearTitle {
   justify-self: end;
   padding: 9px 14px;
-  border: 1px solid #d99a9a;
-  border-radius: 8px;
-  background: #fdf1f1;
-  color: #a12f2f;
-  font-weight: 850;
-  box-shadow: 0 2px 5px rgba(30, 45, 60, 0.09);
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #334155;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
 
 .deleteProductNearTitle:hover {
-  background: #fbe4e4;
-  border-color: #b53b3b;
+  background: #f8fafc;
+  border-color: #cbd5e1;
 }
 
+/* ページの切り替え（1/3 2/3 3/3）：申請書・見積書作成の様邸のタブと同じ（選んでいるページは濃い緑の地に白い字） */
 .multiPageNav {
   justify-self: center;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px;
-  border: 1px solid #c4d8ea;
-  border-radius: 999px;
-  background: #f4f8fc;
+  gap: 0;
+  padding: 0;
+  border: 2px solid #14532d;
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
 }
 
 .multiPageNav button {
   min-width: 50px;
+  min-height: 32px;
   padding: 5px 9px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: transparent;
-  color: #27577d;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  color: #14532d;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: none;
 }
 
 .multiPageNav button:hover {
-  background: #e3f0fa;
+  background: #ecfdf5;
 }
 
 .multiPageNav button.active {
-  background: #1769aa;
+  background: #14532d;
   color: #ffffff;
-  border-color: #0d4f8b;
 }
 
 @media print {
@@ -762,7 +654,7 @@ button:hover {
 
 .draftPanel h2 {
   margin: 0 0 8px;
-  color: #123a5c;
+  color: #14532d;
   font-size: 18px;
 }
 
@@ -779,9 +671,9 @@ button:hover {
   gap: 6px 12px;
   margin: 0 0 18px;
   padding: 12px 14px;
-  border: 1px solid #dbe6ef;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-  background: #f6fafd;
+  background: #f8fafc;
   font-size: 13px;
 }
 
@@ -805,19 +697,24 @@ button:hover {
 .draftActions button {
   min-width: 150px;
   padding: 10px 16px;
-  border: 1px solid #9bb8d5;
-  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
   background: #fff;
-  color: #173d70;
+  color: #334155;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
 }
 
+/* 続きから入力する・受注簿に入れる（申請書・見積書作成の「見積書に入れる」と同じ薄い緑） */
 .draftActions button.primary {
-  border-color: #1769aa;
-  background: #1769aa;
-  color: #fff;
+  border-color: #6ee7b7;
+  background: #d1fae5;
+  color: #064e3b;
+}
+
+.draftActions button.primary:hover {
+  background: #a7f3d0;
 }
 
 /* 住宅改修の見積もり（発注書）から届いた部材・特定福祉用具の見積もりから届いた商品を、受注簿に入れるかを選ぶダイアログ。
@@ -830,7 +727,7 @@ button:hover {
   max-height: min(46vh, 360px);
   margin: 0 0 14px;
   overflow: auto;
-  border: 1px solid #dbe6ef;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
 }
 
@@ -844,8 +741,8 @@ button:hover {
   position: sticky;
   top: 0;
   padding: 6px 10px;
-  background: #f6fafd;
-  color: #6b7c8d;
+  background: #f8fafc;
+  color: #64748b;
   font-weight: 500;
   text-align: left;
 }
@@ -906,10 +803,10 @@ button:hover {
   max-height: 168px;
   overflow-y: auto;
   padding: 3px;
-  border: 1px solid #9cc3dd;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
   background: #fff;
-  box-shadow: 0 8px 18px rgba(23, 105, 170, .18);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .16);
 }
 
 .namePickerList button {
@@ -927,7 +824,7 @@ button:hover {
 }
 
 .namePickerList button:hover {
-  background: #e8f3fb;
+  background: #ecfdf5;
 }
 
 .entryGrid .sheetCell textarea.customerNameInput {
@@ -1387,8 +1284,8 @@ button:hover {
 .status {
   padding: 4px 8px;
   border-radius: 999px;
-  background: #e8f2ff;
-  color: #0d4f8b;
+  background: #ecfdf5;
+  color: #065f46;
   font-size: 12px;
   font-weight: 800;
   white-space: nowrap;
@@ -1440,7 +1337,7 @@ button:hover {
 
 .usageGuide h3 {
   margin: 0;
-  color: #0d4f8b;
+  color: #14532d;
   font-size: 15px;
   grid-column: 1 / -1;
 }
@@ -1528,7 +1425,7 @@ button:hover {
 .cropFrame {
   position: absolute;
   inset: 24px;
-  border: 2px solid rgba(23, 105, 170, 0.5);
+  border: 2px solid rgba(5, 150, 105, 0.5);
   border-radius: 6px;
   pointer-events: none;
 }
@@ -1561,8 +1458,8 @@ button:hover {
 }
 
 .imageThumb.active {
-  border-color: #1769aa;
-  box-shadow: 0 0 0 2px rgba(23, 105, 170, 0.14);
+  border-color: #059669;
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.16);
 }
 
 .imageThumb > button:first-child {
@@ -1628,7 +1525,7 @@ button:hover {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #1769aa, #4f9de8);
+  background: linear-gradient(90deg, #059669, #34d399);
   transition: width 180ms ease;
 }
 
@@ -1826,9 +1723,9 @@ button:hover {
 }
 
 .pricingChoice.active {
-  border-color: #1b6aa8;
-  background: #eef7ff;
-  box-shadow: inset 0 0 0 1px rgba(27, 106, 168, 0.22);
+  border-color: #059669;
+  background: #ecfdf5;
+  box-shadow: inset 0 0 0 1px rgba(5, 150, 105, 0.22);
 }
 
 .pricingChoice span {
@@ -1878,7 +1775,7 @@ button:hover {
 
 .masterListBox h3 {
   margin: 0;
-  color: #0d4f8b;
+  color: #14532d;
   font-size: 14px;
 }
 
@@ -1896,7 +1793,7 @@ button:hover {
   border: 1px solid #c8d9e8;
   border-radius: 8px;
   background: #ffffff;
-  color: #123a5c;
+  color: #14532d;
   font-weight: 900;
 }
 
@@ -2018,7 +1915,7 @@ button:hover {
 }
 
 .defaultOfficeSelect span {
-  color: #0d4f8b;
+  color: #14532d;
   font-size: 13px;
   font-weight: 900;
 }
@@ -2312,21 +2209,6 @@ button:hover {
 }
 
 @media (max-width: 760px) {
-  .topbar {
-    position: static;
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .brand {
-    min-width: 0;
-  }
-
-  .actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
   .topProfitAlerts {
     width: 100%;
     margin-left: 0;
@@ -2334,10 +2216,6 @@ button:hover {
 
   .profitAlert {
     white-space: normal;
-  }
-
-  .actions button {
-    flex: 1 1 30%;
   }
 
   .workspace {
@@ -3259,50 +3137,6 @@ main .integratedTabs {
   }
 }
 
-.catalogVersionTabs{
-  display:flex;
-  gap:8px;
-  margin:6px 0 10px;
-}
-.catalogVersionTabs button{
-  min-height:46px;
-  min-width:144px;
-  border:1.5px solid #9ebcda;
-  background:linear-gradient(180deg,#ffffff 0%,#f2f8fd 100%);
-  color:#17496f;
-  border-radius:11px;
-  padding:0 20px;
-  font-size:16px;
-  font-weight:850;
-  letter-spacing:.02em;
-  white-space:nowrap;
-  cursor:pointer;
-  box-shadow:0 3px 7px rgba(30,63,91,.13),inset 0 1px 0 rgba(255,255,255,.92);
-  transition:background 120ms ease,border-color 120ms ease,box-shadow 120ms ease,transform 120ms ease;
-}
-.catalogVersionTabs button:hover{
-  background:linear-gradient(180deg,#fbfeff 0%,#dcecf8 100%);
-  border-color:#5b91bc;
-  color:#0b4f86;
-  transform:translateY(-1px);
-  box-shadow:0 5px 10px rgba(30,63,91,.17),inset 0 1px 0 rgba(255,255,255,.96);
-}
-.catalogVersionTabs button:active{
-  transform:translateY(0);
-  box-shadow:inset 0 2px 4px rgba(30,45,60,.14);
-}
-.catalogVersionTabs button.active{
-  background:linear-gradient(180deg,#1875b6 0%,#0b558e 100%);
-  border-color:#0b558e;
-  color:#fff;
-  box-shadow:0 4px 9px rgba(13,79,139,.24),inset 0 1px 0 rgba(255,255,255,.22);
-}
-.catalogVersionTabs button.active:hover{
-  background:linear-gradient(180deg,#2585c6 0%,#1269a2 100%);
-  border-color:#084a7c;
-  color:#fff;
-}
-
 /* 2026-07-17: printed product name readability */
 @media print {
   .orderEntrySheet .productNameBlock {
@@ -3359,209 +3193,273 @@ body .integratedShell > .integratedTabs:first-of-type {
   visibility: hidden !important;
 }
 
-body .integratedShell .brand h1 {
-  font-size: 0 !important;
-}
-
-body .integratedShell .brand h1::after {
-  content: "販売受注簿作成ツール";
-  font-size: 22px;
-}
-
-body .integratedShell .brand p {
-  font-size: 0 !important;
-}
-
-body .integratedShell .brand p::after {
-  content: "商品画像を読み取り、販売受注簿を作成";
-  font-size: 12px;
-}
-
-/* 2026-07-30: reference-style visual system for the standalone order app.
-   The workflow and data controls stay unchanged; these are presentation-only overrides. */
+/* 2026-10-28 申請書・見積書作成と同じ緑（ユーザーの指示「上のタブは、印刷、保存、メール、見積もり作成、設定のみにする」
+   「色合いも、見積もり・申請書アプリと全く同じ、緑ベース（書式なども）に統一する」）。
+   手本は住宅改修の申請書・見積書作成（ポータルの jutaku-mitsumori/。リポジトリ akamar08taiyo-bot/- のブランチ claude/sasaoka-shikiri-app の
+   src/sasaoka/App.tsx の THEME.estimate と components/ui.tsx の Btn）：見出しの段は濃い緑 #14532d・白い字、画面の地は #f2f6f4、
+   ボタンは薄い地に濃い字・細い枠（印刷＝薄い水色 softSky、保存＝薄い青 softBlue、Excel＝薄い緑 softGreen、ほかは白）、枠は緑（emerald）。
+   前の世代（2026-07-30 の水色の reference-style、それより前の青いグラデーションの .topbar・.actions・.catalogVersionTabs）は消して、ここ1つにした（既知の落とし穴1）。
+   受注簿・集計・見積書の帳票の色（印刷・PDF・Excel に出る水色の見出し・上の線）は変えない（申請書・見積書作成も、帳票は帳票の色のまま）。 */
 :root {
-  --reference-cyan: #15a8df;
-  --reference-cyan-dark: #0b8dc2;
+  --reference-cyan: #15a8df; /* 受注簿の帳票の上の線（印刷・PDF・Excel の orderXlsx.mjs の ACCENT と同じ） */
   --reference-navy: #1d3448;
-  --reference-muted: #607c91;
-  --reference-bg: #eef9fd;
-  --reference-surface: #ffffff;
   --reference-line: #cfe1eb;
+  --app-green: #14532d;
+  --app-bg: #f2f6f4;
 }
 
 body,
 #root,
 .app {
-  background: var(--reference-bg) !important;
+  background: var(--app-bg) !important;
   color: var(--reference-navy) !important;
   font-family: "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif !important;
 }
 
+/* 見出しの段：← 業務アプリポータルへ戻る・「発」・題名、そのすぐ右に 印刷・保存・メール・見積もり作成・設定 */
 .topbar {
-  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
   padding: 12px clamp(16px, 2.4vw, 32px);
-  background: rgba(255, 255, 255, .97) !important;
-  border-bottom: 1px solid var(--reference-line) !important;
-  box-shadow: 0 7px 22px rgba(28, 89, 119, .08) !important;
+  background: var(--app-green);
+  color: #ffffff;
 }
 
 .brand {
-  gap: 11px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 0 0 auto;
 }
 
 .logoMark {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px !important;
-  background: linear-gradient(145deg, #f4b63e 0%, #ffd96f 100%) !important;
-  color: #fff !important;
-  box-shadow: 0 5px 12px rgba(242, 174, 54, .28);
-  font-size: 0 !important;
-}
-
-.logoMark::after {
-  content: "販";
-  font-size: 19px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .15);
+  color: #ffffff;
+  font-size: 18px;
   font-weight: 900;
 }
 
 .brand h1 {
-  font-size: 0 !important;
-  color: var(--reference-navy) !important;
-}
-
-.brand h1::after {
-  content: "販売受注簿作成";
-  font-size: 20px;
-  letter-spacing: .02em;
+  margin: 0;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
 }
 
 .brand p {
-  font-size: 0 !important;
-  color: var(--reference-muted) !important;
-}
-
-.brand p::after {
-  content: "画像を読み取り、販売受注簿へ反映";
+  margin: 0;
+  color: #dcfce7;
   font-size: 11px;
 }
 
 .actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
 }
 
+/* 利益の知らせ（利益額マイナス・利益率が基準未満）がないときは場所をとらない（スマホで緑の段の下に空きができていた） */
+.topProfitAlerts:empty {
+  display: none;
+}
+
 .actions button,
-.actions .primary,
-.actions .softPrimary {
+.actionMenuList button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   min-height: 44px;
-  border: 1px solid #b8d6e5 !important;
-  border-radius: 11px !important;
-  background: #fff !important;
-  color: var(--reference-navy) !important;
-  box-shadow: 0 3px 8px rgba(32, 86, 112, .12), inset 0 1px 0 rgba(255, 255, 255, .95) !important;
+  padding: 0 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+  transition: background 120ms ease;
 }
 
 .actions button:hover,
-.actions .softPrimary:hover {
-  background: #effaff !important;
-  border-color: #67bddc !important;
-  color: #0a668d !important;
+.actionMenuList button:hover {
+  background: #f8fafc;
 }
 
-.actions .primary {
-  background: var(--reference-cyan) !important;
-  border-color: var(--reference-cyan) !important;
-  color: #fff !important;
-  box-shadow: 0 5px 12px rgba(21, 168, 223, .25) !important;
+.actions button.btnSky {
+  border-color: #7dd3fc;
+  background: #f0f9ff;
+  color: #075985;
 }
 
-.actions .primary:hover {
-  background: var(--reference-cyan-dark) !important;
-  border-color: var(--reference-cyan-dark) !important;
-  color: #fff !important;
+.actions button.btnSky:hover {
+  background: #e0f2fe;
 }
 
-.actions .softPrimary {
-  background: #e9f8fd !important;
-  border-color: #8ccfe5 !important;
-  color: #0b6d93 !important;
+.actions button.btnBlue {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1e40af;
+}
+
+.actions button.btnBlue:hover {
+  background: #dbeafe;
+}
+
+.actionMenuList button.btnGreen {
+  border-color: #6ee7b7;
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.actionMenuList button.btnGreen:hover {
+  background: #d1fae5;
+}
+
+.actions button:focus-visible,
+.actionMenuList button:focus-visible,
+.catalogVersionTabs button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* 保存・メールを押すと出る一覧（PDF・Excel を選ぶ） */
+.actionMenu {
+  position: relative;
+}
+
+.actionMenuButton::after {
+  content: "▾";
+  font-size: 12px;
+}
+
+.actionMenuList {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  display: grid;
+  gap: 6px;
+  min-width: 100%;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, .22);
+}
+
+.actionMenuList button {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.actionMenuList button:focus-visible {
+  outline-color: #3b82f6;
 }
 
 .workspace {
   gap: 14px;
   padding: 14px;
-  background: var(--reference-bg);
+  background: var(--app-bg);
 }
 
+/* 画像の欄など：白い地に緑の枠（申請書・見積書作成の「新規作成」の枠と同じ） */
 .panel,
 .previewShell {
-  border: 1px solid var(--reference-line) !important;
-  border-radius: 15px !important;
-  background: rgba(255, 255, 255, .98) !important;
-  box-shadow: 0 12px 28px rgba(29, 87, 115, .08) !important;
+  border: 2px solid #059669 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .05) !important;
 }
 
 .panelHead {
   padding: 14px 16px;
-  border-bottom: 1px solid #e2eef3 !important;
-  background: #fbfeff !important;
+  border-bottom: 1px solid #d1fae5 !important;
+  background: #ffffff !important;
 }
 
-.panelHead h2,
+.panelHead h2 {
+  color: var(--app-green) !important;
+  letter-spacing: .02em;
+}
+
 .orderEntrySheet h2 {
   color: var(--reference-navy) !important;
   letter-spacing: .02em;
 }
 
-.panelHead p,
-.brand p {
-  color: var(--reference-muted) !important;
-}
-
 .status {
-  background: #e7f8fd !important;
-  color: #0b7ea8 !important;
-  border: 1px solid #a9dce9;
+  border: 1px solid #a7f3d0;
 }
 
 .usageGuide {
-  border-color: #d2e6ef !important;
-  border-radius: 13px !important;
-  background: #fff !important;
-  color: #31566c !important;
+  border-color: #e2e8f0 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  color: #334155 !important;
 }
 
-.usageGuide h3 {
-  color: #1a6a8b !important;
+/* 介援隊・ウェルファン版：申請書・見積書作成の様邸のタブと同じ（選んでいる方は濃い緑の地に白い字） */
+.catalogVersionTabs {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0 10px;
 }
 
 .catalogVersionTabs button {
-  border-color: #b7d7e5 !important;
-  border-radius: 11px !important;
-  background: #fff !important;
-  color: #24566f !important;
-  box-shadow: 0 3px 7px rgba(41, 98, 124, .1) !important;
+  min-height: 46px;
+  min-width: 144px;
+  padding: 0 20px;
+  border: 2px solid var(--app-green);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--app-green);
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
 }
 
 .catalogVersionTabs button:hover {
-  background: #effaff !important;
-  border-color: #69c0dd !important;
-  color: #0b729a !important;
+  background: #ecfdf5;
 }
 
 .catalogVersionTabs button.active {
-  background: var(--reference-cyan) !important;
-  border-color: var(--reference-cyan) !important;
-  color: #fff !important;
-  box-shadow: 0 5px 12px rgba(21, 168, 223, .24) !important;
+  background: var(--app-green);
+  color: #ffffff;
+}
+
+.catalogVersionTabs button:focus-visible {
+  outline-color: #3b82f6;
+}
+
+/* 受注簿の中の字はすべて濃い色（.orderEntrySheet * の !important）なので、選んでいるページ（濃い緑の地）の字だけ白に戻す */
+.orderEntrySheet .multiPageNav button.active {
+  color: #ffffff !important;
 }
 
 .dropZone {
-  border-color: #9fd6e8 !important;
-  border-radius: 13px !important;
-  background: #f8fdff !important;
+  border: 2px dashed #6ee7b7 !important;
+  border-radius: 12px !important;
+  background: #f7fdf9 !important;
 }
 
+/* ここから下は帳票（受注簿のシート）の色。印刷・PDF でも同じ指定が効くので、色を変えるときは orderXlsx.mjs の色も合わせる */
 .orderEntrySheet {
   border: 1px solid var(--reference-line) !important;
   border-top: 5px solid var(--reference-cyan) !important;
@@ -3580,11 +3478,12 @@ body,
   background: #fbfeff !important;
 }
 
+/* 打っている欄は申請書・見積書作成の入力欄と同じ青い枠（画面だけ） */
 .orderEntrySheet input:focus,
 .orderEntrySheet select:focus,
 .orderEntrySheet textarea:focus {
-  border-color: var(--reference-cyan) !important;
-  box-shadow: 0 0 0 3px rgba(21, 168, 223, .14) !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px #dbeafe !important;
   outline: none;
 }
 
@@ -3604,21 +3503,32 @@ body,
   border-color: #c8e0e9 !important;
 }
 
-@media (max-width: 980px) {
-  .topbar { align-items: flex-start; flex-wrap: wrap; }
-  .actions { width: 100%; }
-  .workspace { padding: 10px; }
-}
+/* スマホ・タブレットの縦：見出しの段は折り返し、ボタンは字の幅で段いっぱいに広げる（字が2行に割れないように） */
+@media (max-width: 760px) {
+  .topbar {
+    position: static;
+  }
 
-/* The HTML bootstrap script supplies the accessible Japanese labels directly. */
-.app .logoMark::after,
-.app .brand h1::after,
-.app .brand p::after {
-  content: none !important;
-}
+  .actions {
+    width: 100%;
+  }
 
-.app .logoMark {
-  font-size: 19px !important;
+  .actions > button,
+  .actions > .actionMenu {
+    flex: 1 1 auto;
+  }
+
+  .actions > .actionMenu > button {
+    width: 100%;
+  }
+
+  .actions button {
+    padding: 0 10px;
+  }
+
+  .workspace {
+    padding: 10px;
+  }
 }
 
 /* Make the paste instructions easier to read without changing their layout. */
@@ -3887,16 +3797,6 @@ body,
   .orderTitleWithAdd h2 {
     flex-basis: 100%;
     text-align: center;
-  }
-}
-
-/* スマホの幅：上の段のボタン（「Excel保存」を足して6つ）は、字が2行に割れないよう左右の余白を詰める */
-@media (max-width: 640px) {
-  .actions button,
-  .actions .primary,
-  .actions .softPrimary {
-    padding: 0 6px;
-    white-space: nowrap;
   }
 }
 

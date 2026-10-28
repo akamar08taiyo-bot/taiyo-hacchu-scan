@@ -34,11 +34,17 @@
   `tokutei-scan-begin`〜`end`・`tokutei-scan-app-begin`〜`end`、Learnings.md 第32・33項）。読み取った商品（受注簿の欄に入れた値）を postMessage
   `taiyo-hacchu-scanned` で窓に送り、窓で貼り付けた画像は `taiyo-scan-image` で受けて読む。受注簿・上の段・ダイアログは出さず、この端末の下書きにも保存しない。
 - **Excel保存**（ユーザーの指示「販売受注簿や見積もりは全てExcelで保存できるようにする。ページは3ページまでいけるようにする」2026-10-25。Learnings.md 第37〜40項）：
-  上の段の「PDF保存」の右の「Excel保存」（`xlsxDownload`）は、PDF と同じく印刷CSSで見えているシート（1点1ページ＋集計）を読んで .xlsx にする（`src/lib/orderXlsx.mjs`）。
+  上の段の「💾 保存」→「📗 Excelで保存」（`xlsxDownload`）は、PDF と同じく印刷CSSで見えているシート（1点1ページ＋集計）を読んで .xlsx にする（`src/lib/orderXlsx.mjs`）。
   見積書の窓の「PDF保存」の右の「Excel保存」は、受注簿の画面の `window.__taiyoXlsx.estimate(document)` で、その窓の中身（打ち直した値も）を .xlsx にする
   （`src/lib/estimateXlsx.mjs`。単品・複数商品の両方。明細が多ければ2・3ページと続き、明細の見出しを各ページの上にくり返す）。
   書き出しの部品は `src/lib/xlsxBook.mjs`（特定福祉用具の xlsxBook.ts を写したもの＋画像・拡大縮小・改ページ・印刷タイトル。zip は無圧縮で自前）。
   作り方・確かめ方は特定福祉用具のリポジトリの taiyo-excel-export スキル。印刷・PDF の見た目を変えたら、Excel の位置（mm）・色も合わせて直す。
+- **上の段と色合い**（ユーザーの指示「上のタブは、印刷、保存、メール、見積もり作成、設定のみにする」「色合いも、見積もり・申請書アプリと全く同じ、緑ベース（書式なども）に統一する」2026-10-28。Learnings.md 第45〜48項）：
+  上の段は 🖨 印刷・💾 保存（PDF／Excel を選ぶ）・✉ メール（PDF／Excel を選ぶ）・📝 見積もり作成・⚙ 設定 の5つ（`ActionMenu`）。色は住宅改修の申請書・見積書作成
+  （リポジトリ `-` のブランチ claude/sasaoka-shikiri-app の `src/sasaoka/App.tsx` の THEME.estimate・`components/ui.tsx` の Btn）と同じ：見出しの段 #14532d、地 #f2f6f4、
+  印刷＝薄い水色・保存＝薄い青・Excel＝薄い緑・ほかは白。指定は `styles.css` の「2026-10-28 申請書・見積書作成と同じ緑」の1か所。**帳票（受注簿のシート・集計・見積書の紙）の色は変えていない**（印刷・PDF・Excel と同じ水色）。
+- **メール**：パソコンは添付の PDF・Excel を保存して、メールのソフトを `mailto:`（宛先・件名・本文。2000字まで）で開く。.eml は Edge が「デバイスに問題を起こす可能性があります」と止めるのでやめた（第46項）。
+  スマホ・タブレットは共有メニュー（添付も入る）。仕切りなどが入っていなくても作れる（印刷・保存は今までどおり確かめる）。売上伝票発行依頼書（taiyo-uriage-denpyo）の `src/lib/mailDraft.js` も同じ作り。
 - 技術構成: Vite + React（`src/main.jsx`, 1ファイルに集約・圧縮された生成コード
   相当のスタイルでベタ書きされている＝手で読むには `grep -n -o` でパターン検索が
   現実的。整形されていないので awk/sed で該当行を fold して読むこと）。

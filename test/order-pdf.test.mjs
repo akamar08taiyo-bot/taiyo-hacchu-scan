@@ -4,8 +4,8 @@ import { readFileSync } from "node:fs";
 
 const source = readFileSync(new URL("../src/main.jsx", import.meta.url), "utf8");
 
-test("販売受注簿はツールバーからそのままPDFにできる", () => {
-  assert.match(source, /\(0,j\.jsx\)\(`button`,\{onClick:pdfDownload,children:`PDF保存`\}\)/);
+test("販売受注簿はツールバー（保存 → PDFで保存）からそのままPDFにできる", () => {
+  assert.match(source, /\{label:`📄 PDFで保存`,onClick:pdfDownload\}/);
   assert.match(source, /async function pdfDownload\(\)/);
   // A4横・余白6mm。1枚に収める（はみ出しても分割せず縮小）
   assert.match(source, /orientation:`landscape`,unit:`mm`,format:`a4`/);

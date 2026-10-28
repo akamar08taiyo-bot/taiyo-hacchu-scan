@@ -647,3 +647,44 @@
   受け取る側（この docs/）を先に公開し、そのあと送り手（太陽ポータルの jutaku-mitsumori/・sasaoka/）を公開する（第14項の落とし穴と同じ順）。
 - 確かめ：`test/jutaku-import.test.mjs`（4つが入る・ないときは空・日付でなければ入れない）。
 
+
+## 2026-10-28 上の段を5つに・申請書・見積書作成と同じ緑・メールは mailto:（売上伝票発行依頼書も）
+
+ユーザーの指示（スクリーンショットの上の段に赤い枠）：「上のタブは、印刷、保存、メール、見積もり作成、設定のみにする」「色合いも、見積もり・申請書アプリと全く同じ、緑ベース（書式なども）に統一する」。
+作業の途中で「すべて入力しなくても、メールでとばせるようにする」（仕切り未入力の知らせが出た画面）、「このような警告がでる。メールにそのまま飛ばない」（Edge のダウンロードの
+「…eml はデバイスに問題を起こす可能性があります。このまま保持しますか?」）、「こちらの売上伝票発行依頼書のメールについても同様」（同じ2つの指示を貼り直し）。
+
+### 45. 上の段は 印刷・保存・メール・見積もり作成・設定。PDF と Excel は押したあとに選ぶ
+- 起きた事実：上の段に 印刷・PDF保存・Excel保存・PDFでメール・Excelでメール・見積もり作成・設定 の7つが並んでいた。
+- 対処：`main.jsx` の `ActionMenu`（「💾 保存」「✉ メール」を押すと「📄 PDFで…」「📗 Excelで…」の一覧。外を押す・Esc で閉じる。画面の右の端では右にそろえる）。
+  一覧の項目は押したその場で保存・メールを始める（メールのソフトを開くのは押した操作の続きでないと止められることがあるため）。
+  「見積もり・申請書アプリ」はポータルのタイル「申請書・見積書作成」＝住宅改修（リポジトリ `-` のブランチ claude/sasaoka-shikiri-app）。ブラウザのタブの名前もこれ。
+- 今後：e2e は `pick(page, '保存', '📗 Excelで保存')`（`test/e2e-xlsx.mjs`）。`getByRole('button', {name: 'Excel保存'})` はもう当たらない。
+
+### 46. 添付つきの .eml は Edge が「デバイスに問題を起こす可能性があります」と止める → パソコンは「保存＋mailto:」
+- 起きた事実：第42項の .eml（X-Unsent: 1）を「Excelでメール」で保存すると、Edge のダウンロードの一覧で警告になり、保存・保持を押さないと残らず、メールにそのまま飛ばなかった。
+- 原因：Chromium の download_file_types.asciipb で eml（と msg・mht）は Windows で `ALLOW_ON_USER_GESTURE`（押した操作から始まり、かつ前の日より前にそのサイトを開いたことがあるときだけ警告しない）。
+  Excel は押したその場で保存していたので、押した操作の続きでも警告が出た（Edge は条件がちがうか、履歴を消している）。ブラウザの側からは止められない。
+- 対処：`src/lib/mailDraft.mjs` の `sendMailDraft`：パソコンは添付の PDF・Excel を保存（PDF保存・Excel保存と同じ名前）して、すぐ `mailto:`（宛先・CC・件名・本文。改行は %0D%0A）を開く。
+  Thunderbird（mailto の既定のアプリ）が新しいメールを開くので、保存したファイルをダウンロードの一覧からドラッグして付けてもらう（mailto: はファイルを付けられない）。
+  Chromium は Windows でほかのアプリに渡す URL を 2048 字（platform_util_win.cc の kMaxUrlLength）までにしていて、長いと何も開かない → `MAILTO_MAX = 2000`、
+  `mailtoFits` で収まらないときは商品の行を減らして「ほか○点（添付をご覧ください）」。スマホ・タブレットは今までどおり共有メニュー（添付まで入る）。
+- 今後：ブラウザのテストでは `HTMLAnchorElement.prototype.click` を差し替えて mailto: を覚える（`catchMailto`。本物の headless の Chromium は mailto: を「failed」にするだけで、保存は消えない）。
+  添付まで自動で入れたいと言われたら、会社のパソコンの Edge のポリシー（ExemptDomainFileTypePairsFromFileTypeDownloadWarnings で eml とこのサイト）で警告を止めて .eml に戻す方法がある（管理者の作業）。
+
+### 47. 緑の色合いは「見出しの段・ボタン・枠」だけ。帳票の色は変えない（PDF は1ドットも変わらない）
+- 起きた事実：見出しの段・ボタンの指定が `styles.css` に4世代あった（1世代目の青いグラデーション、760px・640px の上書き、2026-07-30 の水色の reference-style、
+  `.integratedShell .brand h1{font-size:0}` と `::after` の字・`.app .brand h1::after{content:none}`、`index.html` の load で字を書きかえるスクリプト）。重なった結果、題名（h1）は字の大きさ 0 で見えず、「発」だけが出ていた。
+- 対処：古い世代を消して「2026-10-28 申請書・見積書作成と同じ緑」の1か所にした（既知の落とし穴1）。手本は住宅改修の `App.tsx` の THEME.estimate（見出しの段 #14532d・地 #f2f6f4）と
+  `ui.tsx` の Btn（印刷＝softSky #f0f9ff/#7dd3fc/#075985、保存＝softBlue、Excel＝softGreen、新規・追加・入れる＝emerald、ほか・削除は白）。介援隊／ウェルファン版・ページの切り替えは様邸のタブの形。
+  見積書の窓の上の段（`simpleEstimateHtmlReference` の `.toolbar`）も同じ色。`.orderEntrySheet *{color:#030b14!important}` があるので、受注簿の中の白い字は `.orderEntrySheet …{color:#fff!important}` で戻す。
+  受注簿・集計・見積書の紙の色（水色の見出し・上の線 `--reference-cyan`＝orderXlsx.mjs の ACCENT）は変えない（申請書・見積書作成も帳票は帳票の色）。
+- 確かめ：受注簿の PDF（3ページ）と見積書の PDF を前（docs/）と後で 1440px・820px で作り、pdftoppm の画像が全部同じ。`test/top-bar.test.mjs`（5つ・一覧・メールの確かめなし・指定が1か所・帳票の色）は直す前のコードで4件落ちる。
+- 今後：画面の色を変えるときは、帳票の要素に効く指定（@media のない `.orderEntrySheet` などは印刷・PDF にも効く）に触れていないか、PDF を前後で作って比べる。
+
+### 48. メールは入力がそろっていなくても作る／売上伝票発行依頼書の「Failed to fetch dynamically imported module」
+- メール：`mailWith` から `validateMultiCosts` を外した（仕切り未入力でも作る）。印刷・PDF保存・Excel保存は今までどおり確かめる（e2e の 5)）。売上伝票発行依頼書も `createMail` の確かめを外した。
+- 売上伝票発行依頼書（taiyo-uriage-denpyo）：画面に「Failed to fetch dynamically imported module: …/assets/pdf-export-r8kS9Zfs.js」。PDF・メールの部品を押したときに `import()` で読んでいて、
+  その部品（jspdf のファイルも index のファイル名を中に持つ）の名前は公開し直すたびに変わり、古いファイルは docs/ から消すので、前の版のまま開いていたタブでは読めなかった。
+  → `pdf-export.js`（html2canvas・jsPDF）と `mailDraft.js` を最初から読み込む形にした（index の JS は 190kB → 758kB）。このリポジトリ（受注簿）は前から全部最初に読む形。
+- 売上伝票発行依頼書の上の段は 印刷・保存（PDF）・メール（PDF）・設定（マスタ設定）。共有リンク・空白の状態に戻すは右の「🖨 印刷」の下に移した。
