@@ -2867,30 +2867,39 @@ main .integratedTabs {
   align-self: start;
 }
 
+/* 2026-10-29 集計（2枚目）を受注簿（1枚目）と同じ書式に（ユーザーの指示「販売受注簿の2枚目だけ、書式が少し違います。1枚目と統一してください」）。
+   前の集計は、本文が明朝体・見出しが太いゴシック・水色の細い線（2026-07-13 の multi-product-order-summary）で、受注簿（ゴシック）と違っていた。
+   受注簿と同じ書体（本文の字）・題名・見出しの色・線にする。題名と字の大きさは .orderEntrySheet h2 などの受注簿の指定がそのまま効く。
+   受注簿の見出しの色は販売と給付で違う（給付は水色）ので、商品がすべて給付なら給付の色（.summaryBenefit。main.jsx の MultiSummaryPage）。
+   印刷・PDF の色は下の @media print。Excel は src/lib/orderXlsx.mjs の集計（受注簿のページと同じ色・字）。 */
 .multiSummarySheet {
+  --sum-cell-bg: #f4f6f7;
+  --sum-label-bg: #fafafa;
+  --sum-label-ink: #08375d;
+  --sum-head-bg: #eaf8fc;
+  --sum-head-ink: #1b506a;
+  --sum-grid-frame: #718291;
+  --sum-frame: #333;
+  --sum-line: #333;
   margin-top: 16px;
-  padding: 14px 16px 18px;
-  border: 0.3mm solid #b9d7f0;
-  background: #fff;
-  font-family: "BIZ UDPMincho", "BIZ UD明朝", "Yu Mincho", "游明朝", "MS Mincho", serif;
-  color: #29394c;
+  padding: 9px;
+  font-family: inherit;
 }
 
-.multiSummarySheet h2 {
-  margin: 0 0 10px;
-  border-bottom: 0.55mm solid #3b82d6;
-  padding: 0 0 6px;
-  color: #153f82;
-  font-family: "BIZ UDPMincho", "BIZ UD明朝", "Yu Mincho", "游明朝", "MS Mincho", serif;
-  font-size: 16px;
-  font-weight: 900;
-  letter-spacing: .12em;
+.multiSummarySheet.summaryBenefit {
+  --sum-cell-bg: #e5f4ff;
+  --sum-label-bg: #e5f4ff;
+  --sum-label-ink: #0b568f;
+  --sum-head-bg: #e5f4ff;
+  --sum-head-ink: #0b568f;
+  --sum-grid-frame: #8fbfe2;
+  --sum-frame: #8fbfe2;
 }
 
 .multiSummaryHead {
   display: grid;
   grid-template-columns: 1.4fr .8fr .8fr;
-  border: 0.3mm solid #c1d9ef;
+  border: 1px solid var(--sum-grid-frame);
   margin: 10px 0;
 }
 
@@ -2898,7 +2907,7 @@ main .integratedTabs {
   display: grid;
   grid-template-columns: 90px 1fr;
   min-height: 40px;
-  border-right: 0.3mm solid #c1d9ef;
+  border-right: 1px solid var(--sum-line);
   align-items: center;
 }
 
@@ -2906,19 +2915,22 @@ main .integratedTabs {
   border-right: 0;
 }
 
-.multiSummaryHead b {
+.multiSummarySheet .multiSummaryHead b {
   height: 100%;
   display: grid;
   place-items: center;
-  background: #dcecff;
-  color: #153f82;
-  border-right: 0.3mm solid #c1d9ef;
+  border-right: 1px solid var(--sum-line);
+  background: var(--sum-cell-bg);
+  color: var(--sum-label-ink) !important;
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .multiSummaryHead span {
-  padding: 6px 10px;
+  padding: 3px 5px;
   text-align: center;
-  color: #29394c;
+  font-size: 12.5px;
+  font-weight: 700;
 }
 
 .multiSummaryTable {
@@ -2940,21 +2952,29 @@ main .integratedTabs {
 .multiSummaryTable col.colGrand,
 .multiSummaryTable col.colCost { width: 8%; }
 
+/* 明細の表は受注簿の「申込番号・WEBコード…」の表（.entryProductTable）と同じ */
 .multiSummaryTable th,
 .multiSummaryTable td {
-  border: 0.3mm solid #c1d9ef;
-  padding: 7px 6px;
+  padding: 3px 5px;
   text-align: center;
   vertical-align: middle;
-  color: #29394c;
-  font-size: 9.5pt;
+  line-height: 1.15;
 }
 
-.multiSummaryTable th {
-  background: #dcecff;
-  color: #153f82;
-  font-family: "BIZ UDPゴシック", "Yu Gothic", Meiryo, sans-serif;
-  font-weight: 800;
+.multiSummarySheet .multiSummaryTable th {
+  border: 1px solid #bcdbe7;
+  background: var(--sum-head-bg);
+  color: var(--sum-head-ink) !important;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+.multiSummaryTable td {
+  height: 34px;
+  border: 1px solid #c8e0e9;
+  font-size: 12.3px;
+  font-weight: 700;
 }
 
 .multiSummaryTable .textLeft {
@@ -2962,85 +2982,122 @@ main .integratedTabs {
   line-height: 1.32;
   word-break: break-word;
   overflow-wrap: anywhere;
-  font-size: 9.3pt;
-  font-weight: 700;
 }
 
-.multiSummaryTable tfoot th {
-  background: #eaf4ff;
-  font-weight: 900;
-}
-
+/* 合計の表は受注簿の「管理情報」の表（.management）と同じ */
 .multiSummaryManagement {
   width: 100%;
   margin-top: 12px;
   border-collapse: collapse;
-  font-family: "BIZ UDPMincho", "BIZ UD明朝", "Yu Mincho", "游明朝", "MS Mincho", serif;
+  border: 1px solid var(--sum-frame);
 }
 
 .multiSummaryManagement th,
 .multiSummaryManagement td {
-  border: 0.3mm solid #c1d9ef;
-  padding: 7px 10px;
-  text-align: right;
-  color: #29394c;
-  font-size: 10pt;
-}
-
-.multiSummaryManagement th {
-  width: 26%;
-  background: #eff7ff;
-  color: #153f82;
-  font-family: "BIZ UDPゴシック", "Yu Gothic", Meiryo, sans-serif;
-  font-weight: 800;
-  text-align: left;
-}
-
-.multiManagement {
-  margin-top: 12px;
-  border: 1px solid var(--line);
-}
-
-.multiManagement h3 {
-  margin: 0;
-  padding: 7px;
+  height: 27px;
+  padding: 3px 5px;
+  border: 1px solid var(--sum-line);
   text-align: center;
-  background: #f2f6f9;
-  border-bottom: 1px solid var(--line);
-  color: var(--blue-900);
+  font-size: 12px;
+  line-height: 1.08;
 }
 
-.multiManagement dl {
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.multiSummarySheet .multiSummaryManagement th {
+  width: 26%;
+  background: var(--sum-label-bg);
+  color: var(--sum-label-ink) !important;
+  font-weight: 900;
 }
 
-.multiManagement dl > div {
-  display: grid;
-  grid-template-columns: 44% 56%;
-  min-height: 38px;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-
-.multiManagement dt,
-.multiManagement dd {
-  margin: 0;
-  display: grid;
-  place-items: center;
-  padding: 6px;
-}
-
-.multiManagement dt {
-  background: #f7fafc;
-  color: var(--blue-900);
+.multiSummaryManagement td {
   font-weight: 700;
-  border-right: 1px solid var(--line);
 }
 
-.multiManagement dd {
-  font-weight: 800;
+/* スマホの幅：顧客名・商品数・日付は1つずつの段に、明細の表は横に動かして見る（前は顧客名が1文字ずつ縦に並び、金額の数字が重なっていた） */
+.multiSummaryScroll {
+  overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+  .multiSummaryHead {
+    grid-template-columns: 1fr;
+  }
+
+  .multiSummaryHead > div {
+    border-right: 0;
+    border-bottom: 1px solid var(--sum-line);
+  }
+
+  .multiSummaryHead > div:last-child {
+    border-bottom: 0;
+  }
+
+  /* 金額は「26,400円」が1行に入る幅。商品名は細めにして、横に動かさずに見える所を増やす */
+  .multiSummaryTable {
+    min-width: 640px;
+  }
+
+  .multiSummaryTable col.colProductName { width: 27%; }
+  .multiSummaryTable col.colCatalog,
+  .multiSummaryTable col.colWeb,
+  .multiSummaryTable col.colModel,
+  .multiSummaryTable col.colColorSize { width: 7%; }
+  .multiSummaryTable col.colQty { width: 5%; }
+  .multiSummaryTable col.colShipping,
+  .multiSummaryTable col.colSale,
+  .multiSummaryTable col.colGrand,
+  .multiSummaryTable col.colCost { width: 10%; }
+}
+
+@media print {
+  /* 印刷・PDF は画面の幅によらずパソコンと同じ並び（PDF はスマホでもこの指定を当ててから取り込む） */
+  .multiSummaryHead {
+    grid-template-columns: 1.4fr .8fr .8fr !important;
+  }
+
+  .multiSummaryHead > div {
+    border-right: 1px solid var(--sum-line) !important;
+    border-bottom: 0 !important;
+  }
+
+  .multiSummaryHead > div:last-child {
+    border-right: 0 !important;
+  }
+
+  .multiSummaryTable {
+    min-width: 0 !important;
+  }
+
+  .multiSummaryTable col.colProductName { width: 38% !important; }
+  .multiSummaryTable col.colCatalog,
+  .multiSummaryTable col.colWeb,
+  .multiSummaryTable col.colModel,
+  .multiSummaryTable col.colColorSize { width: 6.5% !important; }
+  .multiSummaryTable col.colQty { width: 4% !important; }
+  .multiSummaryTable col.colShipping,
+  .multiSummaryTable col.colSale,
+  .multiSummaryTable col.colGrand,
+  .multiSummaryTable col.colCost { width: 8% !important; }
+
+  .multiSummaryScroll {
+    overflow: visible !important;
+  }
+
+  /* 受注簿の印刷と同じ：見出しは薄い水色、線は灰色（給付は見出しの水色と外の枠の色をそのまま） */
+  .multiSummarySheet {
+    --sum-cell-bg: #eaf4ff;
+    --sum-label-bg: #eaf4ff;
+    --sum-grid-frame: #6b7f8f;
+    --sum-frame: #6b7f8f;
+    --sum-line: #6b7f8f;
+  }
+
+  .multiSummarySheet.summaryBenefit {
+    --sum-cell-bg: #e5f4ff;
+    --sum-label-bg: #e5f4ff;
+    --sum-grid-frame: #8fbfe2;
+    --sum-frame: #8fbfe2;
+  }
 }
 
 .multiCostError {

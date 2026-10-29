@@ -4,7 +4,7 @@
 // 商品が2つ以上のときは「集計」のシート（受注簿【販売】集計）も。貼り付けた画像も同じ枠に入れる。
 // 金額は受注簿で手で直せる欄が多いので、受注簿の値をそのまま書く（集計の合計だけ、明細の和と同じときは式）。
 
-import {createXlsxBook, gridOf, imageToJpeg, XL_GOTHIC, XL_MINCHO, XL_PT_MM, XL_YUGOTHIC, xlRange, xlRef} from './xlsxBook.mjs';
+import {createXlsxBook, gridOf, imageToJpeg, XL_PT_MM, XL_YUGOTHIC, xlRange, xlRef} from './xlsxBook.mjs';
 
 // 印刷の色（styles.css の印刷の受注簿。太字は使わない＝デザイン方針）
 const INK = '06111F';
@@ -227,13 +227,10 @@ export function buildOrderXlsx(pages, summary, title = '販売受注簿') {
   ws.page.rowBreaks = breaks;
   ws.page.printArea = [0, 0, r - 1, last];
 
-  // 集計（商品が2つ以上のとき）。A4 横・1ページに収める。印刷と同じく本文は BIZ UDP明朝、見出しは BIZ UDPゴシック
+  // 集計（商品が2つ以上のとき）。A4 横・1ページに収める。受注簿のページと同じ字（游ゴシック）・見出しの色・線
+  // （ユーザーの指示「販売受注簿の2枚目だけ、書式が少し違います。1枚目と統一してください」2026-10-29。前は明朝体と水色の細い線）
   if (summary) {
     const ss = book.addSheet('集計', {orientation: 'landscape', margins: {l: 6, r: 6, t: 6, b: 6, h: 3, f: 3}, fitWidth: 1, fitHeight: 1});
-    const ink = '030B14';
-    const mfont = (sz, color = ink) => ({name: XL_MINCHO, sz, color});
-    const gfont = (sz, color = ink) => ({name: XL_GOTHIC, sz, color});
-    const thin = {l: 'thin:C1D9EF', r: 'thin:C1D9EF', t: 'thin:C1D9EF', b: 'thin:C1D9EF'};
     // 列は表の列（印刷で測った mm。幅 344.5mm）。上の段・下の管理の表の区切りも同じ列に入れる
     const colMm = [130.8, 22.4, 22.4, 22.4, 22.4, 13.8, 27.5, 27.5, 27.5, 27.5];
     const g = gridOf([0, ...colMm.map((_, i) => colMm.slice(0, i + 1).reduce((a, b) => a + b, 0)), 23.8, 160.5, 160.7, 184.5, 252.4, 276.2, 89.5, 172.1, 261.6]);
@@ -242,7 +239,7 @@ export function buildOrderXlsx(pages, summary, title = '販売受注簿') {
     const n = g.cuts.length - 2;
     let q = 0;
     ss.height(q, pt(9));
-    ss.box(q, 0, q, n, summary.title, {font: mfont(12, '1D3448'), align: {h: 'center', v: 'center'}, border: {t: ACCENT, b: 'thin:1D3448'}});
+    ss.box(q, 0, q, n, summary.title, {font: font(px(18), '1D3448'), align: {h: 'center', v: 'center'}, border: {t: ACCENT}});
     q++;
     ss.height(q++, pt(2.6));
     // 顧客名・商品数・日付
@@ -255,14 +252,14 @@ export function buildOrderXlsx(pages, summary, title = '販売受注簿') {
     summary.head.forEach(([name, v], i) => {
       const e = headAt[i];
       if (!e) return;
-      ss.box(q, at(e[0]), q, at(e[1]) - 1, name, {font: mfont(8), fill: 'DCECFF', align: {h: 'center', v: 'center', shrink: true}, border: thin});
-      ss.box(q, at(e[1]), q, at(e[2]) - 1, v, {font: mfont(8), align: {h: 'center', v: 'center', shrink: true}, border: thin});
+      ss.box(q, at(e[0]), q, at(e[1]) - 1, name, {...label, font: font(px(12), LABEL_INK)});
+      ss.box(q, at(e[1]), q, at(e[2]) - 1, v, value(px(12.5)));
     });
     q++;
     ss.height(q++, pt(2.7));
     if (summary.error) {
       ss.height(q, 16);
-      ss.box(q, 0, q, n, summary.error, {font: gfont(9, 'B42318'), align: {h: 'left', v: 'center', shrink: true}});
+      ss.box(q, 0, q, n, summary.error, {font: font(px(12.5)), align: {h: 'left', v: 'center', shrink: true}});
       q++;
     }
     // 明細の表
@@ -272,7 +269,7 @@ export function buildOrderXlsx(pages, summary, title = '販売受注簿') {
     summary.cols.forEach((h, i) => {
       if (i >= colMm.length) return;
       const [a, b] = colAt(i);
-      ss.box(q, a, q, b, h, {font: gfont(9.5), fill: 'DCECFF', align: {h: 'center', v: 'center', wrap: true}, border: thin});
+      ss.box(q, a, q, b, h, {font: font(px(12), HEAD_INK), fill: HEAD_BG, align: {h: 'center', v: 'center', wrap: true}, border: SOFT_ALL});
     });
     q++;
     const first = q;
@@ -282,7 +279,7 @@ export function buildOrderXlsx(pages, summary, title = '販売受注簿') {
         if (i >= colMm.length) return;
         const [a, b] = colAt(i);
         const m = money(v);
-        ss.box(q, a, q, b, m, {font: mfont(i === 0 ? 9.3 : 9.5), align: {h: i === 0 ? 'left' : 'center', v: 'center', shrink: true, indent: i === 0 ? 1 : 0}, border: thin, ...(typeof m === 'number' ? {fmt: YEN} : {})});
+        ss.box(q, a, q, b, m, {font: font(px(12.3)), align: {h: i === 0 ? 'left' : 'center', v: 'center', shrink: true, indent: i === 0 ? 1 : 0}, border: SOFT_ALL, ...(typeof m === 'number' ? {fmt: YEN} : {})});
       });
       q++;
     }
@@ -323,10 +320,7 @@ export function buildOrderXlsx(pages, summary, title = '販売受注簿') {
         }
         const isNum = typeof shown === 'number';
         ss.box(q, at(e[0]), q, at(e[1]) - 1, cell, {
-          font: i % 2 === 0 ? gfont(10) : mfont(10),
-          ...(i % 2 === 0 ? {fill: 'EFF7FF'} : {}),
-          align: {h: 'center', v: 'center', shrink: true},
-          border: thin,
+          ...(i % 2 === 0 ? {...label, font: font(px(12), LABEL_INK)} : value(px(12))),
           ...(isNum ? {fmt: YEN} : {}),
         });
       });
