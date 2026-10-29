@@ -6,16 +6,21 @@
 
 import {createXlsxBook, gridOf, imageToJpeg, XL_PT_MM, XL_YUGOTHIC, xlRange, xlRef} from './xlsxBook.mjs';
 
-// 印刷の色（styles.css の印刷の受注簿。太字は使わない＝デザイン方針）
+// 印刷の色（styles.css の印刷の受注簿。太字は使わない＝デザイン方針）。2026-10-29 に水色から緑に（ユーザーの指示「販売受注簿も緑ベースで、
+// 申請書などと同じような色合いにする」。styles.css の「2026-10-28 申請書・見積書作成と同じ緑」の説明と同じ値）
 const INK = '06111F';
-const LABEL_INK = '08375D';
-const LABEL_BG = 'EAF4FF';
-const HEAD_INK = '1B506A';
-const HEAD_BG = 'EAF8FC';
-const INPUT_BG = 'FBFEFF';
-const LINE = 'thin:8FA3B3';
-const SOFT = 'thin:BCDBE7';
-const ACCENT = 'thick:15A8DF';
+const LABEL_INK = '14532D';
+const LABEL_BG = 'EBF6EE';
+const HEAD_INK = '14532D';
+const HEAD_BG = 'EBF7EF';
+const INPUT_BG = 'FBFEFC';
+const LINE = 'thin:8EA898';
+const SOFT = 'thin:BEDCC8';
+const ACCENT = 'thick:15803D';
+const TITLE_INK = '14532D';
+const BENEFIT_INK = '166534';
+const BENEFIT_BG = 'E2F3E7';
+const MGMT_HEAD_BG = 'EDF8F0';
 const ALL = {l: LINE, r: LINE, t: LINE, b: LINE};
 const SOFT_ALL = {l: SOFT, r: SOFT, t: SOFT, b: SOFT};
 const YEN = '#,##0"円"';
@@ -139,7 +144,7 @@ export function buildOrderXlsx(pages, summary, title = '販売受注簿') {
 
   pages.forEach((p, k) => {
     ws.height(r, pt(9.5));
-    ws.box(r, 0, r, last, p.title, {font: font(px(18), '1D3448'), align: {h: 'center', v: 'center'}, border: {t: ACCENT}});
+    ws.box(r, 0, r, last, p.title, {font: font(px(18), TITLE_INK), align: {h: 'center', v: 'center'}, border: {t: ACCENT}});
     r++;
     gap(2.1);
     gridRow(p.primary, p.benefit && p.primary.length >= E.primaryBenefit.length - 1 ? E.primaryBenefit : E.primary, 6.6);
@@ -186,7 +191,7 @@ export function buildOrderXlsx(pages, summary, title = '販売受注簿') {
     const top = r;
     const [m1, m2] = span(0, E.mgmt[4]);
     ws.height(r, pt(4.8));
-    ws.box(r, m1, r, m2, '管理情報', {font: font(px(11.33), HEAD_INK), fill: 'EEF9FD', align: {h: 'center', v: 'center'}, border: ALL});
+    ws.box(r, m1, r, m2, '管理情報', {font: font(px(11.33), HEAD_INK), fill: MGMT_HEAD_BG, align: {h: 'center', v: 'center'}, border: ALL});
     r++;
     const pairs = (list, edges, rowMm, labelSt, valueSt) => {
       for (let i = 0; i < list.length; i += 2) {
@@ -203,7 +208,7 @@ export function buildOrderXlsx(pages, summary, title = '販売受注簿') {
       }
     };
     pairs(p.mgmt, E.mgmt, 8.6, {...label, font: font(px(12), LABEL_INK)}, {st: value(px(12), {fill: INPUT_BG})});
-    if (p.benefitRows.length) pairs(p.benefitRows, E.benefit, 6.1, {...label, font: font(px(10.67), '0B568F'), fill: 'E5F4FF'}, {yen: true, st: value(px(10.67), {font: font(px(10.67), '07111F')})});
+    if (p.benefitRows.length) pairs(p.benefitRows, E.benefit, 6.1, {...label, font: font(px(10.67), BENEFIT_INK), fill: BENEFIT_BG}, {yen: true, st: value(px(10.67), {font: font(px(10.67), '07111F')})});
     const [i1, i2] = span(E.image[0], W);
     const box = {font: font(px(13)), fill: 'FAFAFA', align: {h: 'center', v: 'center'}, border: {l: 'thin:333333', r: 'thin:333333', t: 'thin:333333', b: 'thin:333333'}};
     if (p.image) {
@@ -239,7 +244,7 @@ export function buildOrderXlsx(pages, summary, title = '販売受注簿') {
     const n = g.cuts.length - 2;
     let q = 0;
     ss.height(q, pt(9));
-    ss.box(q, 0, q, n, summary.title, {font: font(px(18), '1D3448'), align: {h: 'center', v: 'center'}, border: {t: ACCENT}});
+    ss.box(q, 0, q, n, summary.title, {font: font(px(18), TITLE_INK), align: {h: 'center', v: 'center'}, border: {t: ACCENT}});
     q++;
     ss.height(q++, pt(2.6));
     // 顧客名・商品数・日付

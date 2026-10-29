@@ -35,8 +35,9 @@ test("画面・印刷・PDF：集計に明朝体を使わない。集計の書�
   assert.doesNotMatch(css, /\.multiManagement/);
   const block = css.slice(css.indexOf("\n.multiSummarySheet {"), css.indexOf("\n.multiCostError {"));
   assert.match(block, /font-family: inherit/);
-  // 受注簿と同じ見出しの色と線（販売：#08375d・#1b506a、給付：#0b568f・#e5f4ff、明細の表：#bcdbe7・#c8e0e9）。太い明朝の見出しの色（#dcecff・#153f82）は使わない
-  for (const v of ["#08375d", "#1b506a", "#eaf8fc", "#0b568f", "#e5f4ff", "#bcdbe7", "#c8e0e9", "#6b7f8f"]) assert.ok(block.includes(v), v);
+  // 受注簿と同じ見出しの色と線（2026-10-29 から緑。販売：#14532d・#ebf7ef、給付：#166534・#e2f3e7、明細の表：#bedcc8・#c8e2d1、印刷の線 #687f70）。
+  // 太い明朝の見出しの色（#dcecff・#153f82）は使わない
+  for (const v of ["#14532d", "#ebf7ef", "#166534", "#e2f3e7", "#bedcc8", "#c8e2d1", "#687f70"]) assert.ok(block.includes(v), v);
   for (const v of ["#dcecff", "#153f82", "#c1d9ef"]) assert.ok(!block.includes(v), v);
 });
 
@@ -64,9 +65,9 @@ test("Excel：集計のシートも受注簿のページと同じ字（游ゴシ
   const fonts = [...styles.matchAll(/<font>[\s\S]*?<\/font>/g)].map(([f]) => f.match(/<name val="([^"]*)"/)?.[1]).slice(1);
   assert.ok(fonts.length > 1);
   assert.deepEqual([...new Set(fonts)], ["游ゴシック"]);
-  // 受注簿のページの見出しの地（EAF4FF）・明細の表の見出しの地（EAF8FC）。前の集計の DCECFF・EFF7FF は使わない
-  assert.match(styles, /EAF4FF/);
-  assert.match(styles, /EAF8FC/);
-  assert.doesNotMatch(styles, /DCECFF|EFF7FF|C1D9EF/);
+  // 受注簿のページの見出しの地（EBF6EE）・明細の表の見出しの地（EBF7EF）。2026-10-29 から緑（前の水色の EAF4FF・EAF8FC、前の集計の DCECFF・EFF7FF は使わない）
+  assert.match(styles, /EBF6EE/);
+  assert.match(styles, /EBF7EF/);
+  assert.doesNotMatch(styles, /DCECFF|EFF7FF|C1D9EF|EAF4FF|EAF8FC|15A8DF/);
   assert.ok(files["xl/sharedStrings.xml"].includes("受 注 簿 【 販 売 】 集 計"));
 });

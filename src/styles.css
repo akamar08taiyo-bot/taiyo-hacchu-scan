@@ -496,9 +496,9 @@ button:hover {
 .orderEntrySheet {
   margin: 4px;
   padding: 9px;
-  background: linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfefc 100%);
   border: 1px solid #aebbc6;
-  border-top: 5px solid #1769aa;
+  border-top: 5px solid #15803d;
   border-radius: 10px;
   color: #111827;
   /* 親ペインが約780pxしかない画面幅で 820px を要求すると右端が見切れる。
@@ -619,8 +619,8 @@ button:hover {
 .entryGrid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  border-top: 1px solid #718291;
-  border-left: 1px solid #718291;
+  border-top: 1px solid #6e8577;
+  border-left: 1px solid #6e8577;
   align-items: stretch;
   background: #ffffff;
 }
@@ -957,7 +957,7 @@ button:hover {
 .productNameBlock {
   display: grid;
   grid-template-columns: 76px 1fr;
-  border: 1px solid #718291;
+  border: 1px solid #6e8577;
   border-bottom: 0;
   margin-top: 9px;
   min-height: 42px;
@@ -967,9 +967,9 @@ button:hover {
 .productNameBlock b {
   display: grid;
   place-items: center;
-  background: #eaf4ff;
-  border-right: 1px solid #718291;
-  color: #0d3f73;
+  background: #ebf6ee;
+  border-right: 1px solid #6e8577;
+  color: #14532d;
   font-size: 13px;
 }
 
@@ -988,29 +988,29 @@ button:hover {
   width: calc(100% - 16px);
   min-height: 30px;
   margin: 4px 8px;
-  border: 1px solid #9db8d2;
+  border: 1px solid #9cc4aa;
   border-radius: 5px;
   padding: 5px 7px;
   background: #fff;
-  color: #122b45;
+  color: #12301f;
   font-size: 13px;
   font-weight: 600;
 }
 
 .productNameBlock .manualProductMetaInput:focus,
 .compactProductTable .manualAmountInput:focus {
-  border-color: #1769aa;
-  outline: 3px solid rgba(23, 105, 170, .16);
-  background: #f8fcff;
+  border-color: #15803d;
+  outline: 3px solid rgba(21, 128, 61, .16);
+  background: #f7fdf9;
 }
 
 .compactProductTable .manualAmountInput {
-  border-color: #9db8d2;
+  border-color: #9cc4aa;
   background: #fff;
 }
 
 .productPriceNoteLabel {
-  border-top: 1px solid #718291;
+  border-top: 1px solid #6e8577;
 }
 
 .productPriceNote {
@@ -1019,7 +1019,7 @@ button:hover {
   align-items: center;
   flex-wrap: nowrap;
   min-height: 30px;
-  border-top: 1px solid #718291;
+  border-top: 1px solid #6e8577;
   padding: 4px 8px;
   font-size: 13px;
   line-height: 1.2;
@@ -1028,7 +1028,7 @@ button:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   color: #25384d;
-  background: #fbfdff;
+  background: #fbfefc;
 }
 
 .productPriceNote .manualProductPriceInput {
@@ -1036,19 +1036,19 @@ button:hover {
   min-height: 27px;
   margin: 0 4px;
   padding: 4px 7px;
-  border: 1px solid #9db8d2;
+  border: 1px solid #9cc4aa;
   border-radius: 5px;
   background: #ffffff;
-  color: #122b45;
+  color: #12301f;
   font-size: 13px;
   font-weight: 700;
   text-align: right;
 }
 
 .productPriceNote .manualProductPriceInput:focus {
-  border-color: #1769aa;
-  outline: 3px solid rgba(23, 105, 170, .16);
-  background: #f8fcff;
+  border-color: #15803d;
+  outline: 3px solid rgba(21, 128, 61, .16);
+  background: #f7fdf9;
 }
 
 @media (max-width: 980px) {
@@ -1066,7 +1066,7 @@ button:hover {
 
 .entryProductTable th,
 .entryProductTable td {
-  border: 1px solid #718291;
+  border: 1px solid #6e8577;
   padding: 2px 4px;
   font-size: 12.5px;
   line-height: 1.15;
@@ -1077,8 +1077,8 @@ button:hover {
 }
 
 .entryProductTable th {
-  background: #eaf4ff;
-  color: #0d3f73;
+  background: #ebf6ee;
+  color: #14532d;
   font-size: 12px;
   font-weight: 800;
 }
@@ -1233,7 +1233,7 @@ button:hover {
 }
 
 .orderAttachedImage {
-  border-color: #718291;
+  border-color: #6e8577;
   border-radius: 6px;
   min-height: 0;
   height: 100%;
@@ -2063,13 +2063,13 @@ button:hover {
 
 .management .managementTotalRow dt,
 .management .managementTotalRow dd {
-  background: #edf7ff;
+  background: #eef8f1;
   font-weight: 800;
 }
 
 .management dl > div:nth-child(5) dt,
 .management dl > div:nth-child(5) dd {
-  background: #edf7ff;
+  background: #eef8f1;
   font-weight: 800;
 }
 
@@ -2297,8 +2297,8 @@ button:hover {
     max-height: 202mm;
     display: block;
     aspect-ratio: auto;
-    border: 1px solid #6b7f8f;
-    border-top: 3px solid #1769aa;
+    border: 1px solid #687f70;
+    border-top: 3px solid #15803d;
     border-radius: 2mm;
     page-break-inside: avoid;
     break-inside: avoid;
@@ -2360,13 +2360,13 @@ button:hover {
   .productNameBlock {
     min-height: 10mm;
     grid-template-columns: 20mm 1fr;
-    border-color: #6b7f8f;
+    border-color: #687f70;
   }
 
   .productNameBlock b {
     font-size: 9.2pt;
-    background: #eaf4ff;
-    color: #0d3f73;
+    background: #ebf6ee;
+    color: #14532d;
   }
 
   .productNameBlock .printValue {
@@ -2385,8 +2385,8 @@ button:hover {
     line-height: 1.1;
     white-space: nowrap;
     flex-wrap: nowrap;
-    border-color: #6b7f8f;
-    background: #fbfdff;
+    border-color: #687f70;
+    background: #fbfefc;
     color: #111827;
     justify-content: flex-start;
   }
@@ -2417,7 +2417,7 @@ button:hover {
     font-size: 7.6pt;
     line-height: 1.08;
     padding: 0.6mm;
-    border-color: #6b7f8f;
+    border-color: #687f70;
     text-align: center !important;
     vertical-align: middle !important;
   }
@@ -2453,12 +2453,12 @@ button:hover {
   .entryGrid .sheetCell b,
   .management h3,
   .management dt {
-    background: #eaf4ff !important;
-    color: #0d3f73;
+    background: #ebf6ee !important;
+    color: #14532d;
   }
 
   .entryGrid {
-    border-color: #6b7f8f;
+    border-color: #687f70;
   }
 
   .entryGridPrimary {
@@ -2492,11 +2492,11 @@ button:hover {
   .management,
   .management div,
   .management dt {
-    border-color: #6b7f8f;
+    border-color: #687f70;
   }
 
   .orderEntrySheet h2 {
-    color: #0d4f8b;
+    color: #14532d;
     letter-spacing: 0.08em;
     margin: 1mm 0 2mm;
     font-size: 13.5pt;
@@ -2576,14 +2576,14 @@ button:hover {
 
   .management .managementTotalRow dt,
   .management .managementTotalRow dd {
-    background: #eef7ff !important;
+    background: #eef8f1 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
   .management dl > div:nth-child(5) dt,
   .management dl > div:nth-child(5) dd {
-    background: #eef7ff !important;
+    background: #eef8f1 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -2665,7 +2665,7 @@ button:hover {
 /* benefit-mode-blue-layout-2026-07-09 */
 .orderEntrySheet.benefitMode {
   border-top-color: #147fc1;
-  background: #fbfdff;
+  background: #fbfefc;
 }
 
 .orderEntrySheet.benefitMode .entryGridPrimary,
@@ -2675,7 +2675,7 @@ button:hover {
 .orderEntrySheet.benefitMode .entryProductTable,
 .orderEntrySheet.benefitMode .management,
 .orderEntrySheet.benefitMode .sheetImage {
-  border-color: #8fbfe2;
+  border-color: #8cc6a1;
 }
 
 .orderEntrySheet.benefitMode .entryGrid .sheetCell b,
@@ -2683,8 +2683,8 @@ button:hover {
 .orderEntrySheet.benefitMode .management h3,
 .orderEntrySheet.benefitMode .management dt,
 .orderEntrySheet.benefitMode .productNameBlock > b {
-  background: #e5f4ff !important;
-  color: #0b568f !important;
+  background: #e2f3e7 !important;
+  color: #166534 !important;
 }
 
 
@@ -2725,7 +2725,7 @@ main .integratedTabs {
 .entryProductTable th,
 .management h3,
 .management dt {
-  color: #08375d !important;
+  color: #14532d !important;
   font-weight: 900;
 }
 
@@ -2870,15 +2870,15 @@ main .integratedTabs {
 /* 2026-10-29 集計（2枚目）を受注簿（1枚目）と同じ書式に（ユーザーの指示「販売受注簿の2枚目だけ、書式が少し違います。1枚目と統一してください」）。
    前の集計は、本文が明朝体・見出しが太いゴシック・水色の細い線（2026-07-13 の multi-product-order-summary）で、受注簿（ゴシック）と違っていた。
    受注簿と同じ書体（本文の字）・題名・見出しの色・線にする。題名と字の大きさは .orderEntrySheet h2 などの受注簿の指定がそのまま効く。
-   受注簿の見出しの色は販売と給付で違う（給付は水色）ので、商品がすべて給付なら給付の色（.summaryBenefit。main.jsx の MultiSummaryPage）。
+   受注簿の見出しの色は販売と給付で違う（給付は少し濃い緑）ので、商品がすべて給付なら給付の色（.summaryBenefit。main.jsx の MultiSummaryPage）。
    印刷・PDF の色は下の @media print。Excel は src/lib/orderXlsx.mjs の集計（受注簿のページと同じ色・字）。 */
 .multiSummarySheet {
   --sum-cell-bg: #f4f6f7;
   --sum-label-bg: #fafafa;
-  --sum-label-ink: #08375d;
-  --sum-head-bg: #eaf8fc;
-  --sum-head-ink: #1b506a;
-  --sum-grid-frame: #718291;
+  --sum-label-ink: #14532d;
+  --sum-head-bg: #ebf7ef;
+  --sum-head-ink: #14532d;
+  --sum-grid-frame: #6e8577;
   --sum-frame: #333;
   --sum-line: #333;
   margin-top: 16px;
@@ -2887,13 +2887,13 @@ main .integratedTabs {
 }
 
 .multiSummarySheet.summaryBenefit {
-  --sum-cell-bg: #e5f4ff;
-  --sum-label-bg: #e5f4ff;
-  --sum-label-ink: #0b568f;
-  --sum-head-bg: #e5f4ff;
-  --sum-head-ink: #0b568f;
-  --sum-grid-frame: #8fbfe2;
-  --sum-frame: #8fbfe2;
+  --sum-cell-bg: #e2f3e7;
+  --sum-label-bg: #e2f3e7;
+  --sum-label-ink: #166534;
+  --sum-head-bg: #e2f3e7;
+  --sum-head-ink: #166534;
+  --sum-grid-frame: #8cc6a1;
+  --sum-frame: #8cc6a1;
 }
 
 .multiSummaryHead {
@@ -2962,7 +2962,7 @@ main .integratedTabs {
 }
 
 .multiSummarySheet .multiSummaryTable th {
-  border: 1px solid #bcdbe7;
+  border: 1px solid #bedcc8;
   background: var(--sum-head-bg);
   color: var(--sum-head-ink) !important;
   font-size: 12px;
@@ -2972,7 +2972,7 @@ main .integratedTabs {
 
 .multiSummaryTable td {
   height: 34px;
-  border: 1px solid #c8e0e9;
+  border: 1px solid #c8e2d1;
   font-size: 12.3px;
   font-weight: 700;
 }
@@ -3083,20 +3083,20 @@ main .integratedTabs {
     overflow: visible !important;
   }
 
-  /* 受注簿の印刷と同じ：見出しは薄い水色、線は灰色（給付は見出しの水色と外の枠の色をそのまま） */
+  /* 受注簿の印刷と同じ：見出しは薄い緑、線は灰色（給付は見出しの緑と外の枠の色をそのまま） */
   .multiSummarySheet {
-    --sum-cell-bg: #eaf4ff;
-    --sum-label-bg: #eaf4ff;
-    --sum-grid-frame: #6b7f8f;
-    --sum-frame: #6b7f8f;
-    --sum-line: #6b7f8f;
+    --sum-cell-bg: #ebf6ee;
+    --sum-label-bg: #ebf6ee;
+    --sum-grid-frame: #687f70;
+    --sum-frame: #687f70;
+    --sum-line: #687f70;
   }
 
   .multiSummarySheet.summaryBenefit {
-    --sum-cell-bg: #e5f4ff;
-    --sum-label-bg: #e5f4ff;
-    --sum-grid-frame: #8fbfe2;
-    --sum-frame: #8fbfe2;
+    --sum-cell-bg: #e2f3e7;
+    --sum-label-bg: #e2f3e7;
+    --sum-grid-frame: #8cc6a1;
+    --sum-frame: #8cc6a1;
   }
 }
 
@@ -3256,11 +3256,14 @@ body .integratedShell > .integratedTabs:first-of-type {
    src/sasaoka/App.tsx の THEME.estimate と components/ui.tsx の Btn）：見出しの段は濃い緑 #14532d・白い字、画面の地は #f2f6f4、
    ボタンは薄い地に濃い字・細い枠（印刷＝薄い水色 softSky、保存＝薄い青 softBlue、Excel＝薄い緑 softGreen、ほかは白）、枠は緑（emerald）。
    前の世代（2026-07-30 の水色の reference-style、それより前の青いグラデーションの .topbar・.actions・.catalogVersionTabs）は消して、ここ1つにした（既知の落とし穴1）。
-   受注簿・集計・見積書の帳票の色（印刷・PDF・Excel に出る水色の見出し・上の線）は変えない（申請書・見積書作成も、帳票は帳票の色のまま）。 */
+   2026-10-29 受注簿・集計の帳票も緑に（ユーザーの指示「販売受注簿も緑ベースで、申請書などと同じような色合いにする」）：見出しの地・字・線・上の線の
+   水色（#eaf4ff・#eaf8fc・#1b506a・#08375d・#15a8df など）を、同じ明るさの緑（#ebf6ee・#ebf7ef・#14532d・#15803d など）に置きかえた（前の指定のその場で。上に足さない）。
+   印刷・PDF も同じ色。Excel は src/lib/orderXlsx.mjs の色（INK のほか LABEL_BG・HEAD_BG・ACCENT など）を同じ値にしてある。
+   見積書（御見積書）の紙は水色のまま（特定福祉用具の販売見積書の水色とそろえている。main.jsx の見積書の HTML の中の色）。 */
 :root {
-  --reference-cyan: #15a8df; /* 受注簿の帳票の上の線（印刷・PDF・Excel の orderXlsx.mjs の ACCENT と同じ） */
-  --reference-navy: #1d3448;
-  --reference-line: #cfe1eb;
+  --reference-accent: #15803d; /* 受注簿の帳票の上の線（印刷・PDF・Excel の orderXlsx.mjs の ACCENT と同じ） */
+  --reference-navy: #14532d;
+  --reference-line: #cfe5d7;
   --app-green: #14532d;
   --app-bg: #f2f6f4;
 }
@@ -3505,6 +3508,12 @@ body,
   outline-color: #3b82f6;
 }
 
+/* 受注簿の丸・四角（受注区分・レンタル・支払い方法・入荷確認）は緑（ブラウザの決まりの青にしない） */
+.orderEntrySheet input[type="radio"],
+.orderEntrySheet input[type="checkbox"] {
+  accent-color: #15803d;
+}
+
 /* 受注簿の中の字はすべて濃い色（.orderEntrySheet * の !important）なので、選んでいるページ（濃い緑の地）の字だけ白に戻す */
 .orderEntrySheet .multiPageNav button.active {
   color: #ffffff !important;
@@ -3519,10 +3528,10 @@ body,
 /* ここから下は帳票（受注簿のシート）の色。印刷・PDF でも同じ指定が効くので、色を変えるときは orderXlsx.mjs の色も合わせる */
 .orderEntrySheet {
   border: 1px solid var(--reference-line) !important;
-  border-top: 5px solid var(--reference-cyan) !important;
+  border-top: 5px solid var(--reference-accent) !important;
   border-radius: 14px !important;
   background: #fff !important;
-  box-shadow: 0 14px 30px rgba(29, 87, 115, .1) !important;
+  box-shadow: 0 14px 30px rgba(20, 83, 45, .1) !important;
 }
 
 .orderEntrySheet input,
@@ -3530,9 +3539,9 @@ body,
 .orderEntrySheet textarea,
 .officeSelectBox select,
 .officeFieldGrid input {
-  border-color: #c8dfe9 !important;
+  border-color: #c8e2d1 !important;
   border-radius: 9px !important;
-  background: #fbfeff !important;
+  background: #fbfefc !important;
 }
 
 /* 打っている欄は申請書・見積書作成の入力欄と同じ青い枠（画面だけ） */
@@ -3545,19 +3554,19 @@ body,
 }
 
 .entryProductTable th {
-  background: #eaf8fc !important;
-  color: #1b506a !important;
-  border-color: #bcdbe7 !important;
+  background: #ebf7ef !important;
+  color: #14532d !important;
+  border-color: #bedcc8 !important;
 }
 
 .entryProductTable td {
-  border-color: #c8e0e9 !important;
+  border-color: #c8e2d1 !important;
 }
 
 .management h3 {
-  background: #eef9fd !important;
-  color: #1b506a !important;
-  border-color: #c8e0e9 !important;
+  background: #edf8f0 !important;
+  color: #14532d !important;
+  border-color: #c8e2d1 !important;
 }
 
 /* スマホ・タブレットの縦：見出しの段は折り返し、ボタンは字の幅で段いっぱいに広げる（字が2行に割れないように） */
@@ -3753,7 +3762,7 @@ body,
   grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
   margin: 0;
-  border-top: 2px solid #6f8191;
+  border-top: 2px solid #6e8577;
 }
 
 .orderEntrySheet.benefitMode .benefitBreakdown > div {
@@ -3778,8 +3787,8 @@ body,
 
 .orderEntrySheet.benefitMode .benefitBreakdown dt {
   border-right: 1px solid #333;
-  background: #e5f4ff;
-  color: #0b568f;
+  background: #e2f3e7;
+  color: #166534;
   font-weight: 800;
 }
 

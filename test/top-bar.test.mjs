@@ -64,8 +64,19 @@ test("色：見出しの段は申請書・見積書作成と同じ濃い緑、�
   assert.match(css, /\.actionMenuList button\.btnGreen \{\n  border-color: #6ee7b7;\n  background: #ecfdf5;\n  color: #065f46;/);
 });
 
-test("帳票（受注簿のシート）の色は変えない：印刷・PDF・Excel（orderXlsx.mjs の ACCENT）と同じ水色の上の線", () => {
-  assert.match(css, /--reference-cyan: #15a8df;/);
-  assert.match(css, /\.orderEntrySheet \{\n  border: 1px solid var\(--reference-line\) !important;\n  border-top: 5px solid var\(--reference-cyan\) !important;/);
-  assert.match(readFileSync(new URL("../src/lib/orderXlsx.mjs", import.meta.url), "utf8"), /const ACCENT = 'thick:15A8DF';/);
+// 2026-10-29 から帳票（受注簿のシート・集計）も緑（ユーザーの指示「販売受注簿も緑ベースで、申請書などと同じような色合いにする」）。
+// 前は「帳票の色は変えない」として水色のままにしていた（Learnings.md 第47・50項）
+test("帳票（受注簿のシート・集計）も緑：上の線は印刷・PDF・Excel（orderXlsx.mjs の ACCENT）と同じ緑。前の水色を残さない", () => {
+  assert.match(css, /--reference-accent: #15803d;/);
+  assert.match(css, /\.orderEntrySheet \{\n  border: 1px solid var\(--reference-line\) !important;\n  border-top: 5px solid var\(--reference-accent\) !important;/);
+  const xlsx = readFileSync(new URL("../src/lib/orderXlsx.mjs", import.meta.url), "utf8");
+  assert.match(xlsx, /const ACCENT = 'thick:15803D';/);
+  // 受注簿・集計に使っていた水色・青（見出しの地・字・線・上の線）。上の段の「保存」の薄い青（#eff6ff・#bfdbfe・#1e40af）は残す
+  const old = ["#15a8df", "#eaf4ff", "#eaf8fc", "#edf7ff", "#eef7ff", "#eef9fd", "#e5f4ff", "#bcdbe7", "#c8dfe9", "#c8e0e9", "#cfe1eb", "#9db8d2",
+    "#718291", "#6f8191", "#6b7f8f", "#8fbfe2", "#1b506a", "#08375d", "#0d3f73", "#0b568f", "#1d3448", "#122b45", "rgba(29, 87, 115"];
+  const rules = css.replace(/\/\*[\s\S]*?\*\//g, "").toLowerCase(); // 説明の中の前の色は除く
+  for (const v of old) assert.ok(!rules.includes(v), `styles.css に ${v}`);
+  for (const v of ["15A8DF", "EAF4FF", "EAF8FC", "1B506A", "08375D", "0B568F", "E5F4FF", "1D3448", "EEF9FD", "BCDBE7", "8FA3B3"]) assert.ok(!xlsx.includes(`'${v}'`) && !xlsx.includes(`:${v}'`), `orderXlsx.mjs に ${v}`);
+  // 受注簿の丸・四角は緑
+  assert.match(css, /\.orderEntrySheet input\[type="radio"\],\n\.orderEntrySheet input\[type="checkbox"\] \{\n  accent-color: #15803d;/);
 });
