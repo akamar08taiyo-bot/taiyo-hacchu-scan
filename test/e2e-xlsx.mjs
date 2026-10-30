@@ -263,6 +263,63 @@ for (const [name, userAgent, refuse] of [
   await ctx.close();
 }
 
+// 6) 見積書の窓の「閉じる」（ユーザーの指示「閉じるボタンがほしい」2026-10-30）：直していなければすぐ閉じる。
+//    打ち直し・行の追加のあと保存していなければ聞く（キャンセルなら残る）。PDF保存・Excel保存のあとは聞かない。単品・複数商品の両方
+for (const products of [[['シャワーチェア 見本A', 'A-100', 15800, 9480]], [['シャワーチェア 見本A', 'A-100', 15800, 9480], ['浴槽台 見本B', 'B-200', 12000, 7200]]]) {
+  const ctx = await browser.newContext({viewport: {width: 1366, height: 900}, locale: 'ja-JP'});
+  await ctx.route('https://cdn.jsdelivr.net/**', (r) => r.abort());
+  const page = await ctx.newPage();
+  page.on('dialog', (d) => d.accept());
+  page.on('pageerror', (e) => console.log('pageerror', e.message));
+  await fillOrder(page, products);
+  const open = async () => {
+    const [pop] = await Promise.all([ctx.waitForEvent('page'), page.getByRole('button', {name: '見積もり作成'}).click()]);
+    await pop.waitForLoadState();
+    await pop.waitForTimeout(800);
+    const asked = [];
+    pop.on('dialog', (d) => {
+      asked.push(d.message());
+      pop.__answer === 'dismiss' ? d.dismiss() : d.accept();
+    });
+    return {pop, asked};
+  };
+  const close = (pop) => Promise.all([pop.waitForEvent('close', {timeout: 5000}), pop.locator('#closeButton').click()]);
+  let {pop, asked} = await open();
+  for (const width of [1366, 820, 390]) {
+    await pop.setViewportSize({width, height: 700});
+    const r = await pop.evaluate(() => ({right: document.querySelector('#closeButton').getBoundingClientRect().right, sw: document.documentElement.scrollWidth}));
+    assert.ok(r.right <= width && r.sw <= width, `${width}px で「閉じる」が窓の中・横にはみ出さない`);
+  }
+  await close(pop);
+  assert.equal(asked.length, 0, '直していなければ聞かない');
+  ({pop, asked} = await open());
+  await pop.locator('[data-field="quantity"], [data-field="quantity-0"]').first().click();
+  await pop.keyboard.press('Control+A');
+  await pop.keyboard.type('２');
+  pop.__answer = 'dismiss';
+  await pop.locator('#closeButton').click();
+  await pop.waitForTimeout(600);
+  assert.equal(asked.length, 1);
+  assert.match(asked[0], /保存していません/);
+  assert.ok(!pop.isClosed(), 'キャンセルなら閉じない');
+  // PDF は受注簿の画面の jsPDF で保存するので、保存は受注簿の画面に来る
+  await Promise.all([page.waitForEvent('download', {timeout: 60000}), pop.locator('#pdfButton').click()]);
+  await close(pop);
+  assert.equal(asked.length, 1, 'PDF保存のあとは聞かない');
+  ({pop, asked} = await open());
+  await pop.locator('#addRowButton').click();
+  await close(pop);
+  assert.equal(asked.length, 1, '行を足したら聞く（OK で閉じる）');
+  ({pop, asked} = await open());
+  await pop.locator('#addRemarkButton').click();
+  await Promise.all([pop.waitForEvent('download'), pop.locator('#xlsxButton').click()]);
+  await close(pop);
+  assert.equal(asked.length, 0, 'Excel保存のあとは聞かない');
+  assert.ok(!page.isClosed(), '受注簿の画面は残る');
+  console.log(`見積書（${products.length === 1 ? '単品' : '複数'}）の閉じる: OK`);
+  await ctx.close();
+}
+
 await browser.close();
 server.close();
 console.log('保存したファイル:', out);

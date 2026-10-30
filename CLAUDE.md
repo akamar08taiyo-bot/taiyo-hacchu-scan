@@ -37,6 +37,7 @@
   上の段の「💾 保存」→「📗 Excelで保存」（`xlsxDownload`）は、PDF と同じく印刷CSSで見えているシート（1点1ページ＋集計）を読んで .xlsx にする（`src/lib/orderXlsx.mjs`）。
   見積書の窓の「PDF保存」の右の「Excel保存」は、受注簿の画面の `window.__taiyoXlsx.estimate(document)` で、その窓の中身（打ち直した値も）を .xlsx にする
   （`src/lib/estimateXlsx.mjs`。単品・複数商品の両方。明細が多ければ2・3ページと続き、明細の見出しを各ページの上にくり返す）。
+  見積書の窓の上の段の右の端に「閉じる」（`#closeButton`。直したあと印刷・PDF・Excelで保存していなければ聞いてから閉じる。Learnings.md 第51項）。
   書き出しの部品は `src/lib/xlsxBook.mjs`（特定福祉用具の xlsxBook.ts を写したもの＋画像・拡大縮小・改ページ・印刷タイトル。zip は無圧縮で自前）。
   作り方・確かめ方は特定福祉用具のリポジトリの taiyo-excel-export スキル。印刷・PDF の見た目を変えたら、Excel の位置（mm）・色も合わせて直す。
 - **上の段と色合い**（ユーザーの指示「上のタブは、印刷、保存、メール、見積もり作成、設定のみにする」「色合いも、見積もり・申請書アプリと全く同じ、緑ベース（書式なども）に統一する」2026-10-28。Learnings.md 第45〜48項）：

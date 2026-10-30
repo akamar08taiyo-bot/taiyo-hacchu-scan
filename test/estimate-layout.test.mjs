@@ -366,3 +366,16 @@ test("商品が2つ以上の見積書のPDFも、画面の幅によらず同じ�
   assert.match(source, /finally\{[^}]*classList\.remove\("pdfExport"\);window\.dispatchEvent\(new Event\("estimatelayoutchange"\)\);\}/);
   assert.match(source, /window\.addEventListener\('estimatelayoutchange',autoFitEstimateItems\)/);
 });
+
+test("見積書の窓に「閉じる」があり、保存していない直しがあるときだけ確かめてから閉じる", () => {
+  // 上の段の右の端（お知らせのあと）。900px 以下はお知らせを最後の段にして、閉じるはボタンの並びの右の端に残す
+  assert.match(source, /明細行は × で削除できます<\/span><button type="button" id="closeButton">閉じる<\/button><\/div>/);
+  assert.match(source, /\.toolbar\{flex-wrap:wrap\}\.editHint\{order:1;width:100%;margin-left:0\}\.toolbar #closeButton\{margin-left:auto\}\}/);
+  // 打ち直し・行の追加・削除で「保存していない」、印刷・PDF・Excel のあとは「保存した」
+  assert.match(source, /document\.addEventListener\("input",function\(\)\{estUnsaved=true\}\)/);
+  assert.match(source, /closest\("#addRowButton,#addRemarkButton,\.rowDelete"\)\)estUnsaved=true/);
+  assert.match(source, /window\.print\(\);estUnsaved=false/);
+  assert.match(source, /pdf\.save\(name\+"\.pdf"\);estUnsaved=false;/);
+  assert.match(source, /x\.estimate\(document\);estUnsaved=false;/);
+  assert.match(source, /if\(estUnsaved&&!confirm\("[^"]+"\)\)return;window\.close\(\);/);
+});
