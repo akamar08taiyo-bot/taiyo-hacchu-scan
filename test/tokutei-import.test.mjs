@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { applyPriceEdit, orderPriceTotals } from "../src/lib/orderPricing.mjs";
 
 const source = readFileSync(new URL("../src/main.jsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
@@ -167,11 +168,15 @@ test("ページの給付内訳は、特定福祉用具のアプリが分けた�
   assert.equal(calc[0].userBurden + calc[1].userBurden, 2781); // 見積書の利用者負担（27,808円の1割の切り上げ）
 
   // 受注簿で金額・数量・給付割合・商品名を直したら、ふつうの計算に戻る
-  const edited = [{ ...pages[1], quantity: "2" }, { ...pages[1], burdenRatio: 2 }, { ...pages[1], productName: "浴槽台 見本B2" }, { ...pages[1], manualGrandTotalTaxIn: "13000" }];
+  const edited = [{ ...pages[1], quantity: "2" }, { ...pages[1], burdenRatio: 2 }, { ...pages[1], productName: "浴槽台 見本B2" }];
   assert.deepEqual(
     edited.map((p) => benefitCalc(p, totalsOf(p)).userBurden),
-    [2781, 2781, 1391, 1300],
+    [2781, 2781, 1391],
   );
+  // 合計金額（税込）を13,000円と打つと、販売単価も割り戻す（受注簿の画面と同じ計算の合計で給付を出す）
+  const typed13000 = applyPriceEdit(pages[1], "grandTotalTaxIn", "13000");
+  assert.equal(orderPriceTotals(typed13000).grandTotalTaxIn, 13000);
+  assert.equal(benefitCalc(typed13000, orderPriceTotals(typed13000)).userBurden, 1300);
   // ほかの給付のページ（手で入れたもの）は今までどおり
   const manual = { orderType: "給付", burdenRatio: 3, saleUnitPrice: 82, quantity: "1", taxType: "10%", careInsuranceBalance: 200000 };
   assert.deepEqual([benefitCalc(manual, totalsOf(manual)).userBurden, benefitCalc(manual, totalsOf(manual)).insurerBurden], [27, 62]);
