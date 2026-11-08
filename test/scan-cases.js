@@ -223,6 +223,18 @@ const cases = [
       catalogNumber: 'T0767',
     },
   },
+  {
+    // 表示倍率1の小さな字の画面では「35,000」の「,」を「.」と読む（Learnings.md 第36項）。円の前の3桁ごとの「.」は「,」とみる。
+    // 金額・品名は架空（見本）
+    name: '見本の商品（小売価格・卸売価格の「,」が「.」に読まれる）',
+    lines: kaientaiPage({
+      title: '見本 シャワーチェア ミドル/MH-0001 ブルー',
+      catalogNumber: 'S9990', maker: '見本メーカー',
+      jan: '4900000000017', webCode: '999901', tais: '',
+      retail: '35.000円', wholesale: '21.000円',
+    }),
+    expect: { listPrice: 35000, cost: 21000, catalogNumber: 'S9990', webCode: '999901' },
+  },
 ];
 
 module.exports = { cases, kaientaiPage };
