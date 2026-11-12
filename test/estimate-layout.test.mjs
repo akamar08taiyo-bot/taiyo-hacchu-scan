@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { applyPriceEdit, orderPriceTotals, priceOverrides } from "../src/lib/orderPricing.mjs";
 
 const source = readFileSync(new URL("../src/main.jsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
@@ -133,7 +134,8 @@ function loadEstimateBuilders() {
     assert.ok(from > 0 && to > from, `${startText} 〜 ${endText} が見つからない`);
     return source.slice(from, to);
   };
-  return new Function([
+  // 手入力の合計を使うかどうかは、受注簿と同じ priceOverrides（src/lib/orderPricing.mjs）で決める
+  return new Function("priceOverrides", [
     "var simpleEstimateHtml, simpleEstimateHtmlReadable, latestEstimateItems = [];",
     "var sanitizeScanSize=function(v){return String(v||'')};",
     // 複数商品の集計は受注簿側（multiProductTotals）で作る。テストでは allTotals として渡す
@@ -144,7 +146,7 @@ function loadEstimateBuilders() {
     "var single=simpleEstimateHtmlReference;",
     slice("function estimateHtmlEscape(value)", "simpleEstimateHtml = simpleEstimateHtmlReadable;"),
     "return {single:single, multi:simpleEstimateHtmlReadable};",
-  ].join("\n"))();
+  ].join("\n"))(priceOverrides);
 }
 const builders = loadEstimateBuilders();
 const buildEstimate = builders.single;
@@ -154,6 +156,8 @@ const field = (html, name) => {
   const m = html.match(new RegExp(`data-field="${name}">([^<]*)<`));
   return m ? m[1].replace(/&nbsp;|&mdash;/g, "").trim() : null;
 };
+// 受注簿の欄を打った結果の受注簿と合計（画面と同じ $e）で見積書を作る
+const typed = (order, field, value) => { const next = applyPriceEdit(order, field, value); return buildEstimate(next, orderPriceTotals(next), null, {}); };
 const amounts = (html) => ({
   header: field(html, "grandTotalTaxIn"),
   unitPrice: field(html, "unitPrice"),
@@ -198,7 +202,9 @@ test("受注簿で合計金額を手入力で直すと、見積書の御見積�
     header: yen(100000), unitPrice: yen(90909), amount: yen(90909), tax: yen(9091),
     subtotal: yen(90909), taxTotal: yen(9091), grandTotal: yen(100000),
   };
-  assert.deepEqual(amounts(buildEstimate({ ...toiletOrder, manualGrandTotalTaxIn: "100000" }, { saleTotal: 98400, shippingFee: 0 }, null, {})), rounded);
+  // 受注簿の「合計金額（税込）」に100,000円と打つと、販売単価を割り戻す（90,909円＋税は99,999円なので、100,000円は打った金額のまま残す）
+  assert.deepEqual(amounts(typed(toiletOrder, "grandTotalTaxIn", "100000")), rounded);
+  assert.deepEqual(applyPriceEdit(toiletOrder, "grandTotalTaxIn", "100000").saleUnitPrice, 90909);
   // 販売金額を90,909円にしたうえで合計を100,000円に直した：販売金額はそのまま、端数1円を消費税で合わせる
   assert.deepEqual(amounts(buildEstimate({ ...toiletOrder, saleUnitPrice: 90909, manualGrandTotalTaxIn: "100000" }, { saleTotal: 90909, shippingFee: 0 }, null, {})), rounded);
   // 手入力した値が自動計算と同じなら、明細は1円も動かさない
@@ -209,7 +215,7 @@ test("受注簿で合計金額を手入力で直すと、見積書の御見積�
   // 空欄に戻したら自動計算へ戻る
   assert.equal(field(buildEstimate({ ...toiletOrder, manualGrandTotalTaxIn: "" }, { saleTotal: 98400, shippingFee: 0 }, null, {}), "grandTotalTaxIn"), yen(108240));
   // 送料込合計（税抜）を直したときは、それを小計にする
-  assert.deepEqual(amounts(buildEstimate({ ...toiletOrder, manualGrandTotalTaxOut: "90000" }, { saleTotal: 98400, shippingFee: 0 }, null, {})), {
+  assert.deepEqual(amounts(typed(toiletOrder, "grandTotalTaxOut", "90000")), {
     header: yen(99000), unitPrice: yen(90000), amount: yen(90000), tax: yen(9000),
     subtotal: yen(90000), taxTotal: yen(9000), grandTotal: yen(99000),
   });
@@ -219,7 +225,7 @@ test("送料がある見積書でも、受注簿と同じく送料は10%で計�
   const withShipping = { ...toiletOrder, shippingFee: "1000" };
   const shippingRow = (html) => [field(html, "shippingAmount"), field(html, "shippingTax")];
   // 合計金額（税込）を110,000円に直した：送料はそのまま、商品行で合計に合わせる
-  const html = buildEstimate({ ...withShipping, manualGrandTotalTaxIn: "110000" }, { saleTotal: 98400, shippingFee: 1000 }, null, {});
+  const html = typed(withShipping, "grandTotalTaxIn", "110000");
   assert.deepEqual(shippingRow(html), [yen(1000), yen(100)]);
   assert.deepEqual(amounts(html), {
     header: yen(110000), unitPrice: yen(99000), amount: yen(99000), tax: yen(9900),

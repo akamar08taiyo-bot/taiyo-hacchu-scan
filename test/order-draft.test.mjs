@@ -30,7 +30,9 @@ test("次に開いたとき「続きから」か「新しく」を選べる", ()
   assert.match(source, /if\(draftOffer\|\|TOKUTEI_SCAN\)return;/);
   // 続きから：受注簿・商品ページ・現在ページ・画像を戻す
   assert.match(source, /function acceptOrderDraft\(\)/);
-  assert.match(source, /setMultiSaved\(Array\.isArray\(saved\.multiSaved\)\?saved\.multiSaved:\[\]\)/);
+  // 前の版の下書きは、手入力の合計から販売単価などを求め直してそろえる（Learnings.md 第53項）
+  assert.match(source, /t\(adoptLegacyManualTotals\(\{\.\.\.Be,\.\.\.\(saved\.order\|\|\{\}\)\}\)\)/);
+  assert.match(source, /setMultiSaved\(Array\.isArray\(saved\.multiSaved\)\?saved\.multiSaved\.map\(adoptLegacyManualTotals\):\[\]\)/);
   assert.match(source, /if\(saved\.image\)a\(saved\.image\)/);
   // 新しく：押し間違いで失わないよう一度確認してから消す
   assert.match(source, /function discardOrderDraft\(\)/);
