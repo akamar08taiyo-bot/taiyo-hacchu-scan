@@ -202,7 +202,7 @@ test("受注簿で合計金額を手入力で直すと、見積書の御見積�
     header: yen(100000), unitPrice: yen(90909), amount: yen(90909), tax: yen(9091),
     subtotal: yen(90909), taxTotal: yen(9091), grandTotal: yen(100000),
   };
-  // 受注簿の「合計金額（税込）」に100,000円と打つと、販売単価を割り戻す（90,909円＋税は99,999円なので、100,000円は打った金額のまま残す）
+  // 受注簿の「合計金額（税込）」に100000円と打つと、販売単価を割り戻す（90909円＋税は99999円なので、100000円は打った金額のまま残す）
   assert.deepEqual(amounts(typed(toiletOrder, "grandTotalTaxIn", "100000")), rounded);
   assert.deepEqual(applyPriceEdit(toiletOrder, "grandTotalTaxIn", "100000").saleUnitPrice, 90909);
   // 販売金額を90,909円にしたうえで合計を100,000円に直した：販売金額はそのまま、端数1円を消費税で合わせる

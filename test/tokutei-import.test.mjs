@@ -173,7 +173,7 @@ test("ページの給付内訳は、特定福祉用具のアプリが分けた�
     edited.map((p) => benefitCalc(p, totalsOf(p)).userBurden),
     [2781, 2781, 1391],
   );
-  // 合計金額（税込）を13,000円と打つと、販売単価も割り戻す（受注簿の画面と同じ計算の合計で給付を出す）
+  // 合計金額（税込）を13000円と打つと、販売単価も割り戻す（受注簿の画面と同じ計算の合計で給付を出す）
   const typed13000 = applyPriceEdit(pages[1], "grandTotalTaxIn", "13000");
   assert.equal(orderPriceTotals(typed13000).grandTotalTaxIn, 13000);
   assert.equal(benefitCalc(typed13000, orderPriceTotals(typed13000)).userBurden, 1300);
