@@ -283,7 +283,14 @@ for (const products of [[['シャワーチェア 見本A', 'A-100', 15800, 9480]
     });
     return {pop, asked};
   };
-  const close = (pop) => Promise.all([pop.waitForEvent('close', {timeout: 5000}), pop.locator('#closeButton').click()]);
+  // 「閉じる」を押すと窓がすぐ閉じるので、クリックの終わりの確かめより先に窓がなくなることがある（そのときの「閉じた」は正しい）。窓が閉じたかで見る
+  const close = (pop) =>
+    Promise.all([
+      pop.waitForEvent('close', {timeout: 5000}),
+      pop.locator('#closeButton').click({noWaitAfter: true}).catch((e) => {
+        if (!pop.isClosed()) throw e;
+      }),
+    ]);
   let {pop, asked} = await open();
   for (const width of [1366, 820, 390]) {
     await pop.setViewportSize({width, height: 700});
