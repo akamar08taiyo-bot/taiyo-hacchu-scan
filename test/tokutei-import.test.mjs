@@ -267,4 +267,18 @@ test("承認した見積もり（自動で送られた列 taiyo-hacchu-import-qu
   clearJutakuImport(direct);
   assert.equal(store.has("taiyo-hacchu-import-v1"), false);
   assert.equal(readJutakuImport().customerName, "見本 三郎");
+  // 承認で列に入った案件を「📤 販売受注簿に転記」でも送ったとき：受け取り口から入れたら、列の同じ案件（saleId）も消す（2回出さない）
+  store.delete("taiyo-hacchu-import-queue-v1");
+  store.set("taiyo-hacchu-import-queue-v1", JSON.stringify([order("s4", now - 5000, "見本 四郎"), order("s5", now - 4000, "見本 五郎")]));
+  store.set("taiyo-hacchu-import-v1", JSON.stringify(order("s4", now, "見本 四郎")));
+  const again = readJutakuImport();
+  assert.equal(again.fromQueue, undefined);
+  clearJutakuImport(again);
+  assert.deepEqual(JSON.parse(store.get("taiyo-hacchu-import-queue-v1")).map((d) => d.saleId), ["s5"]);
+  // saleId のない前の版の送り手：受け取り口だけを消す（列は触らない）
+  const { saleId: _drop, ...old } = order("x", now, "見本 六子");
+  store.set("taiyo-hacchu-import-v1", JSON.stringify(old));
+  clearJutakuImport(readJutakuImport());
+  assert.equal(store.has("taiyo-hacchu-import-v1"), false);
+  assert.deepEqual(JSON.parse(store.get("taiyo-hacchu-import-queue-v1")).map((d) => d.saleId), ["s5"]);
 });

@@ -31,8 +31,11 @@ test("次に開いたとき「続きから」か「新しく」を選べる", ()
   // 続きから：受注簿・商品ページ・現在ページ・画像を戻す
   assert.match(source, /function acceptOrderDraft\(\)/);
   // 前の版の下書きは、手入力の合計から販売単価などを求め直してそろえる（Learnings.md 第53項）
-  assert.match(source, /t\(adoptLegacyManualTotals\(\{\.\.\.Be,\.\.\.\(saved\.order\|\|\{\}\)\}\)\)/);
-  assert.match(source, /setMultiSaved\(Array\.isArray\(saved\.multiSaved\)\?saved\.multiSaved\.map\(adoptLegacyManualTotals\):\[\]\)/);
+  // 手入力の合計から販売単価を求め直すのは、印（pricing:2）のない前の版の下書きだけ（今の版の下書きで古い合計が生き返らないように）
+  assert.match(source, /pricing:2,/);
+  assert.match(source, /let legacy=Number\(saved\.pricing\)>=2\?\(o=>o\):adoptLegacyManualTotals;/);
+  assert.match(source, /t\(legacy\(\{\.\.\.Be,\.\.\.\(saved\.order\|\|\{\}\)\}\)\)/);
+  assert.match(source, /setMultiSaved\(Array\.isArray\(saved\.multiSaved\)\?saved\.multiSaved\.map\(legacy\):\[\]\)/);
   assert.match(source, /if\(saved\.image\)a\(saved\.image\)/);
   // 新しく：押し間違いで失わないよう一度確認してから消す
   assert.match(source, /function discardOrderDraft\(\)/);
